@@ -113,38 +113,67 @@ Utilizzando il meccanismo while True: per realizzare un ciclo infinito:
 
 #   print(f"Lunghezza sequenza crescente più lunga: {max_lun}")
 
-
 """
 8. Bonus: calcolare la lunghezza della più lunga sequenza di numeri
 che si alternano: maggiore del precedente, minore del precedente,
 Esempio: (3 2 5 6 10 1 2 7 0): 3 (3 2 5 poiché 3>2, 2<5, )
 """
 
-# Inserire sempre tre numeri alla volta alternati:
-# primo < secondo e secondo > terzo
-# Ciò aumenta la sequenza
+# Ad ogni iterazione verificare la sua direzione che sia diversa da quella precedente
+# In questo caso aumentare la sequenza. Viceversa, reimpostarla.
+# Alla fine stampare la sequenza più lunga trovata
 
-lun = 1
-sequence = []
-primo = int(input("Inserisci un numero: "))
+# lun = 0
+# sequence = [int(input("Inserisci un numero: "))]
+# currentValue = sequence[0]
+# prevValue = currentValue
+# currentDirection = ""
+# prevDirection = currentDirection
 
-while True:
-    secondo = int(input("Inserisci un numero: "))
+# while True:
 
-    if primo < secondo or primo > secondo:
-        terzo = int(input("Inserisci il terzo numero: "))
-        if terzo < secondo:
-            lun += 1
-            sequence.append(primo)
-            sequence.append(secondo)
-            sequence.append(terzo)
-    else:
-        print("Riavvio della sequenza\n")
-        lun = 0
-        sequence = []
+#     if not len(sequence) > 1:
+#         currentValue = int(input("Inserisci un altro numero: "))
 
-    print(f"Lunghezza sequenza alternata più lunga: {lun}, con sequenza {sequence}")
+#     else:
+#         """
+#         Caso in cui il primo numero è maggiore del secondo
+#         """
+#         if currentValue > prevValue:
+#             lun += 1
+#             currentDirection = "mag"
+#             prevValue = currentValue
+#             currentValue = int(input("Inserisci un altro numero: "))
 
+#             if currentValue < prevValue:
+#                 lun += 1
+#                 currentDirection = "min"
+#                 prevValue = currentValue
+#             else:
+#                 print("Riavvio della sequenza\n")
+#                 lun = 0
+#                 sequence = []
+
+#       #elif:
+#         """
+#       Caso in cui il primo numero è minore del secondo
+#       """
+#         if currentValue < prevValue:
+#             lun += 1
+#             currentDirection = "min"
+#             prevValue = currentValue
+
+#             if currentValue > prevValue:
+#                 lun += 1
+#                 currentDirection = "mag"
+#                 prevValue = currentValue
+
+#             else:
+#                 print("Riavvio della sequenza\n")
+#                 lun = 0
+#                 sequence = []
+
+#         print(f"Lunghezza sequenza alternata più lunga: {lun}, con sequenza {sequence}")
 
 
 """
