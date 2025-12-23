@@ -1,0 +1,127 @@
+[
+    {
+        "label": "pyfiglet",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pyfiglet",
+        "description": "pyfiglet",
+        "detail": "pyfiglet",
+        "documentation": {}
+    },
+    {
+        "label": "colored",
+        "importPath": "termcolor",
+        "description": "termcolor",
+        "isExtraImport": true,
+        "detail": "termcolor",
+        "documentation": {}
+    },
+    {
+        "label": "num1",
+        "kind": 5,
+        "importPath": "20251222_01_mag_min",
+        "description": "20251222_01_mag_min",
+        "peekOfCode": "num1 = int(input(\"Inserisci il primo numero: \"))\nnum2 = int(input(\"Inserisci il secondo numero: \"))\nif num1 > num2:\n    print(f\"Il primo numero {num1 = } è più grande\")\nelif num1 < num2:\n    print(f\"Il secondo numero {num2 = } è più grande\")\nelse:\n    print(f\"Entrambi i numeri numero {num1} sono uguali\")",
+        "detail": "20251222_01_mag_min",
+        "documentation": {}
+    },
+    {
+        "label": "num2",
+        "kind": 5,
+        "importPath": "20251222_01_mag_min",
+        "description": "20251222_01_mag_min",
+        "peekOfCode": "num2 = int(input(\"Inserisci il secondo numero: \"))\nif num1 > num2:\n    print(f\"Il primo numero {num1 = } è più grande\")\nelif num1 < num2:\n    print(f\"Il secondo numero {num2 = } è più grande\")\nelse:\n    print(f\"Entrambi i numeri numero {num1} sono uguali\")",
+        "detail": "20251222_01_mag_min",
+        "documentation": {}
+    },
+    {
+        "label": "a",
+        "kind": 5,
+        "importPath": "20251222_02_varie",
+        "description": "20251222_02_varie",
+        "peekOfCode": "a = [1, \"Ciao\", 45, [1,2,3], [\"aaa\", \"bbb0\"]]\nprint(a)\nprint(a[1])",
+        "detail": "20251222_02_varie",
+        "documentation": {}
+    },
+    {
+        "label": "num1",
+        "kind": 5,
+        "importPath": "20251222_03_maxnum",
+        "description": "20251222_03_maxnum",
+        "peekOfCode": "num1 = int(input(\"Inserire numero 1: \"))\nnum2 = int(input(\"Inserire numero 2: \"))\nnum3 = int(input(\"Inserire numero 3: \"))\nnum4 = int(input(\"Inserire numero 4: \"))\n\"\"\"\nVariante 1\n\"\"\"\n\"\"\"\nif num1 > num2 and num1 > num3 and num1 > num4:\n    print(f\"Il numero 1 più grande è {num1}\")",
+        "detail": "20251222_03_maxnum",
+        "documentation": {}
+    },
+    {
+        "label": "num2",
+        "kind": 5,
+        "importPath": "20251222_03_maxnum",
+        "description": "20251222_03_maxnum",
+        "peekOfCode": "num2 = int(input(\"Inserire numero 2: \"))\nnum3 = int(input(\"Inserire numero 3: \"))\nnum4 = int(input(\"Inserire numero 4: \"))\n\"\"\"\nVariante 1\n\"\"\"\n\"\"\"\nif num1 > num2 and num1 > num3 and num1 > num4:\n    print(f\"Il numero 1 più grande è {num1}\")\nelif num2 > num1 and num2 > num3 and num2 > num4:",
+        "detail": "20251222_03_maxnum",
+        "documentation": {}
+    },
+    {
+        "label": "num3",
+        "kind": 5,
+        "importPath": "20251222_03_maxnum",
+        "description": "20251222_03_maxnum",
+        "peekOfCode": "num3 = int(input(\"Inserire numero 3: \"))\nnum4 = int(input(\"Inserire numero 4: \"))\n\"\"\"\nVariante 1\n\"\"\"\n\"\"\"\nif num1 > num2 and num1 > num3 and num1 > num4:\n    print(f\"Il numero 1 più grande è {num1}\")\nelif num2 > num1 and num2 > num3 and num2 > num4:\n    print(f\"Il numero 2 più grande è {num2}\")",
+        "detail": "20251222_03_maxnum",
+        "documentation": {}
+    },
+    {
+        "label": "num4",
+        "kind": 5,
+        "importPath": "20251222_03_maxnum",
+        "description": "20251222_03_maxnum",
+        "peekOfCode": "num4 = int(input(\"Inserire numero 4: \"))\n\"\"\"\nVariante 1\n\"\"\"\n\"\"\"\nif num1 > num2 and num1 > num3 and num1 > num4:\n    print(f\"Il numero 1 più grande è {num1}\")\nelif num2 > num1 and num2 > num3 and num2 > num4:\n    print(f\"Il numero 2 più grande è {num2}\")\nelif num3 > num1 and num3 > num2 and num3 > num4:",
+        "detail": "20251222_03_maxnum",
+        "documentation": {}
+    },
+    {
+        "label": "maxnum",
+        "kind": 5,
+        "importPath": "20251222_03_maxnum",
+        "description": "20251222_03_maxnum",
+        "peekOfCode": "maxnum = 0\nif num1 > num2:\n    maxnum = num1\n    print(f\"num1 è più grande e vale {num1}\")\nelse:\n    if num2 > num3:\n        maxnum = num3\n        print(f\"num2 è più grande e vale {num2}\")\n    else:\n        if num3 > num4:",
+        "detail": "20251222_03_maxnum",
+        "documentation": {}
+    },
+    {
+        "label": "numeri",
+        "kind": 5,
+        "importPath": "20251222_03_while",
+        "description": "20251222_03_while",
+        "peekOfCode": "numeri = [1, 5, 6, 743, 2, 45, 7, 7356, 8, 845, 34, 256, 7, 84]\n# numeri = [1, 2, 3]\nposizione = 0\nsomma = 0.0\nwhile True:\n    if posizione >= len(numeri):\n        break\n    valore = numeri[posizione]\n    if valore % 2 == 0:\n        print(f\"{valore} è pari\")",
+        "detail": "20251222_03_while",
+        "documentation": {}
+    },
+    {
+        "label": "posizione",
+        "kind": 5,
+        "importPath": "20251222_03_while",
+        "description": "20251222_03_while",
+        "peekOfCode": "posizione = 0\nsomma = 0.0\nwhile True:\n    if posizione >= len(numeri):\n        break\n    valore = numeri[posizione]\n    if valore % 2 == 0:\n        print(f\"{valore} è pari\")\n    else:\n        print(f\"{valore} è dispari\")",
+        "detail": "20251222_03_while",
+        "documentation": {}
+    },
+    {
+        "label": "somma",
+        "kind": 5,
+        "importPath": "20251222_03_while",
+        "description": "20251222_03_while",
+        "peekOfCode": "somma = 0.0\nwhile True:\n    if posizione >= len(numeri):\n        break\n    valore = numeri[posizione]\n    if valore % 2 == 0:\n        print(f\"{valore} è pari\")\n    else:\n        print(f\"{valore} è dispari\")\n    somma += valore",
+        "detail": "20251222_03_while",
+        "documentation": {}
+    },
+    {
+        "label": "banner_personalizzato",
+        "kind": 2,
+        "importPath": "20251222_04_hey",
+        "description": "20251222_04_hey",
+        "peekOfCode": "def banner_personalizzato(afont):\n    testo = \"Hey\"\n    # 'slant' è uno dei font più popolari, ma ce ne sono centinaia\n    ascii_art = pyfiglet.figlet_format(testo, font=afont)\n    # Stampa il banner in blu\n    banner_colorato = colored(ascii_art, \"blue\")\n    print(banner_colorato)\nbanner_personalizzato(\"slant\")\nbanner_personalizzato(\"block\")\nbanner_personalizzato(\"bubble\")",
+        "detail": "20251222_04_hey",
+        "documentation": {}
+    }
+]
