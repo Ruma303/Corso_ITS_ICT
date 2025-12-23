@@ -116,30 +116,56 @@ Utilizzando il meccanismo while True: per realizzare un ciclo infinito:
 
 """
 8. Bonus: calcolare la lunghezza della più lunga sequenza di numeri
- che si alternano: maggiore del precedente, minore del precedente,
- Esempio: (3 2 5 6 10 1 2 7 0): 3 (3 2 5 poiché 3>2, 2<5, )
+che si alternano: maggiore del precedente, minore del precedente,
+Esempio: (3 2 5 6 10 1 2 7 0): 3 (3 2 5 poiché 3>2, 2<5, )
 """
 
 # Inserire sempre tre numeri alla volta alternati:
 # primo < secondo e secondo > terzo
 # Ciò aumenta la sequenza
-# lun = 0
-# sequence = []
+
+lun = 1
+sequence = []
+primo = int(input("Inserisci un numero: "))
+
+while True:
+    secondo = int(input("Inserisci un numero: "))
+
+    if primo < secondo or primo > secondo:
+        terzo = int(input("Inserisci il terzo numero: "))
+        if terzo < secondo:
+            lun += 1
+            sequence.append(primo)
+            sequence.append(secondo)
+            sequence.append(terzo)
+    else:
+        print("Riavvio della sequenza\n")
+        lun = 0
+        sequence = []
+
+    print(f"Lunghezza sequenza alternata più lunga: {lun}, con sequenza {sequence}")
+
+
+
+"""
+9. Double bonus: cercare se una specifica sottosequenza
+data a priori (es: 1, 5, 3, 7)
+è presente nella sequenza di numeri fornita da tastiera
+"""
+
+# seq = [1, 5, 3, 7]
+# comparison = []
 
 # while True:
-#     primo = int(input("Inserisci il primo numero: "))
-#     secondo = int(input("Inserisci il secondo numero: "))
+#   number = int(input("Inserisci un numero: "))
+#   comparison.append(number)
+#   print(comparison)
 
-#     if primo < secondo:
-#         terzo = int(input("Inserisci il terzo numero: "))
-#         if terzo < secondo:
-#             lun += 1
-#             sequence.append(primo)
-#             sequence.append(secondo)
-#             sequence.append(terzo)
-#     else:
-#         print("Riavvio della sequenza\n")
-#         lun = 0
-#         sequence = []
-
-#     print(f"Lunghezza sequenza alternata più lunga: {lun}, con sequenza {sequence}")
+#   if all(item in seq for item in comparison):
+#     print(f"I numeri {comparison} appartengono alla sequenza iniziale {seq}")
+#   else:
+#     print(f"{number} non fa parte della sequenza")
+#     comparison.pop()
+#     # del comparison[len(comparison) - 1]
+#     print(f"Tutti gli elementi trovati fino ad ora {comparison}")
+#     break
