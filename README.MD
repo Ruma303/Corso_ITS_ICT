@@ -8,6 +8,24 @@ In alto a destra di questo file, potete trovare un'icona con una lente di ingran
 
 ---
 
+## Note accademiche
+
+Per convenzione creeiamo i nomi dei file con questa struttura:
+
+YYYYMMDD_NUMEROINCREMENTALE_TITOLO.py
+
+Dove:
+- YYYYMMDD è la data in formato anno, mese, giorno (es. 20240612 per il 12 giugno 2024)
+- NUMEROINCREMENTALE è un numero che aumenta di 1 per ogni file creato  (es. 01, 02, 03, ...)
+- TITOLO è una breve descrizione del contenuto del file, separata da underscore (_)
+
+Esempi di file:
+- 20240612_01_Hello_World.py
+- 20240612_02_Calcolatrice.py
+- 20240612_03_Gestore_File.py
+
+---
+
 ## Utility varie
 
 ### Charmap e caratteri speciali
@@ -61,13 +79,13 @@ Git è uno strumento fondamentale per il versionamento del codice sorgente. Perm
 1. Installare Git: https://git-scm.com/install/windows
 2. Su questa macchina potete farlo solo da terminale. Esempio, aprite PowerShell e digitate:
 
-winget install --id Git.Git -e --source winget
+`winget install --id Git.Git -e --source winget`
 
 3. Alla fine verificate che Git sia installato con il comando: git --version
 4. Configurate Git con il vostro nome e email (quelli che appariranno nei commit):
 
-    git config --global user.name "Your Name"
-    git config --global user.email "
+    `git config --global user.name "Your Name"`
+    `git config --global user.email "your@email.com"`
 
 (email possibilmente quella dell'accademia)
 
@@ -77,10 +95,10 @@ Volendo, potete vedere il mio codice che si trova su https://github.com/Ruma303/
 
 # Python
 
-1. Installare Python: https://www.python.org/downloads/
+1. Installare Python: https://www.python.org/downloads/, possibilmente via winget da terminale con il comando: `winget install 9NQ7512CXL7T`
 2. Verificare l'installazione aprendo il terminale e digitando: python --version
-3. Python di solito abilita degli alias come py o python3. Potete utilizzare anche questi al posto di python.
-4. Inoltre, Python include già il gestore di pacchetti pip, che useremo per installare le librerie necessarie.
+3. Python di solito abilita degli alias come `py` o `python3`. Potete utilizzare anche questi al posto di python.
+4. Inoltre, Python include già il gestore di pacchetti `pip`, che useremo per installare le librerie necessarie.
 
 ---
 
