@@ -15,8 +15,13 @@ numbers = [3, 4, 2, 5, 1, 7]
 for i in range(len(numbers)):
     for j in range(0, len(numbers) - i - 1):
         if numbers[j] > numbers[j + 1]:
-            # Scambio degli elementi
-            numbers[j], numbers[j + 1] = numbers[j + 1], numbers[j]
+            # Scambio tradizionale a tre variabili
+            temp = numbers[j]
+            numbers[j] = numbers[j + 1]
+            numbers[j + 1] = temp
+
+            # Oppure, scambio degli elementi in stile Python
+            # numbers[j], numbers[j + 1] = numbers[j + 1], numbers[j]
 
 print(numbers)
 
