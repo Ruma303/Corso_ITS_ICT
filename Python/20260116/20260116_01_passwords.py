@@ -1,9 +1,14 @@
 """
-Generazione di una password "semplice"
-1. Generazione di un carattere alfabetico casuale
+Generazione di una password "semplice" tramite
+l'unione di caratteri alfabetici casuali
+
+BONUS: Uso di vincoli quali
+1. Es massimo - min tot numeri
+2. Non due caratteri successivi
+3. Lunghezza complessiva non superiore o inferiore ad un intervallo
 """
 
-from random import randint
+from random import randint, shuffle
 
 numbers="0123456789"
 idx=randint(0, len(numbers))
@@ -17,22 +22,14 @@ idx=randint(0, len(alfa_upper))
 special_chars="!@#$%&*,;.:-_+/\\|\"'?^§[](){}"
 idx=randint(0, len(special_chars))
 
-"""
-Creare algoritmi per generare una password
-"""
 
+# Tutti i caratteri (insieme di tutti gli alfabeti)
 all_chars=alfa_upper+alfa_lower+numbers+special_chars
 
-# Test
+# Numero casuale da un alfabeto
 def rand_char(alfa):
   return alfa[randint(0, len(alfa) - 1)]
 
-"""
-Uso di vincoli:
-1. Es massimo - min tot numeri
-2. Non due caratteri successivi
-3. Non
-"""
 
 def password_generator(alfa, /, # Tipo di alfabeto (es solo numeri, solo speciali etc.)
 
