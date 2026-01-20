@@ -321,3 +321,7 @@ restore_points/
 !docker-compose.yml
 !Dockerfile
 !Vagrantfile
+
+
+# Altri
+**/tempCodeRunnerFile.py

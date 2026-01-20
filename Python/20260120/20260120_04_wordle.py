@@ -5,7 +5,6 @@ STRIKE = verdi = lettera giusta in posizione corretta = 2 punti
 BALL = gialli = lettera giusta in posizione sbagliata = 1 punto
 GRAY = grigi = lettera provata ma errata              = 0 punti
 BLACK = neri = lettera non ancora provata
-
 """
 
 
@@ -65,6 +64,7 @@ def calcola(segreta, prova):
       print("gray: ", primo, secondo)
 
     # Lettera non usata
+    # TODO implementare tentativi
     else:
       blacks += 1
       print("black: ", primo, secondo)
@@ -75,6 +75,5 @@ def calcola(segreta, prova):
 calcola(parola, "paralipomeni") # Corrispondenza completa
 calcola(parola, "parailpomeni") # Corrispondenza parziale
 calcola(parola, "03423") # Nessun match
-
 
 calcola("abcabcabc", "cabcbacab") # Nessun match

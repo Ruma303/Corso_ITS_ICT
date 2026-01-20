@@ -26,4 +26,3 @@ def cambia_num_ref(num):
 
 cambia_num_ref(num_ref)
 print(num_ref)
-

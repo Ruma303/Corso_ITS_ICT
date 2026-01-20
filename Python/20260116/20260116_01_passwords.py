@@ -6,10 +6,12 @@ BONUS: Uso di vincoli quali
 1. Es massimo - min tot numeri
 2. Non due caratteri successivi
 3. Lunghezza complessiva non superiore o inferiore ad un intervallo
+4. Altri vincoli a piacere
 """
 
 from random import randint, shuffle, choice
 
+# Alfabeti
 numbers = "0123456789"
 idx = randint(0, len(numbers))
 
@@ -22,7 +24,6 @@ idx = randint(0, len(alfa_upper))
 special_chars = "!@#$%&*,;.:-_+/\\|\"'?^§[](){}"
 idx = randint(0, len(special_chars))
 
-
 # Tutti i caratteri (insieme di tutti gli alfabeti)
 all_chars = alfa_upper + alfa_lower + numbers + special_chars
 
@@ -31,16 +32,11 @@ all_chars = alfa_upper + alfa_lower + numbers + special_chars
 def rand_char(alfa):
     return alfa[randint(0, len(alfa) - 1)]
 
+
 def password_generator(
-    alfa,
-    /,  # Tipo di alfabeto (es solo numeri, solo speciali etc.)
+    # Tipo di alfabeto (es solo numeri, solo speciali etc.)
     min_len=8,
     max_len=8,  # Lunghezza min - max dell'intera password
-    # Vincoli sui set di caratteri
-    can_nums=True,
-    can_chars_lower=True,
-    can_chars_upper=True,
-    can_specials=True,
     # Vincoli lunghezze set di caratteri
     min_nums=1,
     max_nums=1,  # Quantità min - max di numeri
@@ -50,20 +46,38 @@ def password_generator(
     max_char_upper=1,  # Quantità min - max di caratteri maiuscoli
     min_special=1,
     max_special=1,  # Quantità min - max di caratteri speciali
+    # Numero di shuffle
+    shuffle_nums=1,
 ):
+    # Quantità di vincoli, oltre la password stessa
+    constraints_length = max_nums + max_char_lower + max_char_upper + max_special
+    print(f"Vincoli totali: {constraints_length}")
 
-    current_password_length = max_nums + max_char_lower + max_char_upper + max_special
-    # print(f"Vincoli totali: {current_password_length}")
+    # Controllo lunghezza password
+    if min_len > 128 or max_len > 128:
+        print(f"Lunghezza massima della password consentita: 128")
+        min_len = 128
 
     if max_len < min_len:
-        print(
-            f"La lunghezza massima {max_len} non può essere inferiore alla lunghezza minima {min_len}"
-        )
+        print(f"La lunghezza massima {max_len} non può essere inferiore alla lunghezza minima {min_len}")
         max_len = min_len
         print(f"La password sarà lunga {max_len} caratteri")
 
+    # Altri controlli simili
+    if max_nums < min_nums:
+        max_nums = min_nums
+
+    if max_char_lower < min_char_lower:
+        max_char_lower = min_char_lower
+
+    if max_char_upper < min_char_upper:
+        max_char_upper = min_char_upper
+
+    if max_special < min_special:
+        max_special = min_special
+
     password_length = randint(min_len, max_len)
-    print(f"Lunghezza casuale password: {password_length}")
+    print(f"Lunghezza finale password: {password_length}")
 
     # Gestione delle eccezioni
     try:
@@ -72,14 +86,14 @@ def password_generator(
                 f"Per ragioni di sicurezza la lunghezza della password dev'essere di 8 o più caratteri"
             )
 
-        if current_password_length > max_len:
+        if constraints_length > max_len:
             raise Exception(
-                f"L'insieme dei vincoli inseriti {current_password_length} supera la lunghezza della password da generare {max_len}"
+                f"L'insieme dei vincoli inseriti {constraints_length} supera la lunghezza della password da generare {max_len}"
             )
 
-        if min_len < current_password_length < max_len:
+        if not (min_len < constraints_length < max_len):
             raise Exception(
-                f"L'insieme dei vincoli inseriti {current_password_length} dev'essere compreso tra {min_len} e {max_len}"
+                f"La lunghezza della password {constraints_length} dev'essere compresa tra 8 e 128 caratteri"
             )
 
     except Exception as e:
@@ -89,233 +103,89 @@ def password_generator(
         print("=====================")
         print()
 
-    # TODO Calcolare se e quanti caratteri per ogni set
-    charset_nums = []
+    # Calcolare quanti caratteri per ogni set
+    charset_nums = []  # Lista contenente il numero per ogni set di caratteri
     charset_len = len(charset_nums)
-    charset_list = []
+    charset_list = []  # Lista di caratteri completa
 
-    # Set dei numeri (se non False)
-    if can_nums is not False:
+    # TODO rilevare quali sono i set di caratteri utilizzabili
+    # Eseguire primo round di set obbligatori
+
+    # Set dei numeri
+    if max_nums > 0:
         # Generazione di una lunghezza per la lista di questo set di caratteri
         charset_len = randint(min_nums, max_nums + 1)
         charset_nums.append(charset_len)
-        print(f"\t- {charset_nums[0]} numeri;")
 
-        count = 0
-        while count <= charset_len:
+        for _ in range(charset_len):
             charset_list.append(choice(numbers))
-            count += 1
 
-    # Set dei caratteri minuscoli (se non False)
-    if can_chars_lower is not False:
+    # Set dei caratteri minuscoli
+    if max_char_lower > 0:
         charset_len = randint(min_char_lower, max_char_lower + 1)
         charset_nums.append(charset_len)
-        print(f"\t- {charset_nums[1]} caratteri minuscoli;")
 
-        count = 0
-        while count <= charset_len:
+        for _ in range(charset_len):
             charset_list.append(choice(alfa_lower))
-            count += 1
 
-    # Set dei caratteri maiuscoli (se non False)
-    if can_chars_upper is not False:
+    # Set dei caratteri maiuscoli
+    if max_char_upper > 0:
         charset_len = randint(min_char_upper, max_char_upper + 1)
         charset_nums.append(charset_len)
-        print(f"\t- {charset_nums[2]} caratteri maiuscoli;")
 
-        count = 0
-        while count <= charset_len:
+        for _ in range(charset_len):
             charset_list.append(choice(alfa_upper))
-            count += 1
 
-    # Set dei speciali (se non False)
-    if can_specials is not False:
+    # Set dei speciali
+    if  max_special > 0:
         charset_len = randint(min_special, max_special + 1)
         charset_nums.append(charset_len)
-        print(f"\t- {charset_nums[3]} speciali;")
 
-        count = 0
-        while count <= charset_len:
+        for _ in range(charset_len):
             charset_list.append(choice(special_chars))
-            count += 1
 
+    # Secondo round, riempire i rimanenti caratteri con i set consentiti
 
-    # Elenco di lunghezze finali per ogni set
-    print(f"La password sarà lunga {charset_len} caratteri.")
+    # password_length
+
 
     # Inserire tutti i caratteri in base ai vincoli in una lista
     print(f"Tutti i caratteri da mischiare {charset_list}")
 
     # Mischiare la lista dei caratteri
-    shuffle(charset_list)
+    if shuffle_nums > 15:
+        shuffle_nums = 15
+        print(f"Massimo numero di shuffle = 15")
+    elif shuffle_nums < 10:
+        shuffle_nums = 10
+        print(f"Minimo numero di shuffle = 10")
+    else:
+        shuffle(charset_list)
 
-    # Unione e ritorno della password
+    for _ in range(shuffle_nums + 1):
+        shuffle(charset_list)
+
+    # Unione e ritorno della password sottoforma di stringa
     return "".join(charset_list)
 
 
-pass1 = password_generator(numbers)
-print(f"\t- Password 1 di {len(pass1)} numeri: {pass1}")
+pass1 = password_generator()
+print(f"\t- Password 1 di {len(pass1)} numeri: {pass1}\v")
 
-pass2 = password_generator(all_chars, min_len=10)
-print(f"\t- Password 2 di {len(pass2)} caratteri: {pass2}")
-
-pass3 = password_generator(all_chars, min_len=16, max_len=20)
-print(f"\t- Password 3 di {len(pass3)} caratteri: {pass3}")
-
-pass_err1 = password_generator(all_chars, min_len=7, max_len=20)
-print(f"\t- Password 4 di {len(pass_err1)} caratteri: {pass_err1}")
-
-pass_no_numbers = password_generator(all_chars, min_len=16, max_len=20, can_nums=False)
-print(f"\t- Password di {len(pass_no_numbers)} caratteri senza numeri: {pass_no_numbers}")
-
-
-
-
-
-
-# Possibile versione 2
-"""
-
-def password_generator(
-    min_len=8,
-    max_len=8,
-    can_nums=True,
-    can_chars_lower=True,
-    can_chars_upper=True,
-    can_specials=True,
-    min_nums=1,
-    max_nums=1,
-    min_char_lower=1,
-    max_char_lower=1,
-    min_char_upper=1,
-    max_char_upper=1,
-    min_special=1,
-    max_special=1,
-):
-    # Definizione alfabeti
-    numbers = "0123456789"
-    alfa_lower = "abcdefghijklmnopqrstuvwxyz"
-    alfa_upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    special_chars = "!@#$%&*,;.:-_+/\\|\"'?^§[](){}"
-
-    sets = []
-    # Costruisce la lista dei set attivi con parametri
-    if can_nums:
-        sets.append({
-            "name": "numeri",
-            "chars": numbers,
-            "min": min_nums,
-            "max": max_nums
-        })
-    if can_chars_lower:
-        sets.append({
-            "name": "minuscoli",
-            "chars": alfa_lower,
-            "min": min_char_lower,
-            "max": max_char_lower
-        })
-    if can_chars_upper:
-        sets.append({
-            "name": "maiuscoli",
-            "chars": alfa_upper,
-            "min": min_char_upper,
-            "max": max_char_upper
-        })
-    if can_specials:
-        sets.append({
-            "name": "speciali",
-            "chars": special_chars,
-            "min": min_special,
-            "max": max_special
-        })
-
-    # Calcolo lunghezza password
-    if max_len < min_len:
-        print(f"La lunghezza massima {max_len} non può essere inferiore alla lunghezza minima {min_len}")
-        max_len = min_len
-        print(f"La password sarà lunga {max_len} caratteri")
-    password_length = randint(min_len, max_len)
-    print(f"Lunghezza casuale password: {password_length}")
-
-    # Vincoli
-    somma_minimi = sum(s["min"] for s in sets)
-    somma_massimi = sum(s["max"] for s in sets)
-    try:
-      if password_length < somma_minimi:
-          raise ValueError(f"La lunghezza minima dei set ({somma_minimi}) supera la lunghezza totale desiderata ({password_length})")
-      if password_length > somma_massimi:
-          raise ValueError(f"La lunghezza massima dei set ({somma_massimi}) è inferiore alla lunghezza totale desiderata ({password_length})")
-      if password_length < 8 or min_len < 8:
-          raise ValueError("Per ragioni di sicurezza la lunghezza della password dev'essere di 8 o più caratteri")
-    except Exception as e:
-      print()
-      print("=====================")
-      print("Eccezione: ", e)
-      print("=====================")
-      print()
-
-    # Assegna a ciascun set la quantità minima
-    counts = [s["min"] for s in sets]
-    left = password_length - sum(counts)
-
-    # Distribuisce i caratteri residui in modo random tra i set senza superare i max
-    increments = [s["max"] - c for s, c in zip(sets, counts)]
-    indices = list(range(len(sets)))
-    while left > 0:
-        shuffle(indices)
-        for i in indices:
-            if increments[i] > 0 and left > 0:
-                counts[i] += 1
-                increments[i] -= 1
-                left -= 1
-            if left == 0:
-                break
-
-    # Generazione caratteri
-    charset_list = []
-    charset_nums = []
-    for s, n in zip(sets, counts):
-        curr_chars = [choice(s["chars"]) for _ in range(n)]
-        charset_list.extend(curr_chars)
-        charset_nums.append((s["name"], n))
-
-    # Shuffle e risultato finale
-    shuffle(charset_list)
-    password = "".join(charset_list)
-
-    # Stampa dettagli
-    print("Composizione password:")
-    for name, n in charset_nums:
-        print(f"\t- {n} caratteri {name}")
-    print(f"Password generata: {password}")
-    print(f"Totale caratteri: {len(password)}")
-    return password
-
-
-# Esempi di utilizzo
-pass1 = password_generator(min_len=8, max_len=8)
-print(f"- Password 1: {pass1}\n")
-
-pass2 = password_generator(min_len=10, max_len=10)
-print(f"- Password 2: {pass2}\n")
+pass2 = password_generator(min_len=10)
+print(f"\t- Password 2 di {len(pass2)} caratteri: {pass2}\v")
 
 pass3 = password_generator(min_len=16, max_len=20)
-print(f"- Password 3: {pass3}\n")
+print(f"\t- Password 3 di {len(pass3)} caratteri: {pass3}\v")
 
-pass_no_numbers = password_generator(min_len=16, max_len=20, can_nums=False)
-print(f"- Password senza numeri: {pass_no_numbers}\n")
+pass_err1 = password_generator(min_len=7, max_len=20)
+print(f"\t- Password 4 di {len(pass_err1)} caratteri: {pass_err1}\v")
 
-pass_only_digits = password_generator(min_len=12, max_len=12, can_chars_lower=False, can_chars_upper=False, can_specials=False, min_nums=12, max_nums=12)
-print(f"- Password solo numeri: {pass_only_digits}\n")
+pass_no_numbers = password_generator(min_len=16, max_len=20, max_nums=0)
+print(f"\t- Password di {len(pass_no_numbers)} caratteri senza numeri: {pass_no_numbers}\v")
 
-"""
+pass_4 = password_generator(min_len=16, max_len=20, max_char_lower=4, min_special=3, shuffle_nums=20)
+print(f"\t- Password di {len(pass_4)} caratteri generici: {pass_4}\v")
 
-"""
-Generazione di una password "semplice" tramite
-l'unione di caratteri alfabetici casuali
-
-BONUS: Uso di vincoli quali
-1. Es massimo - min tot numeri
-2. Non due caratteri successivi
-3. Lunghezza complessiva non superiore o inferiore ad un intervallo
-"""
+pass_5 = password_generator(min_len=700, max_char_lower=4, min_special=3, shuffle_nums=3)
+print(f"\t- Password di {len(pass_5)} caratteri generici: {pass_5}\v")
