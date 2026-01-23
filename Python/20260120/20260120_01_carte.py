@@ -81,7 +81,7 @@ da 2-5 va aggiunto 10
 print("\nCalcolo bestia\n")
 
 def calcola_bestia(semi):
-  print("Liste di semi del giocatore X: ", semi)
+  print("Liste di semi del giocatore X2: ", semi)
   tripletta_migliore = []
 
   tripletta_coppe = []
