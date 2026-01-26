@@ -15,6 +15,7 @@ carte = [
   "1D", "2D", "3D", "4D", "5D", "6D", "7D", "8D", "9D", "10D",
   "1S", "2S", "3S", "4S", "5S", "6S", "7S", "8S", "9S", "10S",
 ]
+
 shuffle(carte)
 
 def smazza():

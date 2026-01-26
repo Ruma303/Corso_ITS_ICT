@@ -38,6 +38,7 @@ def calcola(segreta, prova):
   copia_scelta = list(prova)
 
   coppie = zip(copia_segreta, copia_scelta)
+  print(tuple(coppie))
 
   """
   if prova not in segreta:
@@ -73,7 +74,6 @@ def calcola(segreta, prova):
 
 
 calcola(parola, "paralipomeni") # Corrispondenza completa
-calcola(parola, "parailpomeni") # Corrispondenza parziale
-calcola(parola, "03423") # Nessun match
-
-calcola("abcabcabc", "cabcbacab") # Nessun match
+# calcola(parola, "parailpomeni") # Corrispondenza parziale
+# calcola(parola, "03423") # Nessun match
+# calcola("abcabcabc", "cabcbacab") # Nessun match

@@ -1,22 +1,76 @@
 """
-Analisi del Problema (Prima di toccare la tastiera)
+Problema dei cammini
 
-Input: Quali dati riceve il programma? (Esempio: una lista di numeri, una stringa, un file JSON?)
-Output: Cosa deve restituire alla fine? (Esempio: un numero, un messaggio, una lista filtrata?)
-Casi limite: Cosa succede se l'input è vuoto? Se il numero è zero? Se la chiave non esiste?
-Scelta della Tecnica (La tua Cassetta degli Attrezzi)
-Quale di queste strategie si adatta meglio al problema?
-Accumulatore, precedente/successivo, divide et impera, programmazione dinamica, la bandiera (flag), i due cursori , map & filter, Greedy
-Sketch della Logica (Pseudocodice)
-Scrivi a parole tue i passaggi logici principali:
-Il Ciclo di Vita delle Variabili
-Ho dato nomi chiari alle variabili? (es. somma_parziale invece di s)
-Le variabili cambiano valore correttamente all'interno del ciclo?
-L'aggiornamento della variabile avviene nel punto giusto (all'inizio o alla fine del ciclo)?
-Verifica "Umana" (Dry Run)
-Simula di essere il computer con un esempio piccolo (es. una lista di 3 elementi):
-Valore iniziale: ________
-Giro 1: ________
-Giro 2: ________
-Risultato finale: ________ corrisponde a quanto atteso? [Sì / No]
+Sia data una matrice rettangolare di R righe e C colonne
+Un viaggiatore è posizionato nello spigolo in alto a sinistra della matrice
+Quanti percorsi diversi esistono che lo portano allo spigolo in basso a destra?
+Il viaggiatore può andare esclusivamente nella casella sotto o nella casella a destra
 """
+
+# Funzione opzionale per creare una matrice
+def create_matrix(rows, columns):
+    """
+    Genera una lista di tuple, ovvero coordinate: (X riga, Y colonna)
+    """
+    matrix = []
+
+    # Loop creazione righe
+    for row in range(1, rows + 1):
+
+        # Loop per creazione coordinate in una singola riga
+        for j in range(1, columns + 1):
+            # Tuple coordinate contenente riga e colonna
+            coo = (row, j)
+            matrix.append(coo)
+
+    return matrix
+
+m1 = create_matrix(8, 16)
+# print(m1)
+
+
+# È possibile eseguire questa funzione senza una matrice,
+# passando direttamente il numero di righe e colonne
+def find_paths(rows, cols):
+    """
+    Regole spostamenti: Soltanto + 1 per coordinata
+    Ovvero spostamento a destra (asse X) e sotto (asse Y)
+    """
+    all_paths = [] # Insieme dei percorsi noti
+
+    start = (1, 1)
+    target = (rows, cols)
+    print(f"Coordinata di partenza: {start}", f"Coordinata di arrivo: {target}", sep="\n")
+
+    # Calcolo ricorsivo con percorsi
+    def backtrack(path, r, c):
+
+      # Se siamo arrivati al target
+      if (r, c) == target:
+        # Aggiungiamo il percorso trovato
+        all_paths.append(path[:])
+        return
+
+      # Altrimenti, spostamento a destra
+      if r < rows:
+        # Ricorsione con nuova coordinata
+        backtrack(path + [(r + 1, c)], r + 1, c)
+
+      # Altrimenti, spostamento in basso
+      if c < cols:
+        # Ricorsione con nuova coordinata
+        backtrack(path + [(r, c + 1)], r, c + 1)
+
+    backtrack([start], 1, 1)
+    return len(all_paths), all_paths
+
+
+rows = m1[len(m1) - 1][0]
+cols = m1[len(m1) - 1][1]
+
+num, paths = find_paths(rows, cols)
+
+for i, p in enumerate(paths, 1):
+  print(f"Percorso {i}: {p}")
+
+print(f"Numero percorsi trovati: {num}")
