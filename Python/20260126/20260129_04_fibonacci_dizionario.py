@@ -22,6 +22,7 @@ Utilizzare un dizionario per archiviare i valori già calcolati e, rima di calco
 Verificare l'incremento di efficienza dell'algoritmo.
 """
 
+# Dizionario di partenza
 fib_dict = {
     0: 0,
     1: 1,
@@ -32,23 +33,32 @@ count = 2
 
 def Fib(N, count):
 
+    # Casi base di uscita
     if N == 0 or N == 1:
         return 1
 
     else:
-        prev = fib_dict[count]
-        prev2 = fib_dict[count - 1]
-        curr = prev + prev2
+        prev1 = fib_dict[count] # Ultimo elemento del dizionario
+        prev2 = fib_dict[count - 1] # Penultimo elemento
+
+        # Somma dell'ultimo e penultimo elemento
+        curr = prev1 + prev2
+
+        # Aumentiamo il count per accedere al prossimo posto nel dizionario
         count += 1
+
+        # Inserimento del nuovo elemento curr nel dizionario
         fib_dict[count] = curr
+
+        # Ricorsione calcolando il prossimo Fibonacci (N - 1), count +1
         Fib(N - 1, count)
 
+    # Ritorna l'ultimo elemento del dizionario
     return fib_dict[len(fib_dict) - 1]
-
 
 print("Fib di 10: ", Fib(10, count))
 print("Fib di 20: ", Fib(20, count))
 print("Fib di 30: ", Fib(30, count))
 print("Fib di 40: ", Fib(40, count))
 print("Fib di 100: ", Fib(100, count))
-# print(fib_dict)
+print(fib_dict)
