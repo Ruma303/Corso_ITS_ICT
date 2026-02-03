@@ -2,76 +2,91 @@
 
 ## Analisi del problema
 
-Il codice dell'esercizio costruisce una soluzione ricorsiva che calcola la successione di Fibonacci memorizzando ogni valore intermedio in un dizionario globale (`fib_dict`). Ogni volta che viene calcolato un nuovo valore, questo viene aggiunto al dizionario con una nuova chiave.
+Il codice dell'esercizio costruisce una soluzione ricorsiva che calcola la successione di Fibonacci memorizzando ogni valore intermedio in un dizionario globale (`fib_cache`). Ogni volta che viene calcolato un nuovo valore, questo viene aggiunto al dizionario con una nuova chiave.
 
-- Input:
-  - Il programma accetta un numero intero `n` come input, che rappresenta la posizione nella sequenza di Fibonacci.
-  - Nella versione personale prende anche una variabile contatore `count` che parte da 2 (per accedere al terzo elemento del dizionario).
-- Output: Il programma restituisce il valore di Fibonacci corrispondente alla posizione `n`.
+- Input: un numero intero `N` che rappresenta la posizione nella sequenza di Fibonacci.
+- Output: il valore di Fibonacci corrispondente alla posizione `N`.
+- Criteri di accettazione: la funzione deve restituire il valore corretto di Fibonacci per qualsiasi `N` non negativo, utilizzando un dizionario per memorizzare i valori calcolati.
 
-- Criteri di accettazione:
-  - La funzione deve essere implementata in modo ricorsivo.
-  - La funzione deve accettare un numero intero `n` maggiore o uguale a 0.
 
 ## Descrizione tecnica
 
 ### Elementi iniziali
 
  - La funzione utilizza un dizionario per memorizzare i valori calcolati dinamicamente.
- - Il dizionario viene inizializzato con i primi tre valori della sequenza di Fibonacci: `fib_dict = {0: 1, 1: 1, 2: 1}`.
+ - Il dizionario viene inizializzato con i primi tre valori della sequenza di Fibonacci: `fib_cache = {0: 1, 1: 1}`.
 
 ### Algoritmo della funzione ricorsiva
 
-- La funzione gestisce i casi base per `n = 0` e `n = 1`. In questi casi restituirà 1, interrompendo la ricorsione.
-- Nel caso ricorsivo, invece, calcola il valore di Fibonacci per `n` utilizzando i valori memorizzati nel dizionario.
-- Nel farlo, vengono memorizzati dinamicamente l'ultimo e il penultimo valore calcolato nel dizionario, in modo da evitare calcoli ridondanti.
-- Questi due valori vengono sommati per ottenere il nuovo valore di Fibonacci per `n`.
-- Non resta che memorizzare questo nuovo valore nel dizionario:
-  - Per memorizzare il nuovo valore nel dizionario, si utilizza la chiave e si assegna il valore calcolato.
-  - La chiave corrisponde a `count`, che viene incrementata ad ogni chiamata ricorsiva.
-- Avviene quindi la ricorsione chiamando la funzione stessa con `n - 1` e `count + 1` (già incrementato precedentemente per inserire il nuovo elemento nel dizionario).
-- Infine, la funzione restituisce l'ultimo valore di Fibonacci per `n` prelevandolo dal dizionario.
+- La funzione gestisce automaticamente i casi base per `n = 0` e `n = 1` in quanto già presenti nel dizionario. In questi casi, la funzione restituisce semplicemente `1`.
+- Se il valore non è presente nel dizionario, il programma calcola il valore di Fibonacci per `n` calcolando la somma dell'ultimo valore `n - 1` e il penultimo `n - 2` .
+- Infine, la funzione restituisce l'ultimo valore di Fibonacci salvato prelevandolo dal dizionario.
 
+## Codice della soluzione
+
+Nel codice seguente è implementata la soluzione descritta:
+- per mostrare l'efficacia dell'algoritmo ottimizzato, viene confrontato con una versione tradizionale non ottimizzata della funzione di Fibonacci.
+- vengono misurati i tempi di esecuzione per entrambi gli approcci utilizzando il modulo `time`.
 
 ```python
-# Dizionario di partenza
-fib_dict = {
-    0: 0,
-    1: 1,
-    2: 1
-}
+import time
 
-count = 2
+print("Fibonacci ottimizzato tramite dizionario")
 
-def Fib(N, count):
+# Dizionari iniziale
+fib_cache = {0: 1, 1: 1}
 
-    # Casi base di uscita
-    if N == 0 or N == 1:
-        return 1
+def fib(N):
+    # Evitiamo di calcolare Fibonacci di un numero
+    # se già presente nel dizionario
+    if N in fib_cache:
+        return fib_cache[N]
 
-    else:
-        prev1 = fib_dict[count] # Ultimo elemento del dizionario
-        prev2 = fib_dict[count - 1] # Penultimo elemento
+    # Calcolo nuovo fibonacci del numero N
+    # con la somma dei due precedenti
+    fib_cache[N] = fib(N - 1) + fib(N - 2)
+    return fib_cache[N]
 
-        # Somma dell'ultimo e penultimo elemento
-        curr = prev1 + prev2
+# Test di vari valori di fibonacci
+for N in (10, 20, 30, 40, 50, 100):
+    # Misurazione tempo tramite il modulo time
+    start = time.perf_counter()
+    value = fib(N)
+    duration = time.perf_counter() - start
+    print(f"fib({N}) = {value}, tempo calcolo: {duration:.8f} secondi")
 
-        # Aumentiamo il count per accedere al prossimo posto nel dizionario
-        count += 1
 
-        # Inserimento del nuovo elemento curr nel dizionario
-        fib_dict[count] = curr
+"""
+Fibonacci ottimizzato tramite dizionario
+fib(10) = 89, tempo calcolo: 0.00000520 secondi
+fib(20) = 10946, tempo calcolo: 0.00000430 secondi
+fib(30) = 1346269, tempo calcolo: 0.00000530 secondi
+fib(40) = 165580141, tempo calcolo: 0.00000310 secondi
+fib(50) = 20365011074, tempo calcolo: 0.00000570 secondi
+fib(100) = 573147844013817084101, tempo calcolo: 0.00001390 secondi
+"""
 
-        # Ricorsione calcolando il prossimo Fibonacci (N - 1), count +1
-        Fib(N - 1, count)
+print("Fibonacci tradizionale non ottimizzato")
 
-    # Ritorna l'ultimo elemento del dizionario
-    return fib_dict[len(fib_dict) - 1]
+def Fib(N):
+  if N == 0 or N == 1:
+    return 1
+  else:
+    return Fib(N-1)+Fib(N-2)
 
-print("Fib di 10: ", Fib(10, count))
-print("Fib di 20: ", Fib(20, count))
-print("Fib di 30: ", Fib(30, count))
-print("Fib di 40: ", Fib(40, count))
-print("Fib di 100: ", Fib(100, count))
-print(fib_dict)
+# Test di vari valori di fibonacci
+for N in (10, 20, 30, 40):
+    # Misurazione tempo tramite il modulo time
+    start = time.perf_counter()
+    value = Fib(N)
+    duration = time.perf_counter() - start
+    print(f"Fib({N}) = {value}, tempo calcolo: {duration:.8f} secondi")
+
+
+"""
+Fib(10) = 89, tempo calcolo: 0.00001740 secondi
+Fib(20) = 10946, tempo calcolo: 0.00080990 secondi
+Fib(30) = 1346269, tempo calcolo: 0.10199260 secondi
+Fib(40) = 165580141, tempo calcolo: 27.92206450 secondi
+"""
 ```
