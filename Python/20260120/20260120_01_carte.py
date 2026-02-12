@@ -127,7 +127,7 @@ def calcola_bestia(semi):
       if len(seme) > 3: break
 
 
-  # Valutare la tripletta migliore
+  # TODO Valutare la tripletta migliore
   # for tripletta in triplette:
 
   return sum(tripletta_migliore), tripletta_migliore

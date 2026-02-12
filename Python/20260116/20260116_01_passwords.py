@@ -145,6 +145,7 @@ def password_generator(
             charset_list.append(choice(special_chars))
 
     # Secondo round, riempire i rimanenti caratteri con i set consentiti
+    # TODO
 
     # password_length
 
