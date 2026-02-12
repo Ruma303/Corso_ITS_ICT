@@ -21,44 +21,63 @@ Utilizzare un dizionario per archiviare i valori già calcolati e, rima di calco
 
 Verificare l'incremento di efficienza dell'algoritmo.
 """
+import time
 
-# Dizionario di partenza
-fib_dict = {
-    0: 0,
-    1: 1,
-    2: 1
-}
+print("Fibonacci ottimizzato tramite dizionario")
 
-count = 2
+# Dizionari iniziale
+fib_cache = {0: 1, 1: 1}
 
-def Fib(N, count):
+def fib(N):
+    # Evitiamo di calcolare Fibonacci di un numero
+    # se già presente nel dizionario
+    if N in fib_cache:
+        return fib_cache[N]
 
-    # Casi base di uscita
-    if N == 0 or N == 1:
-        return 1
+    # Calcolo nuovo fibonacci del numero N
+    # con la somma dei due precedenti
+    fib_cache[N] = fib(N - 1) + fib(N - 2)
+    return fib_cache[N]
 
-    else:
-        prev1 = fib_dict[count] # Ultimo elemento del dizionario
-        prev2 = fib_dict[count - 1] # Penultimo elemento
+# Test di vari valori di fibonacci
+for N in (10, 20, 30, 40, 50, 100):
+    # Misurazione tempo tramite il modulo time
+    start = time.perf_counter()
+    value = fib(N)
+    duration = time.perf_counter() - start
+    print(f"fib({N}) = {value}, tempo calcolo: {duration:.8f} secondi")
 
-        # Somma dell'ultimo e penultimo elemento
-        curr = prev1 + prev2
 
-        # Aumentiamo il count per accedere al prossimo posto nel dizionario
-        count += 1
+"""
+Fibonacci ottimizzato tramite dizionario
+fib(10) = 89, tempo calcolo: 0.00000520 secondi
+fib(20) = 10946, tempo calcolo: 0.00000430 secondi
+fib(30) = 1346269, tempo calcolo: 0.00000530 secondi
+fib(40) = 165580141, tempo calcolo: 0.00000310 secondi
+fib(50) = 20365011074, tempo calcolo: 0.00000570 secondi
+fib(100) = 573147844013817084101, tempo calcolo: 0.00001390 secondi
+"""
 
-        # Inserimento del nuovo elemento curr nel dizionario
-        fib_dict[count] = curr
+print("Fibonacci tradizionale non ottimizzato")
 
-        # Ricorsione calcolando il prossimo Fibonacci (N - 1), count +1
-        Fib(N - 1, count)
+def Fib(N):
+  if N == 0 or N == 1:
+    return 1
+  else:
+    return Fib(N-1)+Fib(N-2)
 
-    # Ritorna l'ultimo elemento del dizionario
-    return fib_dict[len(fib_dict) - 1]
+# Test di vari valori di fibonacci
+for N in (10, 20, 30, 40):
+    # Misurazione tempo tramite il modulo time
+    start = time.perf_counter()
+    value = Fib(N)
+    duration = time.perf_counter() - start
+    print(f"Fib({N}) = {value}, tempo calcolo: {duration:.8f} secondi")
 
-print("Fib di 10: ", Fib(10, count))
-print("Fib di 20: ", Fib(20, count))
-print("Fib di 30: ", Fib(30, count))
-print("Fib di 40: ", Fib(40, count))
-print("Fib di 100: ", Fib(100, count))
-print(fib_dict)
+
+"""
+Fib(10) = 89, tempo calcolo: 0.00001740 secondi
+Fib(20) = 10946, tempo calcolo: 0.00080990 secondi
+Fib(30) = 1346269, tempo calcolo: 0.10199260 secondi
+Fib(40) = 165580141, tempo calcolo: 27.92206450 secondi
+"""
