@@ -16,34 +16,31 @@ Si scriva il programma di modo che:
 Organizzare il programma in opportune funzioni.
 '''
 
+import sys
+
 list1 = [3, 7, 11, 18, 2, 4]
 
-def get_min(list1):
+def stats(list1):
   now_min = list1[0]
+  now_max = list1[0]
 
   for num in list1:
     if num < now_min:
       now_min = num
 
-  return now_min
-
-def get_max(list1):
-  now_max = list1[0]
-
-  for num in list1:
     if num > now_max:
       now_max = num
 
-  return now_max
+    sum_num += num
 
-def get_avg(list1):
-    now_min = get_min(list1)
-    now_max = get_max(list1)
+  now_avg = sum_num / 2
 
-    return (now_min + now_max ) // 2
+  return now_min, now_max, now_avg
 
+
+def main():
+  print(stats(list1))
+  return 0
 
 if __name__ == "__main__":
-  print(get_min(list1))
-  print(get_max(list1))
-  print(get_avg(list1))
+  sys.exit(main())

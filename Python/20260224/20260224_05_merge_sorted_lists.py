@@ -31,62 +31,31 @@ Prenda l'input dell'utente (i valori per list1 e list2) da tastiera,
     memorizzata sarà [1, 3, 53].
 '''
 
-# Liste di test
-# list1 = [3, 5, 6, 6, 8]
-# list2 = [1, 4, 6]
+def get_list():
 
-def get_lists():
-
-  print("""
-        ========================================
-
-        Inserimento valori nella prima lista.
-
-        Inserire un numero minore del precedente
-        per passare alla prossima lista
-
-        ========================================
+  print(f"""
+        ==============================
+        Inserimento valori nella lista.
+        Inserire un numero minore del
+        precedente per passare alla prossima lista
+        ==============================
         """)
 
-  prev1 = int(input("Inserire un numero: ").strip())
-  list1 = []
-  list1.append(prev1) # Inserimento del primo numero per iniziare i confronti
+  prev = int(input("Inserire un numero: ").strip())
+  lists = [prev] # Creazione e inserimento del primo numero nella lista per iniziare i confronti
 
   while True:
+    # Acquisizione altri numeri per confronti
     num = int(input("Inserire un numero: ").strip())
 
-    if num >= prev1:
-      list1.append(num)
-      prev1 = num
+    if num >= prev:
+      lists.append(num)
+      prev = num
 
-    else: break
+    else:
+      break
 
-
-  print("""
-    ========================================
-
-    Inserimento valori nella seconda lista.
-
-    Inserire un numero minore del precedente
-    per terminare gli input.
-
-    ========================================
-    """)
-
-  prev2 = int(input("Inserire un numero: ").strip())
-  list2 = []
-  list2.append(prev2)
-
-  while True :
-    num = int(input("Inserire un numero: ").strip())
-
-    if num >= prev2:
-      list2.append(num)
-      prev2 = num
-
-    else: break
-
-  print(merge_sorted_lists(list1, list2))
+  return lists
 
 
 def merge_sorted_lists(list1: list[int], list2: list[int]) -> list[int]:
@@ -98,8 +67,6 @@ def merge_sorted_lists(list1: list[int], list2: list[int]) -> list[int]:
   while i < len(list1) and j < len(list2):
 
     # Confrontare gli elementi di entrambe le liste
-    # Accedere all'elemento nella stessa posizione in entrambe le liste
-
     # Inserire prima l'elemento più piccolo: lista 1
     if list1[i] < list2[j]:
       result.append(list1[i])
@@ -133,4 +100,14 @@ def merge_sorted_lists(list1: list[int], list2: list[int]) -> list[int]:
 
 
 if __name__ == "__main__":
-  get_lists()
+  # Liste di test
+  # list1 = [3, 5, 6, 6, 8]
+  # list2 = [1, 4, 6]
+
+  lists = []
+  for i in range(2):
+    new_list = get_list()
+    lists.append(new_list)
+
+  merged_list = merge_sorted_lists(lists[0], lists[1])
+  print(f"{merged_list}")

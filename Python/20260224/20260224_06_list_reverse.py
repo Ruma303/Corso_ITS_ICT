@@ -24,4 +24,5 @@ def reverse(list1):
 
   return final_list
 
-print(reverse(list1))
+if __name__ == "__main__":
+  print(reverse(list1))

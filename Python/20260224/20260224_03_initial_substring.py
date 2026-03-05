@@ -15,18 +15,23 @@ Successivamente, modificare il programma di modo che:
    invochi la funzione e ne stampi il risultato a schermo.
 '''
 
-string = input("Inserisci una stringa: ").strip()
-accept = input("Inserisci una sottostringa di ricerca: ").strip()
-
 def find(string, accept):
   result = ""
 
-  for idx, char in enumerate(accept):
-    if char in string:
-      result += accept[idx]
+  for idx, char in enumerate(string):
+    if char in accept:
+      result += string[idx]
 
   return result, len(result)
 
-str_res, str_len = find(string, accept)
 
-print(f"Stringa più lunga trovata {str_res} di lunghezza {str_len}")
+if __name__ == "__main__":
+
+  # string = input("Inserisci una stringa: ").strip()
+  # accept = input("Inserisci una sottostringa di ricerca: ").strip()
+
+  string = "ciao mooooooondo"
+  accept = "moia oc"
+
+  str_res, str_len = find(string, accept)
+  print(f"Stringa più lunga trovata '{str_res}' di lunghezza {str_len}")

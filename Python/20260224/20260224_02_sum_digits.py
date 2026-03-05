@@ -13,7 +13,6 @@ Modificare il programma di modo che:
  - prenda l'input dell'utente da tastiera.
 '''
 
-num = input("Scrivi un numero con più cifre non negativo: ").strip()
 
 def sum_digits(num):
 
@@ -28,4 +27,7 @@ def sum_digits(num):
 
   return dig_sum
 
-print(sum_digits(num))
+
+if __name__ == "__main__":
+  num = input("Scrivi un numero con più cifre non negativo: ").strip()
+  print(sum_digits(num))

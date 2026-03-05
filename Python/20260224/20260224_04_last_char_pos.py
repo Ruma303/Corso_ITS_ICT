@@ -5,9 +5,7 @@ da tastiera, restituisca la posizione dell'ultima occorrenza di 'c' in
 
 Organizzare il programma in opportune funzioni che effettuino il calcolo.
 '''
-
-string = input("Inserisci una stringa: ").strip()
-char = input("Inserisci un carattere di ricerca: ").strip()
+import sys
 
 def find_last_char(string, char):
 
@@ -28,8 +26,19 @@ def find_last_char(string, char):
         last_idx = idx
     return last_idx
 
-pos = find_last_char(string, char)
-if pos == -1:
-  print(f"Ultima posizione di {char} è {pos}")
-else:
-  print(f"Ultima posizione di {char} è {pos}")
+
+def main():
+  string = input("Inserisci una stringa: ").strip()
+  char = input("Inserisci un carattere di ricerca: ").strip()
+
+  pos = find_last_char(string, char)
+  if pos == -1:
+    print(f"Ultima posizione di {char} è {pos}")
+  else:
+    print(f"Ultima posizione di {char} è {pos}")
+
+  return 0
+
+
+if __name__ == "__main__":
+  sys.exit(main())
