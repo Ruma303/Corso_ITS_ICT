@@ -63,27 +63,41 @@ ché la diritta via era smarrita.
 
 """
 
-def to_list():
-    rows = []
-    last_char = 0
+def get_inputs():
+  poem = ""
+  row = input("Inserisci il tuo poema: ")
+  while True:
+    if row == "":
+      break
 
-    for i, char in enumerate(phrase):
-        if char == "\n":
-            # Preleva la sottostringa tra i newlines esclusi
-            new_phrase = phrase[last_char:i]
-            # Elimina eventuali newlines residui (per sicurezza)
-            new_phrase = new_phrase.replace("\n", "")
-            # Se non vuota, aggiungila
-            if new_phrase.strip() != "":
-                rows.append(new_phrase)
-            last_char = i + 1  # Riparti subito dopo il newline
+    row = input()
+    poem += row + "\n"
 
-    # Gestisci la coda se il testo non termina con un newline
-    if last_char < len(phrase):
-        final_row = phrase[last_char:].replace("\n", "")
-        if final_row.strip() != "":
-            rows.append(final_row)
-    return rows
+  return poem
+
+
+def to_list(phrase):
+  print("sto qua: ", phrase)
+  rows = []
+  last_char = 0
+
+  for i, char in enumerate(phrase):
+      if char == "\n":
+          # Preleva la sottostringa tra i newlines esclusi
+          new_phrase = phrase[last_char:i]
+          # Elimina eventuali newlines residui (per sicurezza)
+          new_phrase = new_phrase.replace("\n", "")
+          # Se non vuota, aggiungila
+          if new_phrase.strip() != "":
+              rows.append(new_phrase)
+          last_char = i + 1  # Riparti subito dopo il newline
+
+  # Gestisci la coda se il testo non termina con un newline
+  if last_char < len(phrase):
+      final_row = phrase[last_char:].replace("\n", "")
+      if final_row.strip() != "":
+          rows.append(final_row)
+  return rows
 
 
 """
@@ -113,6 +127,7 @@ def transpose_v(rows):
 
       # Iterazione sulle righe
       for row in rows:
+        row_len = len(row)
         new_row += row[col] + " "
 
     except IndexError, Exception:
@@ -125,7 +140,8 @@ def transpose_v(rows):
   return result
 
 def main():
-  rows = to_list()
+  inputs = get_inputs()
+  rows = to_list(inputs)
   transposed_phrase = transpose_v(rows)
   print(transposed_phrase)
   return 0
