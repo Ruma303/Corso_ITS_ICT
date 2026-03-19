@@ -60,72 +60,112 @@ Il corrispondente carattere cifrato dovrebbe essere 'D'!
 Buon divertimento!
 '''
 
-# ascii da 65 a 90 per lettere maiuscole
-maiuscole = [chr(x) for x in range(65, 91)]
+from sys import exit
 
-# ascii da 97 a 122 lettere minuscole
-minuscole = [chr(x) for x in range(97, 123)]
-
-def cesare_encryption(messaggio, chiave, alfabeto):
+def cesare_encryption(chiave, messaggio, alfabeto):
 
   """
   Cifra il messaggio usando il Codice di Cesare con chiave 'chiave'.
   Mantiene inalterati caratteri non alfabetici.
   Rispetta la differenza tra maiuscole e minuscole.
   """
+  try:
+    if chiave <= 0:
+        raise ValueError(f"La chiave {chiave} deve essere positiva e maggiore di zero.")
 
-  if chiave <= 0:
-      raise ValueError(f"La chiave {chiave} deve essere positiva e maggiore di zero.")
+    maiuscole = alfabeto[0]
+    minuscole = alfabeto[1]
+    result = ""
 
-  maiuscole = alfabeto[0]
-  minuscole = alfabeto[1]
-  result = ""
+    for char in messaggio:
 
-  for char in messaggio:
-    # print(ord(char))
-    carattere_trasposto = (ord(char) - ord('A') + chiave)
-    # print(f"DEBUG: Posizione carattere {ord(char) - ord('A')} | {carattere_trasposto = }")
-    if 'A' <= char <= 'Z':
-        # Calcolo posizione circolare per le MAIUSCOLE
-        nuovo_car = chr(carattere_trasposto % len(maiuscole) + ord('A'))
-        # print(f"DEBUG: {carattere_trasposto % len(maiuscole)}")
-        # print(f"DEBUG: {carattere_trasposto % len(maiuscole)} + {ord('A')}")
-        result += nuovo_car
-    elif 'a' <= char <= 'z':
-        # Calcolo posizione circolare per le MINUSCOLE
-        nuovo_car = chr(carattere_trasposto % len(minuscole) + ord('a'))
-        result += nuovo_car
-    else:
-        # Caratteri non alfabetici restano invariati
-        result += char
+      # Calcolo posizione circolare per le MAIUSCOLE
+      if 'A' <= char <= 'Z':
+          carattere_trasposto = (ord(char) - ord('A') + chiave)
+          nuovo_car = chr(carattere_trasposto % len(maiuscole) + ord('A'))
+          result += nuovo_car
+      # Calcolo posizione circolare per le MINUSCOLE
+      elif 'a' <= char <= 'z':
+          carattere_trasposto = (ord(char) - ord('a') + chiave)
+          nuovo_car = chr(carattere_trasposto % len(minuscole) + ord('a'))
+          result += nuovo_car
+      else:
+          # Caratteri non alfabetici restano invariati
+          result += char
 
-  return result
+    return result
+
+  except ValueError:
+    print("Cattivo")
+    return messaggio
+  finally:
+    pass
+
+
+def cesare_multi(chiave, messaggio, /, *alfabeti):
+    """
+    Cifra il messaggio usando il Codice di Cesare con chiave 'chiave'.
+    Mantiene inalterati caratteri non appartenenti ad alcun alfabeto.
+    È possibile passare più alfabeti dal terzo parametro in poi.
+    """
+    result = ""
+
+    for char in messaggio:
+        cifrato = False
+
+        for alfabeto in alfabeti:
+            # Non tutti gli alfabeti sono contigui in Unicode
+            # Per questo verifichiamo direttamente se il carattere
+            # appartiene all'alfabeto in analisi
+
+            # scansione lineare: nessun metodo built-in tipo index()
+            idx = 0
+            trovato = False
+
+            for c in alfabeto:
+                if c == char:
+                    trovato = True
+                    break
+                idx += 1              # idx cresce solo se c != char
+
+            if trovato:
+                nuovo_idx = (idx + chiave) % len(alfabeto)
+                result += alfabeto[nuovo_idx]
+                cifrato = True
+                break  # trovato l'alfabeto di appartenenza: nessun altro va controllato
+
+        if not cifrato:
+            result += char
+
+    return result
+
+
+def main():
+  # Alfabeti
+  maiuscole = [chr(x) for x in range(65, 91)]
+  minuscole = [chr(x) for x in range(97, 123)]
+  numeri = [str(n) for n in range(10)]
+  simboli = list('!@#$%^&*')
+  greche = list('αβγδεζηθικλμνξοπρστυφχψω')
+  kanji = ['日', '本', '語', '学']  # esempio (stringhe Unicode)
+
+  # Input
+  # messaggio = input("Inserisci una stringa da codificare: ")
+  chiave = int(input("Inserisci una chiave numerica di spostamento: "))
+  messaggio1 = "_abcxyz ABC!XYZ . "
+  alfabeto1 = [maiuscole, minuscole]
+
+  messaggio2 = "hello ELITE 987 ! αβγ 日語"
+
+  # Tests
+  cesare1 = cesare_encryption(chiave, messaggio1, alfabeto1)
+  print(f"Messaggio originario: {messaggio1 = }\nMessaggio codificato: {cesare1 = }")
+  cesare2 = cesare_multi(chiave, messaggio2,
+      minuscole, maiuscole, numeri, simboli, greche, kanji
+  )
+  print(f"Messaggio originario: {messaggio2 = }\nMessaggio codificato: {cesare2 = }")
+  return 0
 
 
 if __name__ == "__main__":
-  messaggio = input("Inserisci una stringa da codificare: ")
-  chiave = int(input("Inserisci una chiave numerica di spostamento: "))
-  alfabeto = [maiuscole, minuscole]
-  result = cesare_encryption(messaggio, chiave, alfabeto)
-  print(f"messaggio codificato: {result= }")
-
-
-"""
-Esempio con maiuscole: YELLOW
-
-Calcolo posizione carattere Y
-pos = ord(char) - ord('A')
-pos = 89 - 65 = 24
-
-Si aggiunge la chiave di spostamento, es 5:
-24 + 5 = 29
-
-Per restare nel range A..Z si usa il modulo % 26 ovvero, len(maiuscole)
-nuova_pos = pos % 26 = 3 (29 / 26 = 1 con resto di 3)
-
-e si converte in ASCII
-chr(nuova_pos + ord('A')),
-quindi chr(3 + 65) = D
-
-result= 'DJQQTB'
-"""
+  exit(main())

@@ -34,11 +34,12 @@ Prenda l'input dell'utente (i valori per list1 e list2) da tastiera,
 def get_list():
 
   print(f"""
-        ==============================
-        Inserimento valori nella lista.
-        Inserire un numero minore del
-        precedente per passare alla prossima lista
-        ==============================
+        \r==============================
+        \rInserimento valori nella lista.
+        \rInserire un numero minore del
+        \rprecedente per passare alla
+        \rprossima lista
+        \r==============================
         """)
 
   prev = int(input("Inserire un numero: ").strip())

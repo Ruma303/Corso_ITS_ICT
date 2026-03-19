@@ -35,7 +35,7 @@ def get_strings():
   return strings
 
 
-def insert_in_strings(strings: list, pos: int, new: str, substitute: bool = False) -> list[str]:
+def insert_in_strings(strings: list[str], pos: int, new: str, substitute: bool = False) -> list[str]:
 
   try:
     if pos < 0 or pos > len(strings):
@@ -43,7 +43,7 @@ def insert_in_strings(strings: list, pos: int, new: str, substitute: bool = Fals
 
     if substitute:
         # Espandiamo la lista di 1 copiando dal fondo verso pos
-        strings.append(None)  # placeholder per fare spazio
+        strings.append("")  # placeholder per fare spazio
         i = len(strings) - 1
         while i > pos:
             strings[i] = strings[i - 1]  # shifta a destra
@@ -63,11 +63,10 @@ def insert_in_strings(strings: list, pos: int, new: str, substitute: bool = Fals
 
   except IndexError as err:
     print(f"""
-          \r===================
+          \r======================================
           \r{err.__class__.__name__}: {err}
-          \r===================
-          """
-          )
+          \r======================================
+          """)
     return strings
 
 

@@ -77,7 +77,7 @@ def get_inputs():
 
 
 def to_list(phrase):
-  print("sto qua: ", phrase)
+  # print("Frase di input:\n ", phrase)
   rows = []
   last_char = 0
 
@@ -101,7 +101,7 @@ def to_list(phrase):
 
 
 """
-rows è
+Esempio di phrase in ingresso:
 [
   'Nel mezzo del cammin di nostra vita',
   'mi ritrovai per una selva oscura,',
@@ -109,39 +109,39 @@ rows è
 ]
 """
 
-def transpose_v(rows):
+def transpose_v(phrase):
   result = ""
   col = 0
-  max_len = 0
-
-  for row in rows:
-    if len(row) > max_len:
-      max_len = len(row)
 
   # Ciclare sulle colonne
-  while col < max_len:
-
+  while True:
     new_row = ""
+    any_char = False
 
-    try:
+    # Iterazione sulle righe
+    for prev_row in phrase:
+      try:
+        new_row += prev_row[col] + " "
+        # Se col è troppo avanti non riuscirà ad accedere ai caratteri
+        # quindi lancerà l'errore e la flag sotto non si imposterà a True
+        any_char = True
 
-      # Iterazione sulle righe
-      for row in rows:
-        row_len = len(row)
-        new_row += row[col] + " "
+      except (IndexError, Exception):
+        continue
 
-    except IndexError, Exception:
-      new_row += " "
+    if not any_char:
+      break
 
     result += new_row + "\n"
-    new_row = ""
     col += 1
 
   return result
 
 def main():
-  inputs = get_inputs()
-  rows = to_list(inputs)
+  # inputs = get_inputs()
+  # rows = to_list(inputs)
+
+  rows = to_list(phrase)
   transposed_phrase = transpose_v(rows)
   print(transposed_phrase)
   return 0
