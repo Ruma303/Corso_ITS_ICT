@@ -43,9 +43,8 @@ rappresenta i dati del contatto Anna Bianchi.
 L'elenco di contatti memorizzati nell'applicazione è una collezione di dizionari.
 Quale tipo di collezione adoperare? set, list, dict, tuple, ...?
 
-Si fornisce uno scheletro per il programma, da completare.
-In particolare:
- * la funzione main() chiede ripetutamente all'utente quale azione vuole effettuare:
+Si fornisce uno scheletro per il programma, da completare. In particolare:
+  * la funzione main() chiede ripetutamente all'utente quale azione vuole effettuare:
  	* inserimento di una nuovo contatto
  	* stampa della rubrica
  	* ricerca di un contatto
@@ -66,142 +65,150 @@ Estendere il programma per permettere ad ogni contatto di appartenere ad un grup
 Il programma dovrà permettere all'utente di:
 
    1) Creare un nuovo gruppo. Di ogni gruppo interessa il nome ed una descrizione
-   2) Assegnare ogni nuovo contatto ad uno dei gruppi esistenti, lasciando la possibilità
-      che alcuni contatti non appartengano ad alcun gruppo
+   2) Assegnare ogni nuovo contatto ad uno dei gruppi esistenti, lasciando la possibilità che alcuni contatti non appartengano ad alcun gruppo
    3) Estendere la funzionalità di ricerca per cercare solo all'interno di un gruppo
 
 """
 
-import sys
+# Variabile globale: viene inizializzata all'avvio del programma e resta
+# in vita fino alla terminazione del programma.
+contacts = list() # valutare l'uso di altre tipologie di collezioni
+groups = set() # I gruppi saranno tuple composte da (nome, desc)
 
-# --- Variabili globali ---
-contacts = list() 
-groups = list()
-
-# --- Contact actions ---
+# restituisce una stringa che mostra il contatto c
 def contact_to_str(c):
-    # Gestiamo il caso in cui il gruppo sia None o vuoto
-    gruppo_str = c['gruppo'] if c['gruppo'] else "Nessun gruppo"
-    return f"* {c['cognome'].upper()}, {c['nome']}:\n" + \
-           f"    - telefono: {c['telefono']}\n" + \
-           f"    - email: {c['email']}\n" + \
-           f"    - gruppo: {gruppo_str}"
+  gruppo_str = c['gruppo'] if c['gruppo'] else "Nessuno"
+  return f"* {c['cognome']}, {c['nome']}:\n" + \
+    f"   - telefono: {c['telefono']}\n" + \
+    f"   - email: {c['email']}\n" + \
+    f"   - gruppo: {gruppo_str}\n"
 
 def contact_add(n, c, t, e, g=None):
+	global contacts # dichiariamo che questa funzione vuole modificare la variabile globale "contacts"
+
+	# Crea il nuovo contatto
+	new_contact = {
+		"nome":     n,
+		"cognome":  c,
+		"telefono": t,
+		"email":    e,
+		"gruppo":   g
+	}
+	# Aggiungilo in contacts
+	contacts.append(new_contact)
+
+def contact_search(n, c, g=None):
     global contacts
-    new_contact = {
-        "nome": n.strip(),
-        "cognome": c.strip(),
-        "telefono": t.strip(),
-        "email": e.strip(),
-        "gruppo": g.strip() if g else None
-    }
-    contacts.append(new_contact)
+    found = []
 
-def contact_search(n=None, c=None, g=None):
-    """
-    Esercizio 1 & 2: Cerca contatti per nome, cognome e/o gruppo.
-    Se un parametro è vuoto, non viene usato per il filtraggio.
-    """
-    results = []
     for contact in contacts:
-        # Verifichiamo se il contatto soddisfa TUTTI i criteri inseriti
-        match_nome = not n or n.lower() == contact['nome'].lower()
-        match_cognome = not c or c.lower() == contact['cognome'].lower()
-        match_gruppo = not g or (contact['gruppo'] and g.lower() == contact['gruppo'].lower())
-        
-        if match_nome and match_cognome and match_gruppo:
-            results.append(contact)
-    return results
+        match_n = (not n) or (contact['nome'].lower() == n.lower())
+        match_c = (not c) or (contact['cognome'].lower() == c.lower())
+        match_g = (not g) or (contact['gruppo'] == g)
 
-# --- Group actions ---
-def create_group(n, d):
-    global groups
-    if n: # Verifichiamo almeno che il nome non sia vuoto
-        new_group = {
-            "nome": n.strip(),
-            "descrizione": d.strip()
-        }
-        groups.append(new_group)
-        print(f"Gruppo '{n}' creato con successo.")
-    else:
-        print("Errore: Il nome del gruppo non può essere vuoto.")
+        if match_n and match_c and match_g:
+            found.append(contact)
+    return found
 
-def show_groups():
-    if not groups:
-        print("Non ci sono gruppi creati.")
-    for g in groups:
-        print(f"* {g['nome']}: {g['descrizione']}")
 
-# --- User interface (UI) ---
-def ui_add_group():
-    print("\nCreazione nuovo gruppo")
-    nome = input(" - nome gruppo? ").strip()
-    descrizione = input(" - descrizione? ").strip()
-    create_group(nome, descrizione)
-
-def ui_show_contacts():
-    print(f"\nIn rubrica ci sono {len(contacts)} contatti:")
-    for c in contacts:
-        print(contact_to_str(c))
-    print("-" * 20)
+## --- User interface (UI) del programma
 
 def ui_add_contact():
-    print("\nAggiunta di un nuovo contatto")
-    nome = input(" - nome? ")
-    cognome = input(" - cognome? ")
-    telefono = input(" - telefono? ")
-    email = input(" - email? ")
-    
-    # Mostra i gruppi disponibili per aiutare l'utente
-    if groups:
-        print(" Gruppi disponibili:", [g['nome'] for g in groups])
-    gruppo = input(" - gruppo (lascia vuoto per nessuno)? ")
-    
-    contact_add(nome, cognome, telefono, email, gruppo)
+	print("\nAggiunta di un nuovo contatto")
+	nome =     input(" - nome? ")
+	cognome =  input(" - cognome? ")
+	telefono = input(" - telefono? ")
+	email =    input(" - email? ")
+	gruppo =   input(" - gruppo? ")
+	contact_add(nome, cognome, telefono, email, gruppo)
+
+def ui_show_contacts():
+	print(f"In rubrica ci sono i seguenti {len(contacts)} contatti:")
+	for c in contacts:
+		print(contact_to_str(c))
+	print("Fatto.")
 
 def ui_search_contact():
-    print("\nRicerca contatti")
-    nome = input(" - nome (invio per saltare)? ").strip()
-    cognome = input(" - cognome (invio per saltare)? ").strip()
-    gruppo = input(" - gruppo (invio per saltare)? ").strip()
-    
-    result = contact_search(nome, cognome, gruppo)
-    print(f"\nRisultati trovati ({len(result)}):")
-    for c in result:
-        print(contact_to_str(c))
+	print("\nRicerca contatti per nome e/o cognome")
+	# chiedere nome e/o cognome e restituire tutti i contatti corrispondenti
+	nome =    input(" - nome (o stringa vuota)? ")
+	cognome = input(" - cognome (o stringa vuota)? ")
+	result = contact_search(nome, cognome)
+	print(f"\nIn rubrica ci sono le seguenti {len(result)} corrispondenze:")
+	for c in result:
+		print(contact_to_str(c))
+	print("Fatto.")
+
+
+## --- Groups
+
+def create_group(n, d):
+  global groups
+  if n is not None and d is not None:
+    new_group = n, d
+    return groups.add(new_group)
+
+def ui_search_in_group():
+  target_group = input("Inserisci il nome del gruppo in cui cercare: ").strip()
+  # Possiamo riutilizzare contact_search passando solo il gruppo
+  result = contact_search(None, None, target_group)
+
+  print(f"\nContatti nel gruppo {target_group}:")
+  for c in result:
+      print(contact_to_str(c))
+
+## --- Menu
 
 def ui_ask_what_to_do():
-    while True:
-        print("\n--- RUBRICA PYTHON ---")
-        print("1. Aggiungi contatto")
-        print("2. Mostra tutti i contatti")
-        print("3. Cerca contatto (per nome/cognome/gruppo)")
-        print("4. Crea nuovo gruppo")
-        print("5. Mostra gruppi esistenti")
-        print("6. Esci")
-        
-        choice = input("\nScegli un'azione (1-6): ").strip()
-        
-        if choice == '1': 
-            ui_add_contact()
-        elif choice == '2': 
-            ui_show_contacts()
-        elif choice == '3': 
-            ui_search_contact()
-        elif choice == '4': 
-            ui_add_group()
-        elif choice == '5':
-            show_groups()
-        elif choice == '6': 
-            print("Arrivederci!")
-            break
-        else: 
-            print(f"'{choice}' non è un'opzione valida.")
+  while True:
+    print(  "\nScegli un'azione:\n" + \
+    "1. add: Aggiungi un nuovo contatto\n" + \
+    "2. show: Mostra tutta la contacts\n" + \
+    "3. search: Cerca un contatto\n" + \
+    "4. group_C: Crea un gruppo\n" + \
+    "5. group_S: Cerca contatto in un gruppo\n" + \
+    "6. exit: Esci"
+    )
+
+    choice = input("Scrivi l'azione oppure digita il numero corrispondente:\n").strip().lower()
+
+    if choice == 'add' or choice == '1':
+      ui_add_contact()
+    elif choice == 'show' or choice == '2':
+      ui_show_contacts()
+    elif choice == 'search' or choice == '3':
+      ui_search_contact()
+    elif choice == 'group_C' or choice == '4': create_group(
+      input("Indica il nome del gruppo:\n").strip(),
+      input("Scrivi una descrizione del gruppo:\n").strip()
+    )
+    elif choice == 'group_s' or choice == '5':
+      ui_search_in_group()
+    elif choice == 'exit' or choice == '6':
+      print("Arrivederci!")
+      break
+    else:
+      print(f"{choice}? mmm, non capisco...")
+
 
 def main():
+    hardcoded_contacts = [
+        {'nome': 'mario', 'cognome': 'rossi', 'telefono': '157347', 'email': 'mario@gmail.com', 'gruppo': 'IT'},
+        {'nome': 'ugo', 'cognome': 'bianchi', 'telefono': '9999', 'email': 'ugo@gmail.com', 'gruppo': None},
+        {'nome': 'elena', 'cognome': 'gialli', 'telefono': '222222', 'email': 'elena@gmail.com', 'gruppo': 'HR'},
+    ]
+
+    for persona in hardcoded_contacts:
+        # Accediamo ai valori usando le chiavi tra parentesi quadre
+        contact_add(
+            persona['nome'],
+            persona['cognome'],
+            persona['telefono'],
+            persona['email'],
+            persona['gruppo']
+        )
+
     ui_ask_what_to_do()
-    return 0
 
 if __name__ == '__main__':
-    sys.exit(main())
+  sys.exit( main() )
