@@ -113,6 +113,7 @@ def contact_search(n, c, g=None):
 ## --- User interface (UI) del programma
 
 
+
 def ui_add_contact():
     print("\nAggiunta di un nuovo contatto")
     nome = input(" - nome? ")
@@ -202,6 +203,7 @@ def ui_ask_what_to_do():
             break
         else:
             print(f"{choice}? mmm, non capisco...")
+
 
 
 def main():
