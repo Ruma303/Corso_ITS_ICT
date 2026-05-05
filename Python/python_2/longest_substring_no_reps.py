@@ -1,4 +1,4 @@
-'''
+"""
 Scrivere un programma che, letta una stringa 'string' da tastiera,
 restituisca tutte le più lunghe sottostringhe (diverse) di 'string' che
 non hanno caratteri ripetuti.
@@ -13,4 +13,4 @@ cbd
 
 Organizzare il programma in opportune funzioni che effettuino il calcolo.
 
-'''
+"""
