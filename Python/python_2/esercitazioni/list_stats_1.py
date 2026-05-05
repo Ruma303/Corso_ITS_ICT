@@ -23,6 +23,7 @@ list1 = [3, 7, 11, 18, 2, 4]
 def stats(list1):
   now_min = list1[0]
   now_max = list1[0]
+  sum_num = 0
 
   for num in list1:
     if num < now_min:
