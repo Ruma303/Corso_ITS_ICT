@@ -13,5 +13,3 @@ caratteri di punteggiatura.
 
 Organizzare il programma in opportune funzioni che effettuino il calcolo.
 '''
-
-

@@ -16,8 +16,10 @@ from sys import exit
 
 def sum_digits_2(n: int) -> int:
 
-  if type(n) is not int: raise TypeError("L'input inserito deve essere un intero")
-  if n < 0: raise ValueError("Il numero inserito non può essere negativo")
+  if type(n) is not int: 
+    raise TypeError("L'input inserito deve essere un intero")
+  if n < 0: 
+    raise ValueError("Il numero inserito non può essere negativo")
 
   result: int = 0
 

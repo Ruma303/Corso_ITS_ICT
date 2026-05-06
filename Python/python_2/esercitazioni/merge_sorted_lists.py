@@ -33,7 +33,7 @@ Prenda l'input dell'utente (i valori per list1 e list2) da tastiera,
 
 def get_list():
 
-  print(f"""
+  print("""
         \r==============================
         \rInserimento valori nella lista.
         \rInserire un numero minore del
