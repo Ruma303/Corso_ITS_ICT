@@ -32,11 +32,6 @@ In questa specifica sono stati aggiunti:
 	C2.3 dei moduli didattici ci interessa inserire soltanto quelli che ha superato, non tutti quelli del programma
 	C2.4 il luogo di nascita è un'associazione con la classe "LuogoNascita"
 
-	E2.1 [x] città, regione e nazione se vanno bene come singole stringhe componenti un campo composto oppure definirle come classi autonome
-	E2.2 [x] eventuali campi dei moduli superati. 
-		E2.2.1 [x] qui ci sarà sicuramente una associazione tra Studente e Modulo. Verificare il tipo di associazione
-		E2.2.2 [x] il concetto di superamento di un esame potrebbe implicare altri campi come data superamento e voto finale >= 18 (se la base è 30).
-
 
 ## 3. Requisiti sui docenti : Persona (specializzazione di Persona, eredita i suoi campi)
 
@@ -49,7 +44,6 @@ In questa specifica sono stati aggiunti:
 
 	4.1 nome;
 	4.2 edizione;
-	4.3 area disciplinare;
 
 	C4.2 l'edizione è un numero che indica l'anno di partenza
 		B3.1.1 Gli ITS in italia sono stati costituiti dal 2021, quindi questo è il valore minimo

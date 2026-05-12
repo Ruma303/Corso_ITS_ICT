@@ -50,6 +50,7 @@ tmp/
 *.temp
 ~$*
 *.old
+*.bak*
 
 #############################################
 # Output di build, dipendenze e artefatti   #
