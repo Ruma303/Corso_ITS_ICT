@@ -1,5 +1,10 @@
 from sys import exit
 
+# Un contatto non crea altri contatti, un gruppo non cerca altri gruppi.
+# Queste operazioni CRUD verranno spostate in una classe Agenda
+# che conterrà la logica in comune.
+# Le classi Contact e Group avranno soltanto un metodo per essere rappresentati.
+
 
 class Group:
     name: str
@@ -13,25 +18,17 @@ class Group:
         if name is not None and name != "":
             return f"Title: {self.name}\n" + f"Description: {self.description}"
 
-    def add(self): ...
-
-    def show(self): ...
-
-    def search(self): ...
-
-    def delete(self): ...
-
 
 class Contact:
     name: str
     lastname: str
     phone: str
     email: str
-    group: str
+    group: Group
 
-    def __init__(self, n: str, l: str, p: str, e: str, g: str):
+    def __init__(self, n: str, ln: str, p: str, e: str, g: Group):
         self.name = n
-        self.lastname = l
+        self.lastname = ln
         self.phone = p
         self.email = e
         self.group = g
@@ -45,7 +42,7 @@ class Contact:
             f"* {self.lastname}, {self.name}:\n"
             + f"{self.phone}\n"
             + f"{self.email}\n"
-            + f"{self.g.name}"
+            + f"{self.group}"
         )
 
 
@@ -66,8 +63,10 @@ class Agenda:
     def show_contacts(self):
         print(f"\nIn rubrica ci sono i seguenti {len(self.contacts)} contatti:\n")
         for c in self.contacts:
-            print(self.contacts.to_str(c))
+            print(c.to_str())
         print("Fatto.")
+
+    def delete_contact(self): ...
 
     def add_group(): ...
 
@@ -76,12 +75,17 @@ class Agenda:
     def search_group(): ...
 
 
-
 class UI:
+    """Classe che gestisce la presentazione da terminale"""
+    
     def __init__(self, agenda: Agenda):
         self.agenda = agenda
 
-    @staticmethod
+
+    def ui_add_contact(self): ...
+
+    def ui_show_contacts(): ...
+
     def main_menu():
         while True:
             menu_choice = 3
@@ -188,7 +192,8 @@ def main():
     groups = {g1, g2}
 
     try:
-        UI.main_menu()
+        menu = UI()
+        menu.main_menu()
         return 0
     except Exception as e:
         raise Exception(f"Errore generico: {e}")
