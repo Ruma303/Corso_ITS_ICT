@@ -5,6 +5,8 @@ from sys import exit
 # che conterrà la logica in comune.
 # Le classi Contact e Group avranno soltanto un metodo per essere rappresentati.
 
+# FIXME: Rimuovere tutte le classi extra
+# TODO: creare esternamente funzioni e collezioni groups e contacts
 
 class Group:
     name: str
@@ -14,8 +16,8 @@ class Group:
         self.name = n
         self.description = desc
 
-    def to_str(self, name: str, desc: str):
-        if name is not None and name != "":
+    def to_str(self):
+        if self.name is not None and self.name != "":
             return f"Title: {self.name}\n" + f"Description: {self.description}"
 
 
@@ -33,11 +35,11 @@ class Contact:
         self.email = e
         self.group = g
 
-    def to_str(self, name: str, lastname: str, phone: str, email: str, group: Group):
+    def to_str(self):
         if self.name == "" or self.name is None:
             return ""
 
-        g = group.name if not None else ""
+        g = self.group.name if not None else ""
         return (
             f"* {self.lastname}, {self.name}:\n"
             + f"{self.phone}\n"
@@ -77,16 +79,17 @@ class Agenda:
 
 class UI:
     """Classe che gestisce la presentazione da terminale"""
+    agenda: Agenda
     
-    def __init__(self, agenda: Agenda):
-        self.agenda = agenda
-
+    def __init__(self):
+      self.agenda = Agenda()
 
     def ui_add_contact(self): ...
 
     def ui_show_contacts(): ...
 
     def main_menu():
+
         while True:
             menu_choice = 3
 
