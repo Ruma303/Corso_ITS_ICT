@@ -64,13 +64,6 @@ class Dipartimento:
 
 
 class Impiegato:
-    nome: str
-    cognome: str
-    stipendio: float
-    data_nascita: date
-    data_afferenza: date
-    dipartimento: Dipartimento
-    direttore: bool
 
     def __init__(
         self,
