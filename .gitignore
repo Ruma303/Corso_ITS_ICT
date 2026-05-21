@@ -258,7 +258,6 @@ docker-compose*.log
 # Docker runtime
 docker-data/
 docker-volumes/
-**/data/
 **/volumes/
 
 # Vagrant

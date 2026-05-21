@@ -1,0 +1,43 @@
+{
+  "Department": {
+    "0": {
+      "nome": "IT",
+      "telefono": "123456",
+      "direttore_id": "verdi_luigi"
+    },
+    "1": {
+      "nome": "HR",
+      "telefono": "654321",
+      "direttore_id": null
+    }
+  },
+  "Employee": {
+    "0": {
+      "nome": "Mario",
+      "cognome": "Rossi",
+      "stipendio": 2500.0,
+      "data_nascita": "1985-05-20",
+      "data_afferenza": "2026-05-21",
+      "dipartimento_id": 0,
+      "direttore": false
+    },
+    "1": {
+      "nome": "Luigi",
+      "cognome": "Verdi",
+      "stipendio": 2200.0,
+      "data_nascita": "1990-11-12",
+      "data_afferenza": "2026-05-21",
+      "dipartimento_id": 0,
+      "direttore": true
+    },
+    "2": {
+      "nome": "Anna",
+      "cognome": "Bianchi",
+      "stipendio": 2800.0,
+      "data_nascita": "1988-03-05",
+      "data_afferenza": "2026-05-21",
+      "dipartimento_id": 1,
+      "direttore": false
+    }
+  }
+}
