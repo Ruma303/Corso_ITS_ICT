@@ -27,185 +27,171 @@ Questi requisiti sono un frammento di quelli gestiti durante la fase di Analisi 
     - ignoriamo i progetti aziendali.
 """
 
+from __future__ import annotations
+
 import sys
-
-# Importiamo la class 'date' dal modulo 'datetime'.
-# Le istanze di 'date' rappresentano valori del tipo 'Data'.
-# https://docs.python.org/3/library/datetime.html#datetime.date
 from datetime import date
-
-# INFO: Relazioni UML
-# INFO: Afferenza (1..1): Ogni impiegato appartiene a esattamente un dipartimento.
-# INFO: Direzione (0..1): Un impiegato può dirigere un dipartimento (o nessuno).
-
 
 # Class di interesse per il programma
 
-class Dipartimento:
-    nome: str
-    telefono: str
-    #  Per un dipartimento ci può essere un impiegato che lo dirige, 0..1
-    direttore: "Impiegato | None"
 
-    def __init__(self, n: str, t: str, d: "Impiegato | None"):
+class Dipartimento:
+    dipartimenti: dict[str, Dipartimento] = {}
+
+    def __init__(self, n: str, t: str, d: Impiegato | None):
         self.nome = n
         self.telefono = t
         self.direttore = d
 
-    def to_str(self) -> str:
-        if self.direttore:
-            dir_str = f"{self.direttore.cognome} {self.direttore.nome}"
-        else:
-            dir_str = "Nessuno"
+        print(type(self))
 
+    def to_str(self) -> str:
+        dir_str = (
+            f"{self.direttore.cognome} {self.direttore.nome}"
+            if self.direttore
+            else "Nessuno"
+        )
         return (
             f"Dipartimento: {self.nome} (Tel: {self.telefono} | Direttore: {dir_str})"
         )
 
+    def imposta_direzione(self, nuovo_direttore: Impiegato):
+        # Il precedente direttore diventa impiegato normale
+        if self.direttore:
+            self.direttore.direttore = False
+
+        # Assegna il nuovo direttore al dipartimento
+        self.direttore = nuovo_direttore
+        nuovo_direttore.direttore = True
+
+    @classmethod
+    def cerca(cls, nome: str) -> Dipartimento | None:
+        return cls.dipartimenti.get(nome.lower(), None)
+
+    @classmethod
+    def cerca_per_telefono(cls, telefono: str) -> Dipartimento | None:
+        for dip in cls.dipartimenti.values():
+            if dip.telefono == telefono:
+                return dip
+        return None
+
 
 class Impiegato:
+    impiegati: dict[str, Impiegato] = {}
 
     def __init__(
         self,
-        n: str,
-        c: str,
-        s: float,
-        d: date,
-        da: date,
-        dip: Dipartimento,
-        dir: bool = False,
+        nome: str,
+        cognome: str,
+        stipendio: float,
+        data_nascita: date,
+        data_afferenza: date,
+        dipartimento: Dipartimento | None,
+        direttore: bool = False,
     ):
-        if s <= 0:
-            raise ValueError("Lo stipendio deve essere maggiore di zero.")
-        self.nome = n
-        self.cognome = c
-        self.stipendio = s
-        self.data_nascita = d
-        self.data_afferenza = da
-        self.dipartimento = dip  # Relazione afferenza 1..1
-        self.direttore = dir  # di default è False
+        assert stipendio >= 0.0, "Lo stipendio deve essere maggiore o uguale a zero."
+        self.nome = nome
+        self.cognome = cognome
+        self.stipendio = stipendio
+        self.data_nascita = data_nascita
+        self.data_afferenza = data_afferenza
+        self.dipartimento = dipartimento  # Relazione afferenza 1..1
+        self.direttore = direttore  # di default è False
 
     def to_str(self) -> str:
+        nome_dip = self.dipartimento.nome if self.dipartimento else "Nessuno"
+
         if self.direttore:
-            return (
-                f"{self.cognome}, {self.nome}\n"
-                + f"Stipendio: {self.stipendio} €\n"
-                + f"Nato il: {self.data_nascita}\n"
-                + f"Direttore del dipartimento '{self.dipartimento.nome}' dal {self.data_afferenza}\n"
+            info_ruolo = (
+                f"Direttore del dipartimento '{nome_dip}' dal {self.data_afferenza}"
             )
-
         else:
-            return (
-                f"{self.cognome}, {self.nome}\n"
-                + f"Stipendio: {self.stipendio} €\n"
-                + f"Nato il: {self.data_nascita}\n"
-                + f"Afferisce a: {self.dipartimento.nome} dal {self.data_afferenza}\n"
-            )
+            info_ruolo = f"Afferisce a: {nome_dip} dal {self.data_afferenza}"
+
+        return (
+            f"{self.cognome}, {self.nome}\n"
+            f"Stipendio: {self.stipendio} €\n"
+            f"Nato il: {self.data_nascita}\n"
+            f"{info_ruolo}\n"
+        )
+
+    @staticmethod
+    def genera_chiave(nome: str, cognome: str) -> str:
+        return f"{cognome}_{nome}".lower()
+
+    @classmethod
+    def cerca(cls, nome: str, cognome: str) -> Impiegato | None:
+        chiave = cls.genera_chiave(nome, cognome)
+        return cls.impiegati.get(chiave, None)
 
 
-# --- Metodi di Ricerca ---
+# --- Metodi di Inserimento ed Interfaccia (UI) ---
 
 
-def cerca_dipartimento(nome: str, dipartimenti) -> Dipartimento | None:
-    return dipartimenti.get(nome.lower(), None)
-
-
-def cerca_dipartimento_per_telefono(telefono: str, dipartimenti) -> Dipartimento | None:
-    for dip in dipartimenti.values():
-        if dip.telefono == telefono:
-            return dip
-    return None
-
-
-def cerca_impiegato(nome: str, cognome: str, impiegati) -> Impiegato | None:
-    chiave = f"{cognome}_{nome}".lower()
-    return impiegati.get(chiave, None)
-
-
-# --- Metodi di Inserimento ---
-
-
-def aggiungi_dipartimento(self, dipartimento: Dipartimento):
-    self.dipartimenti[dipartimento.nome.lower()] = dipartimento
-
-
-def aggiungi_impiegato(impiegato, impiegati):
-    chiave = f"{impiegato.cognome}_{impiegato.nome}".lower()
-    impiegati[chiave] = impiegato
-
-
-def imposta_direzione(dipartimento: Dipartimento, impiegato: Impiegato):
-    # Il precedente direttore diventa impiegato normale
-    if dipartimento.direttore:
-        dipartimento.direttore.direttore = False
-
-    # Assegna il nuovo direttore al dipartimento
-    dipartimento.direttore = impiegato
-    impiegato.direttore = True
-
-def ui_set_director(dipartimenti: dict[str, Dipartimento], impiegati: dict[str, Impiegato]):
+def ui_set_director():
     print("\n--- ASSEGNA DIRETTORE A DIPARTIMENTO ---")
-    
+
     nome_dip = input("Nome del dipartimento: ").strip().lower()
-    dip = cerca_dipartimento(nome_dip, dipartimenti)
-    
+    dip = Dipartimento.cerca(nome_dip)
+
     if not dip:
         print("Errore: Dipartimento non trovato.")
         return
 
     print(f"Dipartimento selezionato: {dip.nome}")
-    scelta_emp = input("Inserisci la chiave dell'impiegato (es. rossi_mario): ").strip().lower()
-    emp = impiegati.get(scelta_emp)
+    scelta_emp = (
+        input("Inserisci la chiave dell'impiegato (es. rossi_mario): ").strip().lower()
+    )
+    emp = Impiegato.impiegati.get(scelta_emp)
 
     if not emp:
         print("Errore: Impiegato non trovato.")
         return
 
-    imposta_direzione(dip, emp)
+    dip.imposta_direzione(emp)
     print(f"Successo! {emp.nome} {emp.cognome} ora dirige il dipartimento {dip.nome}.")
 
 
-# Funzioni di interfaccia ("ui": "User interface")
-
-def ui_empoloyees_show(impiegati: dict[str, Impiegato], direttori = False):
-  if not direttori:
-    return [e for e, v in impiegati.items() if not v.direttore]
-  else:
-    return [e for e, v in impiegati.items() if v.direttore]
+def ui_empoloyees_show(direttori=False):
+    if not direttori:
+        return [e for e, v in Impiegato.impiegati.items() if not v.direttore]
+    else:
+        return [e for e, v in Impiegato.impiegati.items() if v.direttore]
 
 
-def ui_departments_show(dipartimenti: dict[str, Dipartimento]):
-  return [d for d, v in dipartimenti.items()]
+def ui_departments_show():
+    return [d for d in Dipartimento.dipartimenti.keys()]
 
 
-def ui_add_department(dipartimenti: dict[str, Dipartimento], impiegati: dict[str, Impiegato], nome_predefinito = "") -> Dipartimento | None:
+def ui_add_department(nome_predefinito="") -> Dipartimento | None:
     print("\n--- NUOVO DIPARTIMENTO ---")
     if nome_predefinito == "":
-      nome = input("Inserisci il nome del dipartimento: ").strip()
+        nome = input("Inserisci il nome del dipartimento: ").strip()
     else:
-      nome = nome_predefinito 
+        nome = nome_predefinito
 
-    # Controllo univocità nome
-    if cerca_dipartimento(nome, dipartimenti):
+    # Controllo univocità nome tramite Classmethod
+    if Dipartimento.cerca(nome):
         print(f"Errore: Il dipartimento '{nome}' esiste già.")
         return None
 
     telefono = input("Inserisci il telefono: ").strip()
 
     # Controllo univocità telefono
-    if cerca_dipartimento_per_telefono(telefono, dipartimenti):
-        print(f"Errore: Il telefono '{telefono}' è già associato a un altro dipartimento.")
+    if Dipartimento.cerca_per_telefono(telefono):
+        print(
+            f"Errore: Il telefono '{telefono}' è già associato a un altro dipartimento."
+        )
         return None
 
-    # Mostra tutti gli impiegati non direttori
     print("\nImpiegati disponibili per la direzione:")
-    candidati = ui_empoloyees_show(impiegati, direttori = False)
+    candidati = ui_empoloyees_show(direttori=False)
 
     if not candidati:
         print("Nessun impiegato disponibile al momento.")
     else:
         for k in candidati:
-            emp = impiegati[k]
+            emp = Impiegato.impiegati[k]
             print(f" > {k} ({emp.cognome} {emp.nome})")
 
     scelta = (
@@ -217,12 +203,11 @@ def ui_add_department(dipartimenti: dict[str, Dipartimento], impiegati: dict[str
     obj_direttore = None
 
     if scelta:
-        if scelta in impiegati:
-            emp_scelto = impiegati[scelta]
+        if scelta in Impiegato.impiegati:
+            emp_scelto = Impiegato.impiegati[scelta]
 
             if emp_scelto.direttore:
                 print(f"Errore: {emp_scelto.nome} già dirige un altro dipartimento!")
-                # Non usciamo con return, creiamo il dipartimento senza direttore
             else:
                 obj_direttore = emp_scelto
                 obj_direttore.direttore = True
@@ -232,31 +217,33 @@ def ui_add_department(dipartimenti: dict[str, Dipartimento], impiegati: dict[str
                 input("Vuoi creare un nuovo impiegato ora? (Y/N): ").strip().lower()
             )
             if choice in ("y", "si", "sì"):
-                # Nota: ui_add_employee aggiunge al dizionario 'impiegati'
-                ui_add_employee(dipartimenti, impiegati)
+                ui_add_employee()
                 print(
-                    "Impiegato creato. Per assegnarlo come direttore, usa la funzione di modifica (se prevista) o ricomincia."
+                    "Impiegato creato. Per assegnarlo come direttore, usa la funzione di modifica o ricomincia."
                 )
 
-    # Creazione effettiva
+    # Creazione effettiva e inserimento nell'attributo di classe
     nuovo_dip = Dipartimento(nome, telefono, obj_direttore)
-    dipartimenti[nome.lower()] = nuovo_dip
+    Dipartimento.dipartimenti[nome.lower()] = nuovo_dip
 
-    # Conferma finale corretta
-    nome_direttore = f"{obj_direttore.cognome} {obj_direttore.nome}" if obj_direttore else "Nessun direttore"
+    nome_direttore = (
+        f"{obj_direttore.cognome} {obj_direttore.nome}"
+        if obj_direttore
+        else "Nessun direttore"
+    )
     print(f"\nSuccesso! {nuovo_dip.to_str()}")
     print(f"Direttore assegnato: {nome_direttore}")
 
     return nuovo_dip
 
 
-def ui_add_employee(dipartimenti: dict[str, Dipartimento], impiegati: dict[str, Impiegato]) -> Impiegato | None:
+def ui_add_employee() -> Impiegato | None:
     print("\n--- NUOVO IMPIEGATO ---")
     nome = input("Inserisci il nome: ").strip()
     cognome = input("Inserisci il cognome: ").strip()
 
-    # Verifica univocità dell'impiegato
-    if cerca_impiegato(nome, cognome, impiegati):
+    # Verifica univocità dell'impiegato tramite Classmethod
+    if Impiegato.cerca(nome, cognome):
         print(f"Errore: L'impiegato {cognome} {nome} è già registrato.")
         return None
 
@@ -276,16 +263,16 @@ def ui_add_employee(dipartimenti: dict[str, Dipartimento], impiegati: dict[str, 
         print("Errore: Formato data non valido. Usa YYYY-MM-DD.")
         return None
 
-    # Associazione Dipartimento (deve esistere)
     nome_dip = input("Inserisci il nome del dipartimento: ").strip()
-    dipartimento = cerca_dipartimento(nome_dip, dipartimenti)
+    dipartimento = Dipartimento.cerca(nome_dip)
 
     if dipartimento is None:
-        print(f"Errore! Il dipartimento '{nome_dip}' non esiste!" + \
-          "Assicurati di creare un dipartimento prima di assegnarlo.\n")
+        print(
+            f"Errore! Il dipartimento '{nome_dip}' non esiste!\n"
+            f"Assicurati di creare un dipartimento prima di assegnarlo.\n"
+        )
         return None
 
-    # Dopo che 'dipartimento' è stato valorizzato
     data_afferenza = input("Inserisci la data di afferenza (YYYY-MM-DD): ").strip()
     try:
         data_afferenza = date.fromisoformat(data_afferenza)
@@ -293,7 +280,6 @@ def ui_add_employee(dipartimenti: dict[str, Dipartimento], impiegati: dict[str, 
         print("Errore: Formato data non valido. Usa YYYY-MM-DD.")
         return None
 
-    # HACK: Chiedere se è un impiegato semplice e quindi afferisce ad un dipartimento, oppure se lo dirige
     dirige = (
         input(
             "Questo impiegato dirige il dipartimento? Scrivere Y per confermare, qualsiasi altra risposta indica che afferisce al dipartimento:\n"
@@ -304,8 +290,6 @@ def ui_add_employee(dipartimenti: dict[str, Dipartimento], impiegati: dict[str, 
     assegna_direttore = False
 
     if dirige in ("y", "yes", "si", "sì"):
-        # Verificare se c'è già un direttore. 
-        # In quel caso chiedere se aggiornarlo con il nuovo oppure no.
         if dipartimento.direttore is not None:
             direttore_attuale = dipartimento.direttore
             choice = (
@@ -322,7 +306,7 @@ def ui_add_employee(dipartimenti: dict[str, Dipartimento], impiegati: dict[str, 
         else:
             assegna_direttore = True
 
-    # Creazione e salvataggio impiegato
+    # Creazione impiegato
     nuovo_impiegato = Impiegato(
         nome,
         cognome,
@@ -333,86 +317,82 @@ def ui_add_employee(dipartimenti: dict[str, Dipartimento], impiegati: dict[str, 
         assegna_direttore,
     )
 
-    # Se il nuovo impiegato è direttore, aggiorniamo il suo riferimento nell'oggetto Dipartimento
     if assegna_direttore:
-        imposta_direzione(dipartimento, nuovo_impiegato)
+        dipartimento.imposta_direzione(nuovo_impiegato)
 
-    employee = aggiungi_impiegato(nuovo_impiegato, impiegati)
+    # Salvataggio diretto nell'attributo di classe usando il metodo statico per la chiave
+    chiave = Impiegato.genera_chiave(nome, cognome)
+    Impiegato.impiegati[chiave] = nuovo_impiegato
+
     if assegna_direttore:
-      print(f"\nNuovo direttore aggiunto con successo:\n{nuovo_impiegato.to_str()}")
-    else: 
-      print(f"\nNuovo impiegato aggiunto con successo:\n{nuovo_impiegato.to_str()}")
-    return employee
+        print(f"\nNuovo direttore aggiunto con successo:\n{nuovo_impiegato.to_str()}")
+    else:
+        print(f"\nNuovo impiegato aggiunto con successo:\n{nuovo_impiegato.to_str()}")
+
+    return nuovo_impiegato
 
 
-def ui_ask_what_to_do(dipartimenti: dict[str, Dipartimento], impiegati: dict[str, Impiegato]):
+def ui_ask_what_to_do():
     while True:
         print(
-            "\n\n\n----------\n\nScegli un'azione:\n"
-            + " 1 - aggiungi dipartimento\n"
-            + " 2 - aggiungi impiegato\n"
-            + " 3 - mostra impiegati\n"
-            + " 4 - mostra direttori\n"
-            + " 5 - mostra dipartimenti\n"
-            + " 6 - cambia direttore\n"
-            + " 7 - esci\n"
+            "\n======================\n"
+            "\nScegli un'azione:\n"
+            "\r\t1 - aggiungi dipartimento\n"
+            "\r\t2 - aggiungi impiegato\n"
+            "\r\t3 - mostra impiegati\n"
+            "\r\t4 - mostra direttori\n"
+            "\r\t5 - mostra dipartimenti\n"
+            "\r\t6 - cambia direttore\n"
+            "\r\t7 - esci\n\n"
         )
 
-        choice = input("Digita un numero o l'azione corrispondente: ")
+        choice = input("Digita un numero o l'azione corrispondente: ").strip().lower()
 
-        if choice == "aggiungi dipartimento" or choice == "1":
-            ui_add_department(dipartimenti, impiegati)
-        elif choice == "aggiungi impiegato" or choice == "2":
-            ui_add_employee(dipartimenti, impiegati)
-        elif choice == "mostra impiegati" or choice == "3":
-            print(ui_empoloyees_show(impiegati, False))
-        elif choice == "mostra direttori" or choice == "4":
-            print(ui_empoloyees_show(impiegati, True))
-        elif choice == "mostra dipartimenti" or choice == "5":
-            print(ui_departments_show(dipartimenti))
-        elif choice == "cambia direttore" or choice == "6":
-            ui_set_director(dipartimenti, impiegati)
-        elif choice == "esci" or choice == "7":
+        if choice in ("aggiungi dipartimento", "1"):
+            ui_add_department()
+        elif choice in ("aggiungi impiegato", "2"):
+            ui_add_employee()
+        elif choice in ("mostra impiegati", "3"):
+            print(ui_empoloyees_show(False))
+        elif choice in ("mostra direttori", "4"):
+            print(ui_empoloyees_show(True))
+        elif choice in ("mostra dipartimenti", "5"):
+            print(ui_departments_show())
+        elif choice in ("cambia direttore", "6"):
+            ui_set_director()
+        elif choice in ("esci", "7"):
             print("Arrivederci!")
             break
         else:
-            print(f"Comando '{choice}' sconosciuto. Riprova.\n")
+            print(f"\nComando '{choice}' sconosciuto. Riprova.\n")
+
+
+def precarica_dati():
+    dip_it = Dipartimento("IT", "123456", None)
+    dip_hr = Dipartimento("HR", "654321", None)
+
+    Dipartimento.dipartimenti[dip_it.nome.lower()] = dip_it
+    Dipartimento.dipartimenti[dip_hr.nome.lower()] = dip_hr
+    oggi = date.today()
+
+    emp1 = Impiegato("Mario", "Rossi", 2500.0, date(1985, 5, 20), oggi, dip_it, False)
+    emp2 = Impiegato("Luigi", "Verdi", 2200.0, date(1990, 11, 12), oggi, dip_it, True)
+    dip_it.direttore = emp2
+    emp3 = Impiegato("Anna", "Bianchi", 2800.0, date(1988, 3, 5), oggi, dip_hr, False)
+
+    Impiegato.impiegati[Impiegato.genera_chiave(emp1.nome, emp1.cognome)] = emp1
+    Impiegato.impiegati[Impiegato.genera_chiave(emp2.nome, emp2.cognome)] = emp2
+    Impiegato.impiegati[Impiegato.genera_chiave(emp3.nome, emp3.cognome)] = emp3
 
 
 def main():
-
-    # HACK: Creazione delle strutture e dati principali all'avvio del programma
-
-    dipartimenti: dict[str, Dipartimento] = {}
-    impiegati: dict[str, Impiegato] = {}
-
-    def precarica_dati():
-        dip_it = Dipartimento("IT", "123456", None)
-        dip_hr = Dipartimento("HR", "654321", None)
-
-        dipartimenti[dip_it.nome.lower()] = dip_it
-        dipartimenti[dip_hr.nome.lower()] = dip_hr
-        oggi = date.today()
-
-        emp1 = Impiegato(
-            "Mario", "Rossi", 2500.0, date(1985, 5, 20), oggi, dip_it, False
-        )
-        emp2 = Impiegato(
-            "Luigi", "Verdi", 2200.0, date(1990, 11, 12), oggi, dip_it, True
-        )
-        dip_it.direttore = emp2
-        emp3 = Impiegato(
-            "Anna", "Bianchi", 2800.0, date(1988, 3, 5), oggi, dip_hr, False
-        )
-
-        # "cognome_nome" in minuscolo come chiave univoca per gli impiegati
-        impiegati[f"{emp1.cognome}_{emp1.nome}".lower()] = emp1
-        impiegati[f"{emp2.cognome}_{emp2.nome}".lower()] = emp2
-        impiegati[f"{emp3.cognome}_{emp3.nome}".lower()] = emp3
-
-    precarica_dati()
-
-    ui_ask_what_to_do(dipartimenti, impiegati)
+    try:
+        precarica_dati()
+        ui_ask_what_to_do()
+    except AssertionError as e:
+        print(f"AssertionError: {e}")
+    except Exception as e:
+        print(f"{e.__class__.__name__}: {e}")
     return 0
 
 
