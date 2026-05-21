@@ -29,8 +29,10 @@ Questi requisiti sono un frammento di quelli gestiti durante la fase di Analisi 
 
 from __future__ import annotations
 
+import json
 import sys
 from datetime import date
+from pathlib import Path
 
 # Class di interesse per il programma
 
@@ -170,14 +172,12 @@ def ui_add_department(nome_predefinito="") -> Dipartimento | None:
     else:
         nome = nome_predefinito
 
-    # Controllo univocità nome tramite Classmethod
     if Dipartimento.cerca(nome):
         print(f"Errore: Il dipartimento '{nome}' esiste già.")
         return None
 
     telefono = input("Inserisci il telefono: ").strip()
 
-    # Controllo univocità telefono
     if Dipartimento.cerca_per_telefono(telefono):
         print(
             f"Errore: Il telefono '{telefono}' è già associato a un altro dipartimento."
@@ -222,7 +222,6 @@ def ui_add_department(nome_predefinito="") -> Dipartimento | None:
                     "Impiegato creato. Per assegnarlo come direttore, usa la funzione di modifica o ricomincia."
                 )
 
-    # Creazione effettiva e inserimento nell'attributo di classe
     nuovo_dip = Dipartimento(nome, telefono, obj_direttore)
     Dipartimento.dipartimenti[nome.lower()] = nuovo_dip
 
@@ -242,7 +241,6 @@ def ui_add_employee() -> Impiegato | None:
     nome = input("Inserisci il nome: ").strip()
     cognome = input("Inserisci il cognome: ").strip()
 
-    # Verifica univocità dell'impiegato tramite Classmethod
     if Impiegato.cerca(nome, cognome):
         print(f"Errore: L'impiegato {cognome} {nome} è già registrato.")
         return None
@@ -367,27 +365,60 @@ def ui_ask_what_to_do():
             print(f"\nComando '{choice}' sconosciuto. Riprova.\n")
 
 
-def precarica_dati():
-    dip_it = Dipartimento("IT", "123456", None)
-    dip_hr = Dipartimento("HR", "654321", None)
+def precarica_dati(data_dir: Path):
+    file_dip = data_dir / "dipartimenti.json"
+    file_emp = data_dir / "impiegati.json"
 
-    Dipartimento.dipartimenti[dip_it.nome.lower()] = dip_it
-    Dipartimento.dipartimenti[dip_hr.nome.lower()] = dip_hr
-    oggi = date.today()
+    if not file_dip.exists() or not file_emp.exists():
+        print(
+            "⚠️ Attenzione: File di configurazione JSON non trovati in 'data/'. Il programma partirà vuoto."
+        )
+        return
 
-    emp1 = Impiegato("Mario", "Rossi", 2500.0, date(1985, 5, 20), oggi, dip_it, False)
-    emp2 = Impiegato("Luigi", "Verdi", 2200.0, date(1990, 11, 12), oggi, dip_it, True)
-    dip_it.direttore = emp2
-    emp3 = Impiegato("Anna", "Bianchi", 2800.0, date(1988, 3, 5), oggi, dip_hr, False)
+    # Phase 1: Carica i dipartimenti in memoria (senza direttore per ora)
+    with open(file_dip, "r", encoding="utf-8") as f:
+        dati_dipartimenti = json.load(f)
 
-    Impiegato.impiegati[Impiegato.genera_chiave(emp1.nome, emp1.cognome)] = emp1
-    Impiegato.impiegati[Impiegato.genera_chiave(emp2.nome, emp2.cognome)] = emp2
-    Impiegato.impiegati[Impiegato.genera_chiave(emp3.nome, emp3.cognome)] = emp3
+    mappa_direttori_temp = {}  # Memorizza momentaneamente quale impiegato deve dirigere cosa
+    for d in dati_dipartimenti:
+        nuovo_dip = Dipartimento(d["nome"], d["telefono"], None)
+        Dipartimento.dipartimenti[nuovo_dip.nome.lower()] = nuovo_dip
+        if d.get("direttore_id"):
+            mappa_direttori_temp[nuovo_dip.nome.lower()] = d["direttore_id"]
+
+    # Phase 2: Carica gli impiegati legandoli al rispettivo dipartimento oggetto
+    with open(file_emp, "r", encoding="utf-8") as f:
+        dati_impiegati = json.load(f)
+
+    for e in dati_impiegati:
+        dip_obj = Dipartimento.cerca(e["dipartimento_id"])
+
+        nuovo_emp = Impiegato(
+            nome=e["nome"],
+            cognome=e["cognome"],
+            stipendio=float(e["stipendio"]),
+            data_nascita=date.fromisoformat(e["data_nascita"]),
+            data_afferenza=date.fromisoformat(e["data_afferenza"]),
+            dipartimento=dip_obj,
+            direttore=e["direttore"],
+        )
+        chiave_emp = Impiegato.genera_chiave(nuovo_emp.nome, nuovo_emp.cognome)
+        Impiegato.impiegati[chiave_emp] = nuovo_emp
+
+    # Phase 3: Ricostruisci i riferimenti ai direttori d'ufficio ora che tutti gli oggetti esistono
+    for nome_dip_min, chiave_direttore in mappa_direttori_temp.items():
+        dip_obj = Dipartimento.dipartimenti.get(nome_dip_min)
+        emp_obj = Impiegato.impiegati.get(chiave_direttore)
+        if dip_obj and emp_obj:
+            dip_obj.direttore = emp_obj
 
 
 def main():
+    # Definisce il percorso verso la cartella corrente cwd / data
+    data_dir = Path.cwd() / "data"
+
     try:
-        precarica_dati()
+        precarica_dati(data_dir)
         ui_ask_what_to_do()
     except AssertionError as e:
         print(f"AssertionError: {e}")
