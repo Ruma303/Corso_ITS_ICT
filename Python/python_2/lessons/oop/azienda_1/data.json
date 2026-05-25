@@ -1,0 +1,33 @@
+{
+	"Department": {
+		"0": {
+			"name": "Vendite",
+			"phone": "+39065594932"
+		},
+
+		"1": {
+			"name": "Acquisti",
+			"phone": "+39065594933"
+		}
+	},
+
+	"Employee": {
+		"0": {
+			"name": "Anna",
+			"surname": "Bianchi",
+			"wage": 56000.00,
+			"birth date": "2000-01-01",
+			"department": 1,
+			"employment date": "2005-05-05"
+		},
+
+		"1": {
+			"name": "Biagio",
+			"surname": "Rossi",
+			"wage": 45000.00,
+			"birth date": "1998-10-20",
+			"department": 0,
+			"employment date": "2002-07-15"
+		}
+	}
+}
