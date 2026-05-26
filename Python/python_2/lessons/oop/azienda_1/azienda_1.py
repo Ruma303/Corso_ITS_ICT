@@ -35,14 +35,15 @@ con i costrutti che conosciamo già:
 
 
 Gestire la persistenza dei dati tramite un file JSON.
-"""
-
-import json
-import sys
 
 # Importiamo la class 'date' dal modulo 'datetime'.
 # Le istanze di 'date' rappresentano valori del tipo 'Data'.
 # https://docs.python.org/3/library/datetime.html#datetime.date
+
+"""
+
+import json
+import sys
 from datetime import date
 from typing import Self
 
@@ -60,15 +61,15 @@ class Department:
     # per creare nuovi oggetti (factory methods)
     # Il metodo __init__(self, i,n,p) sarà utilizzato in modo
     # appropriato dai factory methods.
-    def __init__(self, i: int, n: str, p: str) -> None:
+    def __init__(self, i: int, name: str, phone: str) -> None:
 
         assert type(self).next_i not in type(self).all_departments, (
-            f"Error, this should NEVER happen!"
+            "Error, this should NEVER happen!"
         )
 
         self.i = i
-        self.name = n
-        self.phone = p
+        self.name = name
+        self.phone = phone
 
         # Aggiungo il nuovo oggetto al dizionario di tutti gli oggetti della classe esistenti
         type(self).all_departments[self.i] = self
@@ -94,7 +95,7 @@ class Department:
         return result
 
     @classmethod
-    def search(cls, n: str | None, p: str | None) -> list[Department]:
+    def search(cls, n: str | None, p: str | None) -> list[Self]:
         result = []
         for d in cls.all_departments.values():
             if (n != "" and n is not None and d.name != n) or (
@@ -106,7 +107,7 @@ class Department:
         return result
 
     @classmethod
-    def get(cls, i: int) -> Department:
+    def get(cls, i: int) -> Self:
         # print(f"Getting department {i}. All departments: {cls.all_departments}")
         return cls.all_departments[i]
 
@@ -128,33 +129,45 @@ class Employee:
         name: str,
         surname: str,
         wage: float,
-        bdate: date,
+        birth_date: date,
         # il link, con il suo attributo!
-        department: Department,
-        empdate: date,
+        department: Department | None,
+        emp_date: date | None,
     ) -> None:
 
         assert type(self).next_i not in type(self).all_employees, (
-            f"Error, this should NEVER happen!"
+            "Error, this should NEVER happen!"
         )
+
+        assert wage > 0, "Error, wage cannot be zero or negative"
 
         self.i = i
         self.name = name
         self.surname = surname
         self.wage = wage
-        self.birth_date = bdate
+        self.birth_date = birth_date
 
-        self.dept = department
-        self.emp_date = empdate
+        self.department = department
+        self.emp_date = emp_date
 
         type(self).all_employees[self.i] = self
 
     @classmethod
     # Crea un nuovo oggetto, assegnandogli un id ('i') automaticamente
     def create(
-        cls, n: str, s: str, w: float, bdate: date, d: Department, empdate: date
+        cls,
+        name: str,
+        surname: str,
+        wage: float,
+        birth_date: date,
+        department: Department | None,
+        emp_date: date | None,
     ) -> Self:
-        result = cls(cls.next_i, n, s, w, bdate, d, empdate)
+
+        if department is None:
+            emp_date = None
+
+        result = cls(cls.next_i, name, surname, wage, birth_date, department, emp_date)
         cls.next_i += 1
         return result
 
@@ -168,8 +181,12 @@ class Employee:
             d["surname"],
             d["wage"],
             date.fromisoformat(d["birth date"]),
-            Department.get(d["department"]),
-            date.fromisoformat(d["employment date"]),
+            Department.get(d["department"]) if d["department"] is not None else None,
+            (
+                date.fromisoformat(d["employment date"])
+                if d["employment date"] is not None
+                else None
+            ),
         )
         if cls.next_i <= i:
             cls.next_i = (
@@ -185,7 +202,7 @@ class Employee:
             if (
                 (n != "" and n is not None and e.name != n)
                 or (s != "" and s is not None and e.surname != s)
-                or (d is not None and e.dept != d)
+                or (d is not None and e.department != d)
             ):
                 continue
 
@@ -194,10 +211,12 @@ class Employee:
         return result
 
     def to_str(self):
-        return f"{self.surname}, {self.name}\n\r\t- wage = {self.wage}\n\r\t- birth_date = {self.birth_date}\n\r\t- department = {self.dept.to_str()} (from {self.emp_date})"
-
-
-# Funzioni di interfaccia ("ui": "User interface")
+        department_str = (
+            f"{self.department.to_str()} (from {self.emp_date})"
+            if self.department is not None
+            else "None"
+        )
+        return f"{self.surname}, {self.name}\n\r\t- wage = {self.wage}\n\r\t- birth_date = {self.birth_date}\n\r\t- department = {department_str}"
 
 
 def input_date(msg: str):
@@ -219,13 +238,13 @@ def input_department(msg: str, allow_none: bool) -> Department | None:
 
     while result is None:
         dept_id_str = input("ID? ")
-        if dept_id_str == "" and allow_none == True:
+        if dept_id_str == "" and allow_none is True:
             break
 
         try:
             dept_id = int(dept_id_str)
             result = Department.get(dept_id)
-        except:
+        except Exception:
             print("Write the ID of a department")
 
     return result
@@ -237,11 +256,13 @@ def ui_add_employee():
     w = input("Wage? ")
 
     bdate = input_date("Birth date? ")
-    d = input_department("Department? ", False)
+    d = input_department("Department? ", True)
 
-    emp_date = input_date("Employment date? ")
+    emp_date = None
+    if d is not None:
+        emp_date = input_date("Employment date? ")
 
-    e = Employee.create(n, s, float(w), bdate, d, emp_date)
+    return Employee.create(n, s, float(w), bdate, d, emp_date)
 
 
 def ui_search_employees():
@@ -305,7 +326,7 @@ def load_all():
         data: dict = json.load(fp)
 
         # Leggi l'entry 'Department' del database
-        print(f" - Departments")
+        print(" - Departments")
         try:
             for i, obj in data["Department"].items():
                 try:
@@ -317,10 +338,10 @@ def load_all():
                         f"Error while reading department {obj} in database. Detailed error: {ex}"
                     )
         except KeyError:
-            print(f"Error: misformed data file: entry 'Department' does not exist")
+            print("Error: misformed data file: entry 'Department' does not exist")
 
         # Leggi l'entry 'Employee' del database
-        print(f" - Employees")
+        print(" - Employees")
         try:
             for i, obj in data["Employee"].items():
                 print(f"   - Found data for employee {i}: {obj}")
@@ -332,29 +353,59 @@ def load_all():
                         f"Error while reading employee {obj} in database. Detailed error: {ex}"
                     )
         except KeyError:
-            print(f"Error: misformed data file: entry 'Employee' does not exist")
+            print("Error: misformed data file: entry 'Employee' does not exist")
 
-        # Chiudi il file
+        # Chiude lo stream del file
         fp.close()
 
+    except FileNotFoundError:
+        print(f"File '{datafile}' not found. Starting with an empty database.")
     except Exception as ex:
         print(f"Error: cannot open data file. Error: {ex}")
 
 
 def save_all():
-    print(f"Saving data to file '{datafile}' (nothing done, really)")
-    pass
-    # Implementala tu!
+    print(f"Saving data to file '{datafile}'...")
+
+    # Costruiamo la struttura dati che verrà salvata nel JSON
+    data_to_save = {"Department": {}, "Employee": {}}
+
+    # Serializziamo i dipartimenti
+    for dept_id, dept in Department.all_departments.items():
+        data_to_save["Department"][str(dept_id)] = {
+            "name": dept.name,
+            "phone": dept.phone,
+        }
+
+    # Serializziamo gli impiegati
+    for emp_id, emp in Employee.all_employees.items():
+        data_to_save["Employee"][str(emp_id)] = {
+            "name": emp.name,
+            "surname": emp.surname,
+            "wage": emp.wage,
+            "birth date": emp.birth_date.isoformat(),
+            "department": emp.department.i if emp.department is not None else None,
+            "employment date": emp.emp_date.isoformat()
+            if emp.emp_date is not None
+            else None,
+        }
+    try:
+        # Scriviamo il dizionario sul file convertendolo in JSON
+        with open(datafile, "wt") as fp:
+            json.dump(data_to_save, fp, indent=4)
+        # indent=4 rende il file JSON formattato in modo leggibile
+        print("Data successfully saved!")
+    except Exception as e:
+        print(f"Error while saving data. {e.__class__.__name__}: ", e)
 
 
 def main():
-    # Piccola dimostrazione: come leggere una data da tastiera
-    # d = date.fromisoformat('2025-05-19') # Formato: anno-mese-giorno (lo standard ISO)
-    # 'd' ora contiene un riferimento ad una istanza del tipo 'date'.
-
-    load_all()
-    ui_ask_what_to_do()
-    save_all()
+    try:
+        load_all()
+        ui_ask_what_to_do()
+        save_all()
+    except Exception as e:
+        print(f"Error type: {e.__class__.__name__}\nmessage: {e}")
 
     return 0
 

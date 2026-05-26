@@ -7,5 +7,5 @@ anni_servizio(): Integer >= 0
   
   post: 
     adesso = l'istante corrente
-    result = adesso - this.data_assunzioe espresso in anni
+    result = adesso - this.data_assunzione espresso in anni
 ```
