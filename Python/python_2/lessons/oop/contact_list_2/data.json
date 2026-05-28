@@ -7,6 +7,18 @@
         "1": {
             "name": "HR",
             "description": "Human Resources"
+        },
+        "2": {
+            "name": "Sales",
+            "description": "Commerciale"
+        },
+        "3": {
+            "name": "Support",
+            "description": "Assistenza clienti"
+        },
+        "4": {
+            "name": "DevOps",
+            "description": "Tecnici CI CD"
         }
     },
     "Contact": {
@@ -15,21 +27,56 @@
             "lastname": "Rossi",
             "phone": "+391573427917",
             "email": "mario@gmail.com",
-            "department": 0
+            "group": 0
         },
         "1": {
             "name": "Biagio",
             "lastname": "Rossi",
             "phone": "+391573427918",
             "email": "ugo@gmail.com",
-            "department": null
+            "group": null
         },
         "2": {
             "name": "Mario",
             "lastname": "Neri",
             "phone": "+391573427920",
             "email": "elena@gmail.com",
-            "department": 1
+            "group": 1
+        },
+        "3": {
+            "name": "Alice",
+            "lastname": "Verdi",
+            "phone": "+391573423520",
+            "email": "alice@verdi.com",
+            "group": null
+        },
+        "4": {
+            "name": "Luca",
+            "lastname": "Bianchi",
+            "phone": "+390222222222",
+            "email": "luca.bianchi@example.com",
+            "group": 3
+        },
+        "5": {
+            "name": "Sara",
+            "lastname": "Blu",
+            "phone": "+390333333333",
+            "email": "sara.blu@example.com",
+            "group": null
+        },
+        "6": {
+            "name": "Marco",
+            "lastname": "Russo",
+            "phone": "934529345",
+            "email": "russo@marco.com",
+            "group": 4
+        },
+        "7": {
+            "name": "Maria",
+            "lastname": "Ubaldi",
+            "phone": "3457263745",
+            "email": "maria@ubaldi.com",
+            "group": 1
         }
     }
 }

@@ -1,0 +1,17 @@
+{
+  "0": {
+    "nome": "IT",
+    "telefono": "123456",
+    "direttore_id": "verdi_luigi"
+  },
+  "1": {
+    "nome": "HR",
+    "telefono": "654321",
+    "direttore_id": "ughi_ugo"
+  },
+  "2": {
+    "nome": "Commerciale",
+    "telefono": "4592459234",
+    "direttore_id": "bianchi_anna"
+  }
+}

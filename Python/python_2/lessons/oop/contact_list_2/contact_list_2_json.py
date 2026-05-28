@@ -84,11 +84,9 @@ from typing import Self
 
 class Group:
     groups: dict[int, Self] = dict()
-    current_group = 0
+    next_group = 0
 
-    def __init__(self, name: str, description: str, idx: int | None = None):
-        if idx is None:
-            idx = type(self).current_group
+    def __init__(self, idx: int, name: str, description: str):
 
         assert idx not in type(self).groups, f"Error, group id already '{idx}' exists"
 
@@ -97,8 +95,6 @@ class Group:
         self.description = description
 
         type(self).groups[self.idx] = self
-        if type(self).current_group <= self.idx:
-            type(self).current_group = self.idx + 1
 
     @classmethod
     def search(cls, name: str | None) -> list[Self]:
@@ -109,46 +105,65 @@ class Group:
             found.append(group)
         return found
 
-    @classmethod
-    def get(cls, idx: int) -> Self:
-        return cls.groups[idx]
-
     def __str__(self):
         return (
-            f"{self.idx}: {self.name}\n" + f"Description: {self.description}"
+            f"{self.idx}. Name: {self.name}, Description: {self.description}"
             if self.name is not None and self.name != ""
             else f"WARNING! Group '{self.name}' NOT FOUND"
         )
 
+    @classmethod
+    def get(cls, idx: int) -> Self:
+        return cls.groups[idx]
+
+    @classmethod
+    def create(cls, name: str, description: str) -> Self:
+      result = cls(cls.next_group, name, description)
+
+      cls.next_group += 1
+      return result
+
+    @classmethod
+    def create_from_database(cls, i: int, d: dict) -> Self:
+
+      name = d['name']
+      description = d['description']
+      result = cls(i, name, description)
+
+      if cls.next_group <= i:
+        cls.next_group = i + 1
+
+      return result
+
 
 class Contact:
     contacts: dict[int, Self] = dict()
-    current_contact = 0
+    next_contact = 0
 
     def __init__(
         self,
+        idx: int,
         name: str,
         lastname: str,
         phone: str,
         email: str,
         group: Group | None,
-        idx: int | None = None,
     ):
-        if idx is None:
-            idx = type(self).current_contact
 
-        assert idx not in type(self).contacts, f"Error, contact id '{idx}' already exists"
+        assert idx not in type(self).contacts, (
+            f"Error, contact id '{idx}' already exists"
+        )
 
         self.idx = idx
         self.name = name
         self.lastname = lastname
         self.phone = phone
         self.email = email
-        self.group = group or None
+        self.group = group
 
+        # Aggiunge il contatto alla lista contacts, con la chiave idx
         type(self).contacts[self.idx] = self
-        if type(self).current_contact <= self.idx:
-            type(self).current_contact = self.idx + 1
+
 
     def __str__(self):
         gruppo_str = self.group.name if self.group else "Nessuno"
@@ -160,12 +175,12 @@ class Contact:
         )
 
     @classmethod
-    def search(cls, nome, cognome, gruppo=None):
+    def search(cls, name, lastname, gruppo=None) -> list[Self]:
         found = []
 
         for contact in cls.contacts.values():
-            match_n = (not nome) or contact.name.lower() == nome.lower()
-            match_c = (not cognome) or contact.lastname.lower() == cognome.lower()
+            match_n = (not name) or contact.name.lower() == name.lower()
+            match_c = (not lastname) or contact.lastname.lower() == lastname.lower()
             match_g = (not gruppo) or (
                 contact.group and contact.group.name.lower() == gruppo.lower()
             )
@@ -176,7 +191,37 @@ class Contact:
         return found
 
     @classmethod
-    def delete(cls, contact):
+    def create(cls, name: str, lastname: str, phone: str, email: str, group: Group | None = None) -> Self:
+        """
+        Factory Method da usare al posto del costruttore (invoca il costruttore)
+        """
+        result = cls(cls.next_contact, name, lastname, phone, email, group)
+        cls.next_contact += 1
+        return result
+
+    @classmethod
+    def create_from_database(cls, idx: int, d: dict) -> Self:
+        """
+        Crea un contatto da un dizionario
+        """
+        group_id = d["group"]
+        group = Group.get(group_id) if group_id is not None else None
+
+        result = cls(
+          idx,
+          d["name"],
+          d["lastname"],
+          d["phone"],
+          d["email"],
+          group
+        )
+        if cls.next_contact <= idx:
+          cls.next_contact = idx + 1
+        return result
+
+
+    @classmethod
+    def delete(cls, contact) -> None:
         contact_id_to_delete = None
         for contact_id, c in cls.contacts.items():
             if c == contact:
@@ -187,24 +232,10 @@ class Contact:
             del cls.contacts[contact_id_to_delete]
         return
 
-    @classmethod
-    def create(cls, nome, cognome, telefono, email, gruppo=None) -> Self:
-        """
-        Factory Method da usare al posto del costruttore (invoca il costruttore)
-        """
-        return cls(nome, cognome, telefono, email, gruppo)
-
-    @classmethod
-    def create_from_dict(cls, idx: int, d: dict) -> Self:
-      """
-      Crea un contatto da un dizionario
-      """ 
-      pass # lo completo io dopo
-      
 
 # --- User interface (UI) del programma
 
-yes = ("s", "si", "y", "yes")
+yes = ("s", "si", "y", "yes", "ok", "k", "yeah", "yep", "sure", "pizza")
 
 
 def ui_add_contact():
@@ -237,10 +268,10 @@ def ui_add_contact():
     groups = Group.groups
 
     if len(groups) > 0:
-        print("\r\tgruppi disponibili:")
+        print("\r\tgruppi disponibili:\n")
         for g in groups.values():
-            print(f"\t{g.name}")
-        scelta = input("\r\tgruppo? (invio per nessuno)\n>\t").strip()
+            print(f"\t-{g.idx}. {g.name}")
+        scelta = input("\n\r\tgruppo? (invio per nessuno)\n>\t").strip()
         if scelta:
             found = False
             for g in groups.values():
@@ -340,7 +371,7 @@ def ui_add_group(name, description):
             print(f"\nIl gruppo {name} esiste già. Riprovare con un altro nome\n")
             return None
 
-    new_group = Group(name, description)
+    new_group = Group.create(name, description)
     print(f"\nGruppo aggiunto con successo!\n{new_group}\n")
     return new_group
 
@@ -417,7 +448,7 @@ def ui_ask_what_to_do():
             case "2" | "gruppi":
                 menu_choice = 2
             case "3" | "exit":
-                print("Arrivederci!")
+                print("\nArrivederci!\n")
                 break
             case _:
                 print("\nScelta non valida, riprova.")
@@ -487,19 +518,100 @@ def ui_ask_what_to_do():
                     print(f"{group_choice}? non è una scelta valida. Riprova\n")
 
 
-def load_all(): ...
+def load_all(datafile):
+
+    try:
+        with open(datafile, "rt") as f:
+            print(f"\nLoading data file '{datafile}':\n")
+            # Ottenere il dizionario in data.json
+            # filtrare e creare dizionario groups ed contacts
+            # Iniziare con groups perchè gli contacts hanno il campo group
+            # Usare i factory methods, non i costruttori
+
+            data: dict = json.load(f)
+
+            # Legge tutte le entry Group
+            print("\n=== Groups ===\n")
+            try:
+                for i, group in data["Group"].items():
+                    try:
+                        print(f"\r\t- Found data for group {i}: {group}")
+                        Group.create_from_database(int(i), group)
+                    except Exception as ex:
+                        print(
+                            f"Error while reading group {group} in database. Detailed error: {ex}"
+                        )
+            except KeyError:
+                print("Error: misformed data file: entry 'Group' does not exist")
+
+            # Legge tutte le entry Contact
+            print("\n=== Contacts ===\n")
+            try:
+                for i, contact in data["Contact"].items():
+                    try:
+                        print(f"\r\t- Found data for contact {i}: {contact}")
+                        Contact.create_from_database(int(i), contact)
+                    except Exception as ex:
+                        print(
+                            f"Error while reading contact {contact} in database. Detailed error: {ex}"
+                        )
+            except KeyError:
+                print("Error: misformed data file: entry 'Contact' does not exist")
+
+    except FileNotFoundError:
+        print(f"File '{datafile}' not found. Starting with an empty database.")
+    except Exception as ex:
+        print(f"Error: cannot open data file. Error: {ex}")
 
 
-def save_all(): ...
+def save_all(datafile):
+
+    try:
+        print(f"Saving data to file '{datafile}'...")
+
+        # Costruiamo la struttura dati che verrà salvata nel JSON
+        json_structures = {"Group": {}, "Contact": {}}
+
+        # Serializziamo i gruppi
+        for group_id, group in Group.groups.items():
+            json_structures["Group"][str(group_id)] = {
+                "name": group.name,
+                "description": group.description,
+            }
+
+        # Serializziamo i contatti
+        for contact_id, contact in Contact.contacts.items():
+            json_structures["Contact"][str(contact_id)] = {
+                "name": contact.name,
+                "lastname": contact.lastname,
+                "phone": contact.phone,
+                "email": contact.email,
+                "group": contact.group.idx if contact.group is not None else None,
+            }
+
+        try:
+            # Scriviamo il dizionario sul file convertendolo in JSON
+            with open(datafile, "wt") as fp:
+                json.dump(json_structures, fp, indent=4)
+
+            # indent=4 rende il file JSON formattato in modo leggibile
+            print("Data successfully saved!")
+        except Exception as e:
+            print(f"Error while saving data. {e.__class__.__name__}: ", e)
+
+    except FileNotFoundError:
+        print(f"File '{datafile}' not found. Starting with an empty database.")
+    except Exception as ex:
+        print(f"Error: cannot open data file. Error: {ex}")
 
 
 def main():
 
     try:
-        data_dir = Path.cwd() / "data"
-        load_all()
+        datafile = Path.cwd() / "data.json"
+        load_all(datafile)
         ui_ask_what_to_do()
-        save_all()
+        save_all(datafile)
     except AssertionError as e:
         print(f"AssertionError: {e}")
     except Exception as e:
