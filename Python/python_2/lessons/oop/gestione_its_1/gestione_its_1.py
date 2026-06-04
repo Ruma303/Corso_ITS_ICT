@@ -48,16 +48,6 @@ from typing import Optional, Self
 # --- Classi e metodi di supporto
 
 
-class CodiceFiscale:
-    def __init__(self, codice: str):
-        codice_clean = codice.strip().upper()
-        # INFO: sarebbero 16 caratteri, consentiamo anche 0 per fare test rapidi
-        assert bool(re.match(r"^[A-Z0-9]{0,16}$", codice_clean)), (
-            "Provided 'codice fiscale' format is not valid"
-        )
-        self.codice = codice_clean
-
-
 def _require_instance(value, expected_type: type, field_name: str):
     assert isinstance(value, expected_type), (
         f"'{field_name}' must be an instance of {expected_type.__name__}"
@@ -231,7 +221,42 @@ class Citta:
 # --- Classi primarie
 
 
-class Docente:
+class Persona:
+    tutti_cf: set[str] = set()
+
+    def __init__(
+        self,
+        idx: int,
+        nome: str,
+        cognome: str,
+        codice_fiscale: str,
+        citta_nascita: Citta,
+    ):
+        self.idx = idx
+        self.nome = nome
+        self.cognome = cognome
+
+        # TODO: CONTROLLARE CHE CODICE FISCALE NON SIA RIPETUTO SIA TRA DOCENTI CHE TRA STUDENTI
+        # NON DEVONO TROVARSI NEL SET
+
+        self.codice = type(self).check_cf(codice_fiscale)
+        self.citta_nascita = Citta
+
+    def __str__(self) -> str:
+        return f"{self.cognome}, {self.nome} - CF: {self.codice} - {self.citta_nascita}"
+
+    @classmethod
+    def check_cf(cls, codice_fiscale: str) -> str:
+        # INFO: sarebbero 16 caratteri, consentiamo anche 0 per fare test rapidi
+
+        codice_clean = codice_fiscale.strip().upper()
+        assert bool(re.match(r"^[A-Z0-9]{0,16}$", codice_clean)), (
+            "Provided fiscal code format is not valid"
+        )
+        return codice_fiscale
+
+
+class Docente(Persona):
     docenti: dict[int, Self] = dict()
     prossimo = 0
 
@@ -240,16 +265,11 @@ class Docente:
         idx: int,
         nome: str,
         cognome: str,
-        codice_fiscale: CodiceFiscale,
+        codice_fiscale: str,
         citta_nascita: Citta,
     ):
         self.idx = idx
-        self.nome = nome
-        self.cognome = cognome
-        _require_instance(codice_fiscale, CodiceFiscale, "codice_fiscale")
-        self.codice_fiscale = codice_fiscale
-        _require_instance(citta_nascita, Citta, "citta_nascita")
-        self.citta_nascita = citta_nascita
+        super().__init__(idx, nome, cognome, codice_fiscale, citta_nascita)
 
         type(self).docenti[self.idx] = self
 
@@ -258,7 +278,7 @@ class Docente:
         cls,
         nome: str,
         cognome: str,
-        codice_fiscale: CodiceFiscale,
+        codice_fiscale: str,
         citta_nascita: Citta,
     ) -> Self:
         cls.prossimo += 1
@@ -268,7 +288,7 @@ class Docente:
     def create_from_db(cls, idx: int, entity: dict) -> Self:
         nome = entity["nome"]
         cognome = entity["cognome"]
-        codice_fiscale = CodiceFiscale(entity["codice_fiscale"])
+        codice_fiscale = Persona.check_cf(entity["codice_fiscale"])
         id_citta = entity["citta_nascita"]
         citta_nascita = Citta.get(id_citta)
 
@@ -304,7 +324,7 @@ class Docente:
         return cls.docenti.get(idx, None)
 
     def __str__(self) -> str:
-        return f"Docente: {self.nome} {self.cognome}"
+        return "[Docente] " + super().__str__()
 
 
 class Modulo:
@@ -319,11 +339,11 @@ class Modulo:
         ore: int,
         docenti: Optional[list[Docente]] = None,
     ):
+        assert ore > 0, "Module hours cannot be 0 or negative"
         self.idx = idx
         self.codice = codice
         self.nome = nome
         self.ore = ore
-        assert ore > 0, "Module hours cannot be 0 or negative"
 
         self.docenti = _require_list(docenti, Docente, "docenti")
 
@@ -504,7 +524,7 @@ class CorsoITS:
         return f"Corso ITS: {self.nome}"
 
 
-class Studente:
+class Studente(Persona):
     studenti: dict[int, Self] = dict()
     prossimo = 0
 
@@ -513,23 +533,17 @@ class Studente:
         idx: int,
         nome: str,
         cognome: str,
-        codice_fiscale: CodiceFiscale,
+        codice_fiscale: str,
         matricola: str,
         nascita: date,
         citta_nascita: Citta,
         corso: CorsoITS,
         moduli_superati: Optional[list[Modulo]] = None,
     ):
-        self.idx = idx
-        self.nome = nome
-        self.cognome = cognome
-        _require_instance(codice_fiscale, CodiceFiscale, "codice_fiscale")
-        self.codice_fiscale = codice_fiscale
+        super().__init__(idx, nome, cognome, codice_fiscale, citta_nascita)
         self.matricola = matricola
         _require_instance(nascita, date, "nascita")
         self.nascita = nascita
-        _require_instance(citta_nascita, Citta, "citta_nascita")
-        self.citta_nascita = citta_nascita
         _require_instance(corso, CorsoITS, "corso")
         self.corso = corso
         self.moduli_superati = _require_list(moduli_superati, Modulo, "moduli_superati")
@@ -541,7 +555,7 @@ class Studente:
         cls,
         nome: str,
         cognome: str,
-        codice_fiscale: CodiceFiscale,
+        codice_fiscale: str,
         matricola: str,
         nascita: date,
         citta_nascita: Citta,
@@ -568,7 +582,7 @@ class Studente:
         matricola = entity["matricola"]
         nascita = date.fromisoformat(entity["nascita"])
 
-        cf_obj = CodiceFiscale(entity["codice_fiscale"])
+        cf_obj = Persona.check_cf(entity["codice_fiscale"])
 
         # 1. Gestione relazioni 1..1 (Gestiamo i potenziali None)
         citta_obj = Citta.get(entity["citta_nascita"])
@@ -628,7 +642,7 @@ class Studente:
         return cls.studenti.get(idx, None)
 
     def __str__(self) -> str:
-        return f"Studente: {self.nome} {self.cognome}"
+        return "[Studente] " + super().__str__()
 
     def aggiungi_moduli_superati(self, codici_str: str):
         """Riceve una stringa di codici separati da virgola (es: 'py1, java1'),
@@ -850,11 +864,8 @@ def ui_add_studente():
     cognome = input("Last name: ").strip()
     matricola = input("Student ID (Matricola): ").strip()
     cf_str = input("Fiscal Code (Codice Fiscale): ").strip()
-
-    try:
-        cf = CodiceFiscale(cf_str)
-    except AssertionError as e:
-        print(f"Fiscal Code error: {e}")
+    cf = Persona.check_cf(cf_str)
+    if not cf:
         return
 
     data_str = input("Birth date (YYYY-MM-DD): ").strip()
