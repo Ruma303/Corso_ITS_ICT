@@ -222,7 +222,7 @@ class Citta:
 
 
 class Persona:
-    tutti_cf: set[str] = set()
+    persone: dict[str, Self] = dict()
 
     def __init__(
         self,
