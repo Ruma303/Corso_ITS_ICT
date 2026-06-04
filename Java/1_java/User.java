@@ -1,8 +1,6 @@
 class User {
 
-    static {
-        int numberOfUsers = 0;
-    }
+    public static int numberOfUsers = 0;
     public String name = "";
     public String lastname = "";
     public Integer phoneNumber = 0;
@@ -11,5 +9,6 @@ class User {
         this.name = name;
         this.lastname = lastname;
         this.phoneNumber = phoneNumber;
+        User.numberOfUsers ++;
     }
 }

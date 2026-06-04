@@ -181,7 +181,9 @@
       "nascita": "2000-05-25",
       "citta_nascita": 1,
       "corso": 2,
-      "moduli_superati": [2]
+      "moduli_superati": [
+        2
+      ]
     },
     "2": {
       "nome": "Lucia",
@@ -191,7 +193,9 @@
       "nascita": "1997-10-28",
       "citta_nascita": 1,
       "corso": 3,
-      "moduli_superati": [3]
+      "moduli_superati": [
+        3
+      ]
     },
     "3": {
       "nome": "Ugo",
