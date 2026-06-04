@@ -39,6 +39,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+from abc import ABC
 from datetime import date
 from pathlib import Path
 from typing import Optional, Self
@@ -220,9 +221,9 @@ class Citta:
 
 # --- Classi primarie
 
-
-class Persona:
-    persone: dict[str, Self] = dict()
+# Ereditare da ABC trasforma in una classe astratta
+class Persona(ABC):
+    persone: dict[str, Persona] = dict()
 
     def __init__(
         self,
@@ -235,25 +236,27 @@ class Persona:
         self.idx = idx
         self.nome = nome
         self.cognome = cognome
+        self.codice_fiscale = type(self).check_cf(codice_fiscale)
+        _require_instance(citta_nascita, Citta, "citta_nascita")
+        self.citta_nascita = citta_nascita
 
-        # TODO: CONTROLLARE CHE CODICE FISCALE NON SIA RIPETUTO SIA TRA DOCENTI CHE TRA STUDENTI
-        # NON DEVONO TROVARSI NEL SET
-
-        self.codice = type(self).check_cf(codice_fiscale)
-        self.citta_nascita = Citta
+        assert self.codice_fiscale not in Persona.persone, (
+            f"Fiscal code '{self.codice_fiscale}' already exists"
+        )
+        Persona.persone[self.codice_fiscale] = self
 
     def __str__(self) -> str:
-        return f"{self.cognome}, {self.nome} - CF: {self.codice} - {self.citta_nascita}"
+        return f"{self.idx}. {self.cognome}, {self.nome} - CF: {self.codice_fiscale} - from:  {self.citta_nascita}"
 
     @classmethod
     def check_cf(cls, codice_fiscale: str) -> str:
-        # INFO: sarebbero 16 caratteri, consentiamo anche 0 per fare test rapidi
-
         codice_clean = codice_fiscale.strip().upper()
+
+        # INFO: sarebbero 16 caratteri, consentiamo anche 0 per fare test rapidi
         assert bool(re.match(r"^[A-Z0-9]{0,16}$", codice_clean)), (
             "Provided fiscal code format is not valid"
         )
-        return codice_fiscale
+        return codice_clean
 
 
 class Docente(Persona):
@@ -308,7 +311,7 @@ class Docente(Persona):
         return {
             "nome": self.nome,
             "cognome": self.cognome,
-            "codice_fiscale": self.codice_fiscale.codice,
+            "codice_fiscale": self.codice_fiscale,
             "citta_nascita": self.citta_nascita.idx,
         }
 
@@ -582,7 +585,7 @@ class Studente(Persona):
         matricola = entity["matricola"]
         nascita = date.fromisoformat(entity["nascita"])
 
-        cf_obj = Persona.check_cf(entity["codice_fiscale"])
+        codice_fiscale = Persona.check_cf(entity["codice_fiscale"])
 
         # 1. Gestione relazioni 1..1 (Gestiamo i potenziali None)
         citta_obj = Citta.get(entity["citta_nascita"])
@@ -605,7 +608,7 @@ class Studente(Persona):
             idx,
             nome,
             cognome,
-            cf_obj,
+            codice_fiscale,
             matricola,
             nascita,
             citta_obj,
@@ -623,7 +626,7 @@ class Studente(Persona):
             "nome": self.nome,
             "cognome": self.cognome,
             "matricola": self.matricola,
-            "codice_fiscale": self.codice_fiscale.codice,
+            "codice_fiscale": self.codice_fiscale,
             "nascita": self.nascita.isoformat(),
             "citta_nascita": self.citta_nascita.idx,
             "corso": self.corso.idx,
@@ -833,7 +836,7 @@ def ui_add_docente():
     cf_str = input("Fiscal Code (Codice Fiscale): ").strip()
 
     try:
-        cf = CodiceFiscale(cf_str)
+        cf = Persona.check_cf(cf_str)
     except AssertionError as e:
         print(f"Fiscal Code error: {e}")
         return
@@ -959,7 +962,6 @@ def ui_ask_what_to_do():
         elif choice == "9":
             ui_show_all()
         elif choice == "0" or choice.lower() == "exit":
-            print(goodbye())
             break
         else:
             print(f"\nCommand '{choice}' unknown. Please try again.\n")
@@ -1047,6 +1049,7 @@ def main():
         load_all(datafile, load_sequence)
         ui_ask_what_to_do()
         save_all(datafile, load_sequence)
+        print(goodbye())
     except Exception as e:
         print(f"Error kind: {type(e).__name__}: {e}")
 

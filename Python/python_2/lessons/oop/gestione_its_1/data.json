@@ -20,6 +20,9 @@
     },
     "7": {
       "nome": "France"
+    },
+    "8": {
+      "nome": "Uganda"
     }
   },
   "Regions": {
@@ -46,6 +49,14 @@
     "6": {
       "nome": "Veneto",
       "nazione": 1
+    },
+    "7": {
+      "nome": "Sardegna",
+      "nazione": 1
+    },
+    "8": {
+      "nome": "Toscana",
+      "nazione": 1
     }
   },
   "Cities": {
@@ -60,6 +71,10 @@
     "3": {
       "nome": "Verona",
       "regione": 6
+    },
+    "4": {
+      "nome": "Poggibonsi",
+      "regione": 8
     }
   },
   "DisciplinaryAreas": {
