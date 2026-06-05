@@ -1,252 +1,32 @@
 {
-  "Nations": {
-    "1": {
-      "nome": "Italy"
-    },
-    "2": {
-      "nome": "United States of America"
-    },
-    "3": {
-      "nome": "Andorra"
-    },
-    "4": {
-      "nome": "United Kingdom"
-    },
-    "5": {
-      "nome": "Iran"
-    },
-    "6": {
-      "nome": "China"
-    },
-    "7": {
-      "nome": "France"
-    },
-    "8": {
-      "nome": "Uganda"
-    }
-  },
-  "Regions": {
-    "1": {
-      "nome": "Lazio",
-      "nazione": 1
-    },
-    "2": {
-      "nome": "Lombardia",
-      "nazione": 1
-    },
-    "3": {
-      "nome": "Scotland",
-      "nazione": 4
-    },
-    "4": {
-      "nome": "Wales",
-      "nazione": 4
-    },
-    "5": {
-      "nome": "California",
-      "nazione": 2
-    },
-    "6": {
-      "nome": "Veneto",
-      "nazione": 1
-    },
-    "7": {
-      "nome": "Sardegna",
-      "nazione": 1
-    },
-    "8": {
-      "nome": "Toscana",
-      "nazione": 1
-    }
-  },
-  "Cities": {
-    "1": {
-      "nome": "Roma",
-      "regione": 1
-    },
-    "2": {
-      "nome": "Milano",
-      "regione": 2
-    },
-    "3": {
-      "nome": "Verona",
-      "regione": 6
-    },
-    "4": {
-      "nome": "Poggibonsi",
-      "regione": 8
-    }
-  },
+  "Nations": {},
+  "Regions": {},
+  "Cities": {},
   "DisciplinaryAreas": {
-    "1": {
-      "nome": "CyberSecurity"
-    },
-    "2": {
-      "nome": "Full Stack Developing"
-    },
-    "3": {
-      "nome": "Marketing"
-    },
-    "4": {
-      "nome": "General informatics"
+    "Full Stack": {
+      "nome": "Full Stack"
     }
   },
-  "Teachers": {
-    "1": {
-      "nome": "Toni",
-      "cognome": "Mancini",
-      "codice_fiscale": "TONYMANCYNY",
-      "citta_nascita": 1
-    },
-    "2": {
-      "nome": "Alberto",
-      "cognome": "Multari",
-      "codice_fiscale": "4LB3ERT0MULT4RY",
-      "citta_nascita": 3
-    },
-    "3": {
-      "nome": "Mario",
-      "cognome": "Olla",
-      "codice_fiscale": "M4R10OLL4",
-      "citta_nascita": 2
-    }
-  },
+  "Teachers": {},
   "Modules": {
-    "1": {
-      "codice": "py1",
-      "nome": "Python 1",
+    "PGSQL1": {
+      "codice": "PGSQL1",
+      "nome": "PGSQL",
       "ore": 40,
-      "docenti": [
-        1
-      ]
-    },
-    "2": {
-      "codice": "py2",
-      "nome": "Python 2",
-      "ore": 40,
-      "docenti": [
-        1
-      ]
-    },
-    "3": {
-      "codice": "java1",
-      "nome": "Java Standard Edition",
-      "ore": 40,
-      "docenti": [
-        2
-      ]
-    },
-    "4": {
-      "codice": "java2",
-      "nome": "Java Enterprise Edition",
-      "ore": 40,
-      "docenti": [
-        2
-      ]
-    },
-    "5": {
-      "codice": "java3",
-      "nome": "Spring Boot",
-      "ore": 120,
-      "docenti": [
-        2
-      ]
-    },
-    "6": {
-      "codice": "pgsql",
-      "nome": "PostgreSQL",
-      "ore": 60,
-      "docenti": [
-        1
-      ]
+      "docenti": []
     }
   },
   "ITSCourses": {
-    "1": {
-      "nome": "Python",
+    "PostgreSQL": {
+      "nome": "PostgreSQL",
       "edizione": 2025,
-      "area_disciplinare": 2,
-      "moduli": [
-        1,
-        2
-      ]
-    },
-    "2": {
-      "nome": "Java",
-      "edizione": 2026,
-      "area_disciplinare": 2,
-      "moduli": [
-        3,
-        4,
-        5
-      ]
-    },
-    "3": {
-      "nome": "Database",
-      "edizione": 2026,
-      "area_disciplinare": 2,
-      "moduli": [
-        6
-      ]
-    },
-    "4": {
-      "nome": "Sistemi digitali 1",
-      "edizione": 2025,
-      "area_disciplinare": 4,
-      "moduli": []
+      "area_disciplinare": "Full Stack",
+      "moduli": {
+        "1": null,
+        "2": null,
+        "3": null
+      }
     }
   },
-  "Students": {
-    "1": {
-      "nome": "Mario",
-      "cognome": "Rossi",
-      "matricola": "12345",
-      "codice_fiscale": "M3RI0R0SSY",
-      "nascita": "2000-05-25",
-      "citta_nascita": 1,
-      "corso": 2,
-      "moduli_superati": [
-        2
-      ]
-    },
-    "2": {
-      "nome": "Lucia",
-      "cognome": "Bianchi",
-      "matricola": "luxb14",
-      "codice_fiscale": "LUXB14NCHY",
-      "nascita": "1997-10-28",
-      "citta_nascita": 1,
-      "corso": 3,
-      "moduli_superati": [
-        3
-      ]
-    },
-    "3": {
-      "nome": "Ugo",
-      "cognome": "Ughi",
-      "matricola": "ughino",
-      "codice_fiscale": "UG0UGH1",
-      "nascita": "2003-03-13",
-      "citta_nascita": 3,
-      "corso": 1,
-      "moduli_superati": [
-        1,
-        2,
-        6
-      ]
-    },
-    "4": {
-      "nome": "John",
-      "cognome": "Doe",
-      "matricola": "JN83DO30",
-      "codice_fiscale": "J20ND300AD35",
-      "nascita": "2002-04-04",
-      "citta_nascita": 4,
-      "corso": 4,
-      "moduli_superati": [
-        1,
-        6
-      ]
-    }
-  }
+  "Students": {}
 }

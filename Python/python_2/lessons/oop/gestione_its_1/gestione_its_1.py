@@ -36,7 +36,7 @@ UML concettuale delle classi
 
 # TODO: Durante la creazione di Docenti e Studenti cambiare la chiave non con numero intero,
 # ma con il codice fiscale stesso.
-# In questo modo avremmo Persone.persone con chiavi i codici fiscali, e valori le istanze. 
+# In questo modo avremmo Persone.persone con chiavi i codici fiscali, e valori le istanze.
 
 from __future__ import annotations
 
@@ -74,80 +74,67 @@ def _require_list(values: Optional[list], expected_type: type, field_name: str) 
 
 
 class Nazione:
-    nazioni: dict[int, Self] = dict()
-    prossima = 0
+    __nazioni: dict[str, Self] = dict()
+    __prossima = 0
 
-    def __init__(self, idx: int, nome: str):
-        self.set_idx(idx)
+    def __init__(self, nome: str):
         self.set_nome(nome)
 
-        type(self).nazioni[self.get_idx()] = self
-
-    def get_idx(self) -> int:
-        return self._idx
-
-    def set_idx(self, idx: int):
-        assert isinstance(idx, int) and idx > 0, "'idx' must be a positive integer"
-        self._idx = idx
+        type(self).get_nazioni()[self.get_nome()] = self
 
     def get_nome(self) -> str:
         return self._nome
 
-    def set_nome(self, nome: str):
+    def set_nome(self, nome: str) -> None:
         assert isinstance(nome, str), "'nome' must be a string"
         self._nome = nome
 
     @classmethod
-    def create(cls, nome: str) -> Self:
-        cls.prossima += 1
-        return cls(cls.prossima, nome)
+    def get_nazioni(cls) -> dict[str, Self]:
+        return cls.__nazioni
 
     @classmethod
-    def create_from_db(cls, idx: int, entity: dict) -> Self:
+    def set_nazioni(cls, nazioni: dict[str, Self]):
+        cls.__nazioni = nazioni
+
+    @classmethod
+    def create(cls, nome: str) -> Self:
+        if nome in cls.get_nazioni():
+            raise ValueError(f"Nazione '{nome}' already exists")
+        return cls(nome)
+
+    @classmethod
+    def create_from_db(cls, entity: dict) -> Self:
         nome = entity["nome"]
-        result = cls(idx, nome)
-
-        if cls.prossima <= idx:
-            cls.prossima = idx
-
-        return result
+        return cls(nome)
 
     def to_db(self) -> dict:
         return {"nome": self.get_nome()}
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
-        for nazione in cls.nazioni.values():
+        for nazione in cls.get_nazioni().values():
             if nazione.get_nome().lower() == nome.lower():
                 return nazione
         return None
 
     @classmethod
-    def get(cls, idx: int) -> Optional[Self]:
-        # HACK: .get() è un metodo sicuro dei dizionari e non lancia KeyError
-        return cls.nazioni.get(idx, None)
+    def get(cls, k: str) -> Optional[Self]:
+        return cls.get_nazioni().get(k, None)
 
     def __str__(self) -> str:
         return f"Nazione: {self.get_nome()}"
 
 
 class Regione:
-    regioni: dict[int, Self] = dict()
-    prossima = 0
+    __regioni: dict[str, Self] = dict()
+    __prossima = 0
 
-    def __init__(self, idx: int, nome: str, nazione: Nazione):
-        self.set_idx(idx)
+    def __init__(self, nome: str, nazione: Nazione):
         self.set_nome(nome)
         self.set_nazione(nazione)
 
-        type(self).regioni[self.get_idx()] = self
-
-    def get_idx(self) -> int:
-        return self._idx
-
-    def set_idx(self, idx: int):
-        assert isinstance(idx, int) and idx > 0, "'idx' must be a positive integer"
-        self._idx = idx
+        type(self).get_regioni()[self.get_nome()] = self
 
     def get_nome(self) -> str:
         return self._nome
@@ -164,15 +151,29 @@ class Regione:
         self._nazione = nazione
 
     @classmethod
-    def create(cls, nome: str, nazione: Nazione) -> Self:
-        cls.prossima += 1
-        return cls(cls.prossima, nome, nazione)
+    def get_prossima(cls) -> int:
+        return cls.__prossima
 
     @classmethod
-    def create_from_db(cls, idx: int, entity: dict) -> Self:
-        nome = entity["nome"]
+    def set_prossima(cls, prossima: int):
+        cls.__prossima = prossima
 
-        # MODIFICA QUI: Recuperiamo l'oggetto Nazione reale usando l'ID dal database
+    @classmethod
+    def get_regioni(cls) -> dict[str, Self]:
+        return cls.__regioni
+
+    @classmethod
+    def set_regioni(cls, regioni: dict[str, Self]):
+        cls.__regioni = regioni
+
+    @classmethod
+    def create(cls, nome: str, nazione: Nazione) -> Self:
+        cls.set_prossima(cls.get_prossima() + 1)
+        return cls(nome, nazione)
+
+    @classmethod
+    def create_from_db(cls, entity: dict) -> Self:
+        nome = entity["nome"]
         id_nazione = entity["nazione"]
         nazione = Nazione.get(id_nazione)
         if nazione is None:
@@ -180,48 +181,35 @@ class Regione:
                 f"Nazione ID {id_nazione} non trovata per la regione {nome}"
             )
 
-        result = cls(idx, nome, nazione)
-
-        if cls.prossima <= idx:
-            cls.prossima = idx
-
-        return result
+        return cls(nome, nazione)
 
     def to_db(self) -> dict:
-        return {"nome": self.get_nome(), "nazione": self.get_nazione().get_idx()}
+        return {"nome": self.get_nome(), "nazione": self.get_nazione().get_nome()}
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
-        for regione in cls.regioni.values():
+        for regione in cls.get_regioni().values():
             if regione.get_nome().lower() == nome.lower():
                 return regione
         return None
 
     @classmethod
-    def get(cls, idx: int) -> Optional[Self]:
-        return cls.regioni.get(idx, None)
+    def get(cls, k: str) -> Optional[Self]:
+        return cls.get_regioni().get(k, None)
 
     def __str__(self) -> str:
         return f"Regione: {self.get_nome()}"
 
 
 class Citta:
-    citta: dict[int, Self] = dict()
-    prossima = 0
+    __citta: dict[str, Self] = dict()
+    __prossima = 0
 
-    def __init__(self, idx: int, nome: str, regione: Regione):
-        self.set_idx(idx)
+    def __init__(self, nome: str, regione: Regione):
         self.set_nome(nome)
         self.set_regione(regione)
 
-        type(self).citta[self.get_idx()] = self
-
-    def get_idx(self) -> int:
-        return self._idx
-
-    def set_idx(self, idx: int):
-        assert isinstance(idx, int) and idx > 0, "'idx' must be a positive integer"
-        self._idx = idx
+        type(self).get_citta()[self.get_nome()] = self
 
     def get_nome(self) -> str:
         return self._nome
@@ -238,40 +226,48 @@ class Citta:
         self._regione = regione
 
     @classmethod
-    def create(cls, nome: str, regione: Regione) -> Self:
-        cls.prossima += 1
-        return cls(cls.prossima, nome, regione)
+    def get_prossima(cls) -> int:
+        return cls.__prossima
 
     @classmethod
-    def create_from_db(cls, idx: int, entity: dict) -> Self:
-        nome = entity["nome"]
+    def set_prossima(cls, prossima: int):
+        cls.__prossima = prossima
 
-        # MODIFICA QUI: Recuperiamo l'oggetto Regione reale usando l'ID dal database
+    @classmethod
+    def get_citta(cls) -> dict[str, Self]:
+        return cls.__citta
+
+    @classmethod
+    def set_citta(cls, citta: dict[str, Self]):
+        cls.__citta = citta
+
+    @classmethod
+    def create(cls, nome: str, regione: Regione) -> Self:
+        return cls(nome, regione)
+
+    @classmethod
+    def create_from_db(cls, entity: dict) -> Self:
+        nome = entity["nome"]
         id_regione = entity["regione"]
         regione = Regione.get(id_regione)
         if regione is None:
             raise ValueError(f"Regione ID {id_regione} non trovata per la città {nome}")
 
-        result = cls(idx, nome, regione)
-
-        if cls.prossima <= idx:
-            cls.prossima = idx
-
-        return result
+        return cls(nome, regione)
 
     def to_db(self) -> dict:
-        return {"nome": self.get_nome(), "regione": self.get_regione().get_idx()}
+        return {"nome": self.get_nome(), "regione": self.get_regione().get_nome()}
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
-        for c in cls.citta.values():
+        for c in cls.get_citta().values():
             if c.get_nome().lower() == nome.lower():
                 return c
         return None
 
     @classmethod
-    def get(cls, idx: int) -> Optional[Self]:
-        return cls.citta.get(idx, None)
+    def get(cls, k: str) -> Optional[Self]:
+        return cls.get_citta().get(k, None)
 
     def __str__(self) -> str:
         return f"Città: {self.get_nome()}"
@@ -279,30 +275,22 @@ class Citta:
 
 # --- Classi primarie
 
+
 # Ereditare da ABC trasforma in una classe astratta
 class Persona(ABC):
-    persone: dict[str, Persona] = dict()
+    __persone: dict[str, Persona] = dict()
 
     def __init__(
         self,
-        idx: int,
         nome: str,
         cognome: str,
         codice_fiscale: str,
         citta_nascita: Citta,
     ):
-        self.set_idx(idx)
         self.set_nome(nome)
         self.set_cognome(cognome)
         self.set_citta_nascita(citta_nascita)
         self.set_codice_fiscale(codice_fiscale)
-
-    def get_idx(self) -> int:
-        return self._idx
-
-    def set_idx(self, idx: int):
-        assert isinstance(idx, int) and idx > 0, "'idx' must be a positive integer"
-        self._idx = idx
 
     def get_nome(self) -> str:
         return self._nome
@@ -323,17 +311,20 @@ class Persona(ABC):
 
     def set_codice_fiscale(self, codice_fiscale: str):
         codice_clean = type(self).check_cf(codice_fiscale)
-        persona_esistente = Persona.persone.get(codice_clean)
+        persona_esistente = Persona.get_persone().get(codice_clean)
         assert persona_esistente is None or persona_esistente is self, (
             f"Fiscal code '{codice_clean}' already exists"
         )
 
         vecchio_codice = getattr(self, "_codice_fiscale", None)
-        if vecchio_codice is not None and Persona.persone.get(vecchio_codice) is self:
-            del Persona.persone[vecchio_codice]
+        if (
+            vecchio_codice is not None
+            and Persona.get_persone().get(vecchio_codice) is self
+        ):
+            del Persona.get_persone()[vecchio_codice]
 
         self._codice_fiscale = codice_clean
-        Persona.persone[codice_clean] = self
+        Persona.get_persone()[codice_clean] = self
 
     def get_citta_nascita(self) -> Citta:
         return self._citta_nascita
@@ -342,9 +333,17 @@ class Persona(ABC):
         _require_instance(citta_nascita, Citta, "citta_nascita")
         self._citta_nascita = citta_nascita
 
+    @classmethod
+    def get_persone(cls) -> dict[str, Persona]:
+        return cls.__persone
+
+    @classmethod
+    def set_persone(cls, persone: dict[str, Persona]):
+        cls.__persone = persone
+
     def __str__(self) -> str:
         return (
-            f"{self.get_idx()}. {self.get_cognome()}, {self.get_nome()} "
+            f"{self.get_nome()}. {self.get_cognome()}, {self.get_nome()} "
             f"- CF: {self.get_codice_fiscale()} - from:  {self.get_citta_nascita()}"
         )
 
@@ -360,20 +359,34 @@ class Persona(ABC):
 
 
 class Docente(Persona):
-    docenti: dict[int, Self] = dict()
-    prossimo = 0
+    __docenti: dict[str, Self] = dict()
+    __prossimo = 0
 
     def __init__(
         self,
-        idx: int,
         nome: str,
         cognome: str,
         codice_fiscale: str,
         citta_nascita: Citta,
     ):
-        super().__init__(idx, nome, cognome, codice_fiscale, citta_nascita)
+        super().__init__(nome, cognome, codice_fiscale, citta_nascita)
 
-        type(self).docenti[self.get_idx()] = self
+        type(self).get_docenti()[self.get_nome()] = self
+
+    def get_nome(self) -> str:
+        return self._nome
+
+    def set_nome(self, nome: str) -> None:
+        assert isinstance(nome, str), "'nome' must be a string"
+        self._nome = nome
+
+    @classmethod
+    def get_docenti(cls) -> dict[str, Self]:
+        return cls.__docenti
+
+    @classmethod
+    def set_docenti(cls, docenti: dict[str, Self]):
+        cls.__docenti = docenti
 
     @classmethod
     def create(
@@ -383,11 +396,10 @@ class Docente(Persona):
         codice_fiscale: str,
         citta_nascita: Citta,
     ) -> Self:
-        cls.prossimo += 1
-        return cls(cls.prossimo, nome, cognome, codice_fiscale, citta_nascita)
+        return cls(nome, cognome, codice_fiscale, citta_nascita)
 
     @classmethod
-    def create_from_db(cls, idx: int, entity: dict) -> Self:
+    def create_from_db(cls, entity: dict) -> Self:
         nome = entity["nome"]
         cognome = entity["cognome"]
         codice_fiscale = Persona.check_cf(entity["codice_fiscale"])
@@ -399,62 +411,48 @@ class Docente(Persona):
                 f"City with ID {id_citta} cannot be found for teacher {cognome} {nome}"
             )
 
-        result = cls(idx, nome, cognome, codice_fiscale, citta_nascita)
-
-        if cls.prossimo <= idx:
-            cls.prossimo = idx
-
-        return result
+        return cls(nome, cognome, codice_fiscale, citta_nascita)
 
     def to_db(self) -> dict:
         return {
             "nome": self.get_nome(),
             "cognome": self.get_cognome(),
             "codice_fiscale": self.get_codice_fiscale(),
-            "citta_nascita": self.get_citta_nascita().get_idx(),
+            "citta_nascita": self.get_citta_nascita().get_nome(),
         }
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
-        for docente in cls.docenti.values():
+        for docente in cls.get_docenti().values():
             if docente.get_nome().lower() == nome.lower():
                 return docente
         return None
 
     @classmethod
-    def get(cls, idx: int) -> Optional[Self]:
-        return cls.docenti.get(idx, None)
+    def get(cls, k: str) -> Optional[Self]:
+        return cls.get_docenti().get(k, None)
 
     def __str__(self) -> str:
         return "[Docente] " + super().__str__()
 
 
 class Modulo:
-    moduli: dict[int, Self] = dict()
-    prossimo = 0
+    __moduli: dict[str, Self] = dict()
+    __prossimo = 0
 
     def __init__(
         self,
-        idx: int,
         codice: str,
         nome: str,
         ore: int,
         docenti: Optional[list[Docente]] = None,
     ):
-        self.set_idx(idx)
         self.set_codice(codice)
         self.set_nome(nome)
         self.set_ore(ore)
         self.set_docenti(docenti)
 
-        type(self).moduli[self.get_idx()] = self
-
-    def get_idx(self) -> int:
-        return self._idx
-
-    def set_idx(self, idx: int):
-        assert isinstance(idx, int) and idx > 0, "'idx' must be a positive integer"
-        self._idx = idx
+        type(self).get_moduli()[self.get_codice()] = self
 
     def get_codice(self) -> str:
         return self._codice
@@ -484,18 +482,24 @@ class Modulo:
         self._docenti = _require_list(docenti, Docente, "docenti")
 
     @classmethod
+    def get_moduli(cls) -> dict[str, Self]:
+        return cls.__moduli
+
+    @classmethod
+    def set_moduli(cls, moduli: dict[str, Self]):
+        cls.__moduli = moduli
+
+    @classmethod
     def create(
         cls, codice: str, nome: str, ore: int, docenti: Optional[list[Docente]] = None
     ) -> Self:
-        cls.prossimo += 1
-        return cls(cls.prossimo, codice, nome, ore, docenti)
+        return cls(codice, nome, ore, docenti)
 
     @classmethod
-    def create_from_db(cls, idx: int, entity: dict) -> Self:
+    def create_from_db(cls, entity: dict) -> Self:
         codice = entity["codice"]
         nome = entity["nome"]
         ore = entity["ore"]
-
         lista_id_docenti = entity.get("docenti", [])
         docenti_obj = []
         for id_doc in lista_id_docenti:
@@ -503,124 +507,113 @@ class Modulo:
             if doc_obj:
                 docenti_obj.append(doc_obj)
 
-        result = cls(idx, codice, nome, ore, docenti_obj)
-
-        if cls.prossimo <= idx:
-            cls.prossimo = idx
-
-        return result
+        return cls(codice, nome, ore, docenti_obj)
 
     def to_db(self) -> dict:
         return {
             "codice": self.get_codice(),
             "nome": self.get_nome(),
             "ore": self.get_ore(),
-            "docenti": [d.get_idx() for d in self.get_docenti()],
+            "docenti": [d.get_nome() for d in self.get_docenti()],
         }
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
-        for modulo in cls.moduli.values():
+        for modulo in cls.get_moduli().values():
             if modulo.get_nome().lower() == nome.lower():
                 return modulo
         return None
 
     @classmethod
-    def get(cls, idx: int) -> Optional[Self]:
-        return cls.moduli.get(idx, None)
+    def get(cls, k: str) -> Optional[Self]:
+        return cls.get_moduli().get(k, None)
 
     def __str__(self) -> str:
         return f"Modulo: {self.get_nome()}"
 
 
 class AreaDisciplinare:
-    aree_disciplinari: dict[int, Self] = dict()
-    prossima = 0
+    __aree_disciplinari: dict[str, Self] = dict()
+    __prossima = 0
 
-    def __init__(self, idx: int, nome: str):
-        self.set_idx(idx)
+    def __init__(self, nome: str):
         self.set_nome(nome)
 
-        type(self).aree_disciplinari[self.get_idx()] = self
-
-    def get_idx(self) -> int:
-        return self._idx
-
-    def set_idx(self, idx: int):
-        assert isinstance(idx, int) and idx > 0, "'idx' must be a positive integer"
-        self._idx = idx
+        type(self).get_aree_disciplinari()[self.get_nome()] = self
 
     def get_nome(self) -> str:
         return self._nome
 
-    def set_nome(self, nome: str):
+    def set_nome(self, nome: str) -> None:
         assert isinstance(nome, str), "'nome' must be a string"
         self._nome = nome
 
     @classmethod
-    def create(cls, nome: str) -> Self:
-        cls.prossima += 1
-        return cls(cls.prossima, nome)
+    def get_prossima(cls) -> int:
+        return cls.__prossima
 
     @classmethod
-    def create_from_db(cls, idx: int, entity: dict) -> Self:
+    def set_prossima(cls, prossima: int):
+        cls.__prossima = prossima
+
+    @classmethod
+    def get_aree_disciplinari(cls) -> dict[str, Self]:
+        return cls.__aree_disciplinari
+
+    @classmethod
+    def set_aree_disciplinari(cls, aree_disciplinari: dict[str, Self]):
+        cls.__aree_disciplinari = aree_disciplinari
+
+    @classmethod
+    def create(cls, nome: str) -> Self:
+        cls.set_prossima(cls.get_prossima() + 1)
+        return cls(nome)
+
+    @classmethod
+    def create_from_db(cls, entity: dict) -> Self:
         nome = entity["nome"]
-        result = cls(idx, nome)
-
-        if cls.prossima <= idx:
-            cls.prossima = idx
-
-        return result
+        return cls(nome)
 
     def to_db(self) -> dict:
         return {"nome": self.get_nome()}
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
-        for area_disciplinare in cls.aree_disciplinari.values():
+        for area_disciplinare in cls.get_aree_disciplinari().values():
             if area_disciplinare.get_nome().lower() == nome.lower():
                 return area_disciplinare
         return None
 
     @classmethod
-    def get(cls, idx: int) -> Optional[Self]:
-        return cls.aree_disciplinari.get(idx, None)
+    def get(cls, k: str) -> Optional[Self]:
+        return cls.get_aree_disciplinari().get(k, None)
 
     def __str__(self) -> str:
         return f"Area disciplinare: {self.get_nome()}"
 
 
 class CorsoITS:
-    corsi: dict[int, Self] = dict()
-    prossimo = 0
+    __corsi: dict[str, Self] = dict()
+    __prossimo = 0
 
     def __init__(
         self,
-        idx: int,
         nome: str,
         edizione: int,
         area_disciplinare: AreaDisciplinare,
         moduli: Optional[list[Modulo]] = None,
     ):
-        self.set_idx(idx)
         self.set_nome(nome)
         self.set_edizione(edizione)
         self.set_area_disciplinare(area_disciplinare)
         self.set_moduli(moduli)
 
-        type(self).corsi[self.get_idx()] = self
-
-    def get_idx(self) -> int:
-        return self._idx
-
-    def set_idx(self, idx: int):
-        assert isinstance(idx, int) and idx > 0, "'idx' must be a positive integer"
-        self._idx = idx
+        type(self).get_corsi()[self.get_nome()] = self
 
     def get_nome(self) -> str:
         return self._nome
 
-    def set_nome(self, nome: str):
+    def set_nome(self, nome: str) -> None:
         assert isinstance(nome, str), "'nome' must be a string"
         self._nome = nome
 
@@ -647,6 +640,14 @@ class CorsoITS:
         self._moduli = _require_list(moduli, Modulo, "moduli")
 
     @classmethod
+    def get_corsi(cls) -> dict[str, Self]:
+        return cls.__corsi
+
+    @classmethod
+    def set_corsi(cls, corsi: dict[str, Self]):
+        cls.__corsi = corsi
+
+    @classmethod
     def create(
         cls,
         nome: str,
@@ -654,14 +655,12 @@ class CorsoITS:
         area_disciplinare: AreaDisciplinare,
         moduli: Optional[list[Modulo]] = None,
     ) -> Self:
-        cls.prossimo += 1
-        return cls(cls.prossimo, nome, edizione, area_disciplinare, moduli)
+        return cls(nome, edizione, area_disciplinare, moduli)
 
     @classmethod
-    def create_from_db(cls, idx: int, entity: dict) -> Self:
+    def create_from_db(cls, entity: dict) -> Self:
         nome = entity["nome"]
         edizione = entity["edizione"]
-
         area = AreaDisciplinare.get(entity["area_disciplinare"])
         if area is None:
             raise ValueError(
@@ -675,43 +674,37 @@ class CorsoITS:
             if mod_obj is not None:
                 moduli.append(mod_obj)
 
-        result = cls(idx, nome, edizione, area, moduli)
-
-        if cls.prossimo <= idx:
-            cls.prossimo = idx
-
-        return result
+        return cls(nome, edizione, area, moduli)
 
     def to_db(self) -> dict:
         return {
             "nome": self.get_nome(),
             "edizione": self.get_edizione(),
-            "area_disciplinare": self.get_area_disciplinare().get_idx(),
-            "moduli": [m.get_idx() for m in self.get_moduli()],
+            "area_disciplinare": self.get_area_disciplinare().get_nome(),
+            "moduli": [m.get_nome() for m in self.get_moduli()],
         }
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
-        for corso in cls.corsi.values():
+        for corso in cls.get_corsi().values():
             if corso.get_nome().lower() == nome.lower():
                 return corso
         return None
 
     @classmethod
-    def get(cls, idx: int) -> Optional[Self]:
-        return cls.corsi.get(idx, None)
+    def get(cls, k: str) -> Optional[Self]:
+        return cls.get_corsi().get(k, None)
 
     def __str__(self) -> str:
         return f"Corso ITS: {self.get_nome()}"
 
 
 class Studente(Persona):
-    studenti: dict[int, Self] = dict()
-    prossimo = 0
+    __studenti: dict[str, Self] = dict()
+    __prossimo = 0
 
     def __init__(
         self,
-        idx: int,
         nome: str,
         cognome: str,
         codice_fiscale: str,
@@ -725,9 +718,23 @@ class Studente(Persona):
         self.set_nascita(nascita)
         self.set_corso(corso)
         self.set_moduli_superati(moduli_superati)
-        super().__init__(idx, nome, cognome, codice_fiscale, citta_nascita)
+        super().__init__(nome, cognome, codice_fiscale, citta_nascita)
 
-        type(self).studenti[self.get_idx()] = self
+        type(self).get_studenti()[self.get_codice_fiscale()] = self
+
+    def get_nome(self) -> str:
+        return self._nome
+
+    def set_nome(self, nome: str) -> None:
+        assert isinstance(nome, str), "'nome' must be a string"
+        self._nome = nome
+
+    def get_cognome(self) -> str:
+        return self._cognome
+
+    def set_cognome(self, cognome: str) -> None:
+        assert isinstance(cognome, str), "'cognome' must be a string"
+        self._cognome = cognome
 
     def get_matricola(self) -> str:
         return self._matricola
@@ -759,6 +766,14 @@ class Studente(Persona):
         )
 
     @classmethod
+    def get_studenti(cls) -> dict[str, Self]:
+        return cls.__studenti
+
+    @classmethod
+    def set_studenti(cls, studenti: dict[str, Self]):
+        cls.__studenti = studenti
+
+    @classmethod
     def create(
         cls,
         nome: str,
@@ -770,9 +785,7 @@ class Studente(Persona):
         corso: CorsoITS,
         moduli_superati: Optional[list[Modulo]] = None,
     ) -> Self:
-        cls.prossimo += 1
         return cls(
-            cls.prossimo,
             nome,
             cognome,
             codice_fiscale,
@@ -784,15 +797,13 @@ class Studente(Persona):
         )
 
     @classmethod
-    def create_from_db(cls, idx: int, entity: dict) -> Self:
+    def create_from_db(cls, entity: dict) -> Self:
         nome = entity["nome"]
         cognome = entity["cognome"]
         matricola = entity["matricola"]
         nascita = date.fromisoformat(entity["nascita"])
-
         codice_fiscale = Persona.check_cf(entity["codice_fiscale"])
 
-        # 1. Gestione relazioni 1..1 (Gestiamo i potenziali None)
         citta_obj = Citta.get(entity["citta_nascita"])
         if citta_obj is None:
             raise ValueError(f"Citta ID {entity['citta_nascita']} non trovata")
@@ -801,7 +812,6 @@ class Studente(Persona):
         if corso_obj is None:
             raise ValueError(f"CorsoITS ID {entity['corso']} non trovato")
 
-        # 2. Gestione relazione 0..* per il Type Checker
         lista_mod_sup = entity.get("moduli_superati", [])
         moduli_obj: list[Modulo] = []
         for m in lista_mod_sup:
@@ -810,7 +820,6 @@ class Studente(Persona):
                 moduli_obj.append(mod_obj)
 
         result = cls(
-            idx,
             nome,
             cognome,
             codice_fiscale,
@@ -820,10 +829,6 @@ class Studente(Persona):
             corso_obj,
             moduli_obj,
         )
-
-        if cls.prossimo <= idx:
-            cls.prossimo = idx
-
         return result
 
     def to_db(self) -> dict:
@@ -833,29 +838,31 @@ class Studente(Persona):
             "matricola": self.get_matricola(),
             "codice_fiscale": self.get_codice_fiscale(),
             "nascita": self.get_nascita().isoformat(),
-            "citta_nascita": self.get_citta_nascita().get_idx(),
-            "corso": self.get_corso().get_idx(),
-            "moduli_superati": [m.get_idx() for m in self.get_moduli_superati()],
+            "citta_nascita": self.get_citta_nascita().get_nome(),
+            "corso": self.get_corso().get_nome(),
+            "moduli_superati": [m.get_nome() for m in self.get_moduli_superati()],
         }
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
-        for studente in cls.studenti.values():
+        for studente in cls.get_studenti().values():
             if studente.get_nome().lower() == nome.lower():
                 return studente
         return None
 
     @classmethod
-    def get(cls, idx: int) -> Optional[Self]:
-        return cls.studenti.get(idx, None)
+    def get(cls, k: str) -> Optional[Self]:
+        return cls.get_studenti().get(k, None)
 
     def __str__(self) -> str:
         moduli_superati = [m.get_nome() for m in self.get_moduli_superati()]
-        return "[Studente] " + super().__str__() + \
-        f" | Serial: {self.get_matricola()}" + \
-        f" | Course: {self.get_corso()}" + \
-        f" | Modules: {moduli_superati}\n"
-
+        return (
+            "[Studente] "
+            + super().__str__()
+            + f" | Serial: {self.get_matricola()}"
+            + f" | Course: {self.get_corso()}"
+            + f" | Modules: {moduli_superati}\n"
+        )
 
     def aggiungi_moduli_superati(self, codici_str: str):
         """Riceve una stringa di codici separati da virgola (es: 'py1, java1'),
@@ -868,7 +875,7 @@ class Studente(Persona):
                 continue
 
             modulo_trovato = None
-            for m in Modulo.moduli.values():
+            for m in Modulo.get_moduli().values():
                 if m.get_codice().lower() == codice_pulito.lower():
                     modulo_trovato = m
                     break
@@ -902,12 +909,12 @@ def ui_add_nazione():
         return
 
     nazione = Nazione.create(nome)
-    print(f"\nSuccess! {nazione} created with ID {nazione.get_idx()}.")
+    print(f"\nSuccess! {nazione} created with ID {nazione.get_nome()}.")
 
 
 def ui_add_regione():
     print("\n--- NEW REGION ---")
-    if not Nazione.nazioni:
+    if not Nazione.get_nazioni():
         print("Error: You must create at least one Nation first.")
         return
 
@@ -924,12 +931,12 @@ def ui_add_regione():
         return
 
     regione = Regione.create(nome, nazione)
-    print(f"\nSuccess! {regione} created with ID {regione.get_idx()}.")
+    print(f"\nSuccess! {regione} created with ID {regione.get_nome()}.")
 
 
 def ui_add_citta():
     print("\n--- NEW CITY ---")
-    if not Regione.regioni:
+    if not Regione.get_regioni():
         print("Error: You must create at least one Region first.")
         return
 
@@ -946,7 +953,7 @@ def ui_add_citta():
         return
 
     citta = Citta.create(nome, regione)
-    print(f"\nSuccess! {citta} created with ID {citta.get_idx()}.")
+    print(f"\nSuccess! {citta} created with ID {citta.get_nome()}.")
 
 
 def ui_add_area_disciplinare():
@@ -957,12 +964,12 @@ def ui_add_area_disciplinare():
         return
 
     area = AreaDisciplinare.create(nome)
-    print(f"\nSuccess! {area} created with ID {area.get_idx()}.")
+    print(f"\nSuccess! {area} created with ID {area.get_nome()}.")
 
 
 def ui_add_corso():
     print("\n--- NEW ITS COURSE ---")
-    if not AreaDisciplinare.aree_disciplinari:
+    if not AreaDisciplinare.get_aree_disciplinari():
         print("Error: You must create at least one Disciplinary Area first.")
         return
 
@@ -989,7 +996,7 @@ def ui_add_corso():
     try:
         corso = CorsoITS.create(nome, edizione, area, moduli=[])
         print(
-            f"\nSuccess! {corso} (Ed. {edizione}) created with ID {corso.get_idx()}."
+            f"\nSuccess! {corso} (Ed. {edizione}) created with ID {corso.get_nome()}."
         )
     except AssertionError as e:
         print(f"Validation error: {e}")
@@ -1012,9 +1019,9 @@ def ui_add_modulo():
         return
 
     docenti_selezionati = []
-    if Docente.docenti:
+    if Docente.get_docenti():
         print("\nAvailable teachers:")
-        for idx, doc in Docente.docenti.items():
+        for idx, doc in Docente.get_docenti().items():
             print(f"  [{idx}] {doc.get_nome()} {doc.get_cognome()}")
 
         ids_str = input(
@@ -1034,14 +1041,14 @@ def ui_add_modulo():
 
     try:
         modulo = Modulo.create(codice, nome, ore, docenti_selezionati)
-        print(f"\nSuccess! {modulo} created with ID {modulo.get_idx()}.")
+        print(f"\nSuccess! {modulo} created with ID {modulo.get_nome()}.")
     except AssertionError as e:
         print(f"Validation error: {e}")
 
 
 def ui_add_docente():
     print("\n--- NEW TEACHER ---")
-    if not Citta.citta:
+    if not Citta.get_citta():
         print("Error: You must create at least one City for the birth place first.")
         return
 
@@ -1063,15 +1070,15 @@ def ui_add_docente():
         return
 
     docente = Docente.create(nome, cognome, cf, citta)
-    print(f"\nSuccess! {docente} created with ID {docente.get_idx()}.")
+    print(f"\nSuccess! {docente} created with ID {docente.get_nome()}.")
 
 
 def ui_add_studente():
     print("\n--- NEW STUDENT ---")
-    if not Citta.citta:
+    if not Citta.get_citta():
         print("Error: You must create at least one City for the birth place first.")
         return
-    if not CorsoITS.corsi:
+    if not CorsoITS.get_corsi():
         print(
             "Error: You must create at least one ITS Course to enroll the student first."
         )
@@ -1107,12 +1114,12 @@ def ui_add_studente():
     studente = Studente.create(
         nome, cognome, cf, matricola, nascita, citta, corso, moduli_superati=[]
     )
-    print(f"\nSuccess! {studente} created with ID {studente.get_idx()}.")
+    print(f"\nSuccess! {studente} created with ID {studente.get_nome()}.")
 
     # RICHIESTA DEI MODULI SUPERATI
-    if Modulo.moduli:
+    if Modulo.get_moduli():
         print("\nAvailable modules in the system:")
-        for mod in Modulo.moduli.values():
+        for mod in Modulo.get_moduli().values():
             print(f"  [{mod.get_codice()}] {mod.get_nome()}")
 
         codici_input = input(
@@ -1128,14 +1135,14 @@ def ui_show_all():
     print("\n--- CURRENT DATA SUMMARY ---")
 
     registri = [
-        ("Nations", Nazione.nazioni),
-        ("Regions", Regione.regioni),
-        ("Cities", Citta.citta),
-        ("Disciplinary Areas", AreaDisciplinare.aree_disciplinari),
-        ("ITS Courses", CorsoITS.corsi),
-        ("Modules", Modulo.moduli),
-        ("Teachers", Docente.docenti),
-        ("Students", Studente.studenti),
+        ("Nations", Nazione.get_nazioni()),
+        ("Regions", Regione.get_regioni()),
+        ("Cities", Citta.get_citta()),
+        ("Disciplinary Areas", AreaDisciplinare.get_aree_disciplinari()),
+        ("ITS Courses", CorsoITS.get_corsi()),
+        ("Modules", Modulo.get_moduli()),
+        ("Teachers", Docente.get_docenti()),
+        ("Students", Studente.get_studenti()),
     ]
 
     for titolo, registro in registri:
@@ -1234,10 +1241,11 @@ def save_all(datafile, load_sequence):
         # Prepariamo il sotto-dizionario per la classe corrente (es: data_structure['Nazioni'] = {})
         data_structure[key] = {}
 
-        # Prendiamo ogni istanza salvata nel registro di classe (es. Nazione.nazioni)
+        # Prendiamo ogni istanza salvata nel registro di classe (es. Nazione.get_nazioni())
         for idx, instance in registry.items():
             # Invochiamo il metodo to_db() dell'oggetto per ottenere il dizionario pulito
-            data_structure[key][str(idx)] = instance.to_db()
+            # FIX da sistemare la chiave altrimenti l'ID intero viene usato come chiave
+            data_structure[key][instance.get_nome()] = instance.to_db()
 
     try:
         with open(datafile, "wt", encoding="utf-8") as fp:
@@ -1255,19 +1263,23 @@ def main():
 
     # 1. Nome della chiave all'interno del file JSON
     # 2. La classe, in modo che nel ciclo si attivi il factory method di quella classe
-    # 3. Dizionario di memoria utilizzato in scrittura da save_all() ES. ogni volta che creiamo una nazione, il costruttore salva dentro il dizionario Nazione.nazioni. Viene usato lo stesso
+    # 3. Dizionario di memoria utilizzato in scrittura da save_all() ES. ogni volta che creiamo una nazione, il costruttore salva dentro il dizionario Nazione.get_nazioni(). Viene usato lo stesso
     # dizionario per sapere dove iterare e creare oggetti JSON di quella classe.
 
     load_sequence = [
         # (Chiave JSON, Classe, Dizionario delle istanze in memoria)
-        ("Nations", Nazione, Nazione.nazioni),
-        ("Regions", Regione, Regione.regioni),
-        ("Cities", Citta, Citta.citta),
-        ("DisciplinaryAreas", AreaDisciplinare, AreaDisciplinare.aree_disciplinari),
-        ("Teachers", Docente, Docente.docenti),
-        ("Modules", Modulo, Modulo.moduli),
-        ("ITSCourses", CorsoITS, CorsoITS.corsi),
-        ("Students", Studente, Studente.studenti),
+        ("Nations", Nazione, Nazione.get_nazioni()),
+        ("Regions", Regione, Regione.get_regioni()),
+        ("Cities", Citta, Citta.get_citta()),
+        (
+            "DisciplinaryAreas",
+            AreaDisciplinare,
+            AreaDisciplinare.get_aree_disciplinari(),
+        ),
+        ("Teachers", Docente, Docente.get_docenti()),
+        ("Modules", Modulo, Modulo.get_moduli()),
+        ("ITSCourses", CorsoITS, CorsoITS.get_corsi()),
+        ("Students", Studente, Studente.get_studenti()),
     ]
     try:
         datafile = Path.cwd() / "data.json"
