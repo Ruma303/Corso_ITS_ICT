@@ -34,6 +34,10 @@ UML concettuale delle classi
 3) gestire la persistenza dei dati tramite un file JSON.
 """
 
+# TODO: Durante la creazione di Docenti e Studenti cambiare la chiave non con numero intero,
+# ma con il codice fiscale stesso.
+# In questo modo avremmo Persone.persone con chiavi i codici fiscali, e valori le istanze. 
+
 from __future__ import annotations
 
 import json
@@ -74,10 +78,24 @@ class Nazione:
     prossima = 0
 
     def __init__(self, idx: int, nome: str):
-        self.idx = idx
-        self.nome = nome
+        self.set_idx(idx)
+        self.set_nome(nome)
 
-        type(self).nazioni[self.idx] = self
+        type(self).nazioni[self.get_idx()] = self
+
+    def get_idx(self) -> int:
+        return self._idx
+
+    def set_idx(self, idx: int):
+        assert isinstance(idx, int) and idx > 0, "'idx' must be a positive integer"
+        self._idx = idx
+
+    def get_nome(self) -> str:
+        return self._nome
+
+    def set_nome(self, nome: str):
+        assert isinstance(nome, str), "'nome' must be a string"
+        self._nome = nome
 
     @classmethod
     def create(cls, nome: str) -> Self:
@@ -95,12 +113,12 @@ class Nazione:
         return result
 
     def to_db(self) -> dict:
-        return {"nome": self.nome}
+        return {"nome": self.get_nome()}
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
         for nazione in cls.nazioni.values():
-            if nazione.nome.lower() == nome.lower():
+            if nazione.get_nome().lower() == nome.lower():
                 return nazione
         return None
 
@@ -110,7 +128,7 @@ class Nazione:
         return cls.nazioni.get(idx, None)
 
     def __str__(self) -> str:
-        return f"Nazione: {self.nome}"
+        return f"Nazione: {self.get_nome()}"
 
 
 class Regione:
@@ -118,12 +136,32 @@ class Regione:
     prossima = 0
 
     def __init__(self, idx: int, nome: str, nazione: Nazione):
-        self.idx = idx
-        self.nome = nome
-        _require_instance(nazione, Nazione, "nazione")
-        self.nazione = nazione
+        self.set_idx(idx)
+        self.set_nome(nome)
+        self.set_nazione(nazione)
 
-        type(self).regioni[self.idx] = self
+        type(self).regioni[self.get_idx()] = self
+
+    def get_idx(self) -> int:
+        return self._idx
+
+    def set_idx(self, idx: int):
+        assert isinstance(idx, int) and idx > 0, "'idx' must be a positive integer"
+        self._idx = idx
+
+    def get_nome(self) -> str:
+        return self._nome
+
+    def set_nome(self, nome: str):
+        assert isinstance(nome, str), "'nome' must be a string"
+        self._nome = nome
+
+    def get_nazione(self) -> Nazione:
+        return self._nazione
+
+    def set_nazione(self, nazione: Nazione):
+        _require_instance(nazione, Nazione, "nazione")
+        self._nazione = nazione
 
     @classmethod
     def create(cls, nome: str, nazione: Nazione) -> Self:
@@ -150,12 +188,12 @@ class Regione:
         return result
 
     def to_db(self) -> dict:
-        return {"nome": self.nome, "nazione": self.nazione.idx}
+        return {"nome": self.get_nome(), "nazione": self.get_nazione().get_idx()}
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
         for regione in cls.regioni.values():
-            if regione.nome.lower() == nome.lower():
+            if regione.get_nome().lower() == nome.lower():
                 return regione
         return None
 
@@ -164,7 +202,7 @@ class Regione:
         return cls.regioni.get(idx, None)
 
     def __str__(self) -> str:
-        return f"Regione: {self.nome}"
+        return f"Regione: {self.get_nome()}"
 
 
 class Citta:
@@ -172,12 +210,32 @@ class Citta:
     prossima = 0
 
     def __init__(self, idx: int, nome: str, regione: Regione):
-        self.idx = idx
-        self.nome = nome
-        _require_instance(regione, Regione, "regione")
-        self.regione = regione
+        self.set_idx(idx)
+        self.set_nome(nome)
+        self.set_regione(regione)
 
-        type(self).citta[self.idx] = self
+        type(self).citta[self.get_idx()] = self
+
+    def get_idx(self) -> int:
+        return self._idx
+
+    def set_idx(self, idx: int):
+        assert isinstance(idx, int) and idx > 0, "'idx' must be a positive integer"
+        self._idx = idx
+
+    def get_nome(self) -> str:
+        return self._nome
+
+    def set_nome(self, nome: str):
+        assert isinstance(nome, str), "'nome' must be a string"
+        self._nome = nome
+
+    def get_regione(self) -> Regione:
+        return self._regione
+
+    def set_regione(self, regione: Regione):
+        _require_instance(regione, Regione, "regione")
+        self._regione = regione
 
     @classmethod
     def create(cls, nome: str, regione: Regione) -> Self:
@@ -202,12 +260,12 @@ class Citta:
         return result
 
     def to_db(self) -> dict:
-        return {"nome": self.nome, "regione": self.regione.idx}
+        return {"nome": self.get_nome(), "regione": self.get_regione().get_idx()}
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
         for c in cls.citta.values():
-            if c.nome.lower() == nome.lower():
+            if c.get_nome().lower() == nome.lower():
                 return c
         return None
 
@@ -216,7 +274,7 @@ class Citta:
         return cls.citta.get(idx, None)
 
     def __str__(self) -> str:
-        return f"Città: {self.nome}"
+        return f"Città: {self.get_nome()}"
 
 
 # --- Classi primarie
@@ -233,20 +291,62 @@ class Persona(ABC):
         codice_fiscale: str,
         citta_nascita: Citta,
     ):
-        self.idx = idx
-        self.nome = nome
-        self.cognome = cognome
-        self.codice_fiscale = type(self).check_cf(codice_fiscale)
-        _require_instance(citta_nascita, Citta, "citta_nascita")
-        self.citta_nascita = citta_nascita
+        self.set_idx(idx)
+        self.set_nome(nome)
+        self.set_cognome(cognome)
+        self.set_citta_nascita(citta_nascita)
+        self.set_codice_fiscale(codice_fiscale)
 
-        assert self.codice_fiscale not in Persona.persone, (
-            f"Fiscal code '{self.codice_fiscale}' already exists"
+    def get_idx(self) -> int:
+        return self._idx
+
+    def set_idx(self, idx: int):
+        assert isinstance(idx, int) and idx > 0, "'idx' must be a positive integer"
+        self._idx = idx
+
+    def get_nome(self) -> str:
+        return self._nome
+
+    def set_nome(self, nome: str):
+        assert isinstance(nome, str), "'nome' must be a string"
+        self._nome = nome
+
+    def get_cognome(self) -> str:
+        return self._cognome
+
+    def set_cognome(self, cognome: str):
+        assert isinstance(cognome, str), "'cognome' must be a string"
+        self._cognome = cognome
+
+    def get_codice_fiscale(self) -> str:
+        return self._codice_fiscale
+
+    def set_codice_fiscale(self, codice_fiscale: str):
+        codice_clean = type(self).check_cf(codice_fiscale)
+        persona_esistente = Persona.persone.get(codice_clean)
+        assert persona_esistente is None or persona_esistente is self, (
+            f"Fiscal code '{codice_clean}' already exists"
         )
-        Persona.persone[self.codice_fiscale] = self
+
+        vecchio_codice = getattr(self, "_codice_fiscale", None)
+        if vecchio_codice is not None and Persona.persone.get(vecchio_codice) is self:
+            del Persona.persone[vecchio_codice]
+
+        self._codice_fiscale = codice_clean
+        Persona.persone[codice_clean] = self
+
+    def get_citta_nascita(self) -> Citta:
+        return self._citta_nascita
+
+    def set_citta_nascita(self, citta_nascita: Citta):
+        _require_instance(citta_nascita, Citta, "citta_nascita")
+        self._citta_nascita = citta_nascita
 
     def __str__(self) -> str:
-        return f"{self.idx}. {self.cognome}, {self.nome} - CF: {self.codice_fiscale} - from:  {self.citta_nascita}"
+        return (
+            f"{self.get_idx()}. {self.get_cognome()}, {self.get_nome()} "
+            f"- CF: {self.get_codice_fiscale()} - from:  {self.get_citta_nascita()}"
+        )
 
     @classmethod
     def check_cf(cls, codice_fiscale: str) -> str:
@@ -271,10 +371,9 @@ class Docente(Persona):
         codice_fiscale: str,
         citta_nascita: Citta,
     ):
-        self.idx = idx
         super().__init__(idx, nome, cognome, codice_fiscale, citta_nascita)
 
-        type(self).docenti[self.idx] = self
+        type(self).docenti[self.get_idx()] = self
 
     @classmethod
     def create(
@@ -309,16 +408,16 @@ class Docente(Persona):
 
     def to_db(self) -> dict:
         return {
-            "nome": self.nome,
-            "cognome": self.cognome,
-            "codice_fiscale": self.codice_fiscale,
-            "citta_nascita": self.citta_nascita.idx,
+            "nome": self.get_nome(),
+            "cognome": self.get_cognome(),
+            "codice_fiscale": self.get_codice_fiscale(),
+            "citta_nascita": self.get_citta_nascita().get_idx(),
         }
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
         for docente in cls.docenti.values():
-            if docente.nome.lower() == nome.lower():
+            if docente.get_nome().lower() == nome.lower():
                 return docente
         return None
 
@@ -342,15 +441,47 @@ class Modulo:
         ore: int,
         docenti: Optional[list[Docente]] = None,
     ):
-        assert ore > 0, "Module hours cannot be 0 or negative"
-        self.idx = idx
-        self.codice = codice
-        self.nome = nome
-        self.ore = ore
+        self.set_idx(idx)
+        self.set_codice(codice)
+        self.set_nome(nome)
+        self.set_ore(ore)
+        self.set_docenti(docenti)
 
-        self.docenti = _require_list(docenti, Docente, "docenti")
+        type(self).moduli[self.get_idx()] = self
 
-        type(self).moduli[self.idx] = self
+    def get_idx(self) -> int:
+        return self._idx
+
+    def set_idx(self, idx: int):
+        assert isinstance(idx, int) and idx > 0, "'idx' must be a positive integer"
+        self._idx = idx
+
+    def get_codice(self) -> str:
+        return self._codice
+
+    def set_codice(self, codice: str):
+        assert isinstance(codice, str), "'codice' must be a string"
+        self._codice = codice
+
+    def get_nome(self) -> str:
+        return self._nome
+
+    def set_nome(self, nome: str):
+        assert isinstance(nome, str), "'nome' must be a string"
+        self._nome = nome
+
+    def get_ore(self) -> int:
+        return self._ore
+
+    def set_ore(self, ore: int):
+        assert isinstance(ore, int) and ore > 0, "Module hours cannot be 0 or negative"
+        self._ore = ore
+
+    def get_docenti(self) -> list[Docente]:
+        return self._docenti
+
+    def set_docenti(self, docenti: Optional[list[Docente]]):
+        self._docenti = _require_list(docenti, Docente, "docenti")
 
     @classmethod
     def create(
@@ -381,16 +512,16 @@ class Modulo:
 
     def to_db(self) -> dict:
         return {
-            "codice": self.codice,
-            "nome": self.nome,
-            "ore": self.ore,
-            "docenti": [d.idx for d in self.docenti],
+            "codice": self.get_codice(),
+            "nome": self.get_nome(),
+            "ore": self.get_ore(),
+            "docenti": [d.get_idx() for d in self.get_docenti()],
         }
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
         for modulo in cls.moduli.values():
-            if modulo.nome.lower() == nome.lower():
+            if modulo.get_nome().lower() == nome.lower():
                 return modulo
         return None
 
@@ -399,7 +530,7 @@ class Modulo:
         return cls.moduli.get(idx, None)
 
     def __str__(self) -> str:
-        return f"Modulo: {self.nome}"
+        return f"Modulo: {self.get_nome()}"
 
 
 class AreaDisciplinare:
@@ -407,10 +538,24 @@ class AreaDisciplinare:
     prossima = 0
 
     def __init__(self, idx: int, nome: str):
-        self.idx = idx
-        self.nome = nome
+        self.set_idx(idx)
+        self.set_nome(nome)
 
-        type(self).aree_disciplinari[self.idx] = self
+        type(self).aree_disciplinari[self.get_idx()] = self
+
+    def get_idx(self) -> int:
+        return self._idx
+
+    def set_idx(self, idx: int):
+        assert isinstance(idx, int) and idx > 0, "'idx' must be a positive integer"
+        self._idx = idx
+
+    def get_nome(self) -> str:
+        return self._nome
+
+    def set_nome(self, nome: str):
+        assert isinstance(nome, str), "'nome' must be a string"
+        self._nome = nome
 
     @classmethod
     def create(cls, nome: str) -> Self:
@@ -428,12 +573,12 @@ class AreaDisciplinare:
         return result
 
     def to_db(self) -> dict:
-        return {"nome": self.nome}
+        return {"nome": self.get_nome()}
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
         for area_disciplinare in cls.aree_disciplinari.values():
-            if area_disciplinare.nome.lower() == nome.lower():
+            if area_disciplinare.get_nome().lower() == nome.lower():
                 return area_disciplinare
         return None
 
@@ -442,7 +587,7 @@ class AreaDisciplinare:
         return cls.aree_disciplinari.get(idx, None)
 
     def __str__(self) -> str:
-        return f"Area disciplinare: {self.nome}"
+        return f"Area disciplinare: {self.get_nome()}"
 
 
 class CorsoITS:
@@ -457,16 +602,49 @@ class CorsoITS:
         area_disciplinare: AreaDisciplinare,
         moduli: Optional[list[Modulo]] = None,
     ):
-        self.idx = idx
-        self.nome = nome
-        self.edizione = edizione
-        assert edizione > 0, "Edition can only be a positive integer number"
+        self.set_idx(idx)
+        self.set_nome(nome)
+        self.set_edizione(edizione)
+        self.set_area_disciplinare(area_disciplinare)
+        self.set_moduli(moduli)
 
+        type(self).corsi[self.get_idx()] = self
+
+    def get_idx(self) -> int:
+        return self._idx
+
+    def set_idx(self, idx: int):
+        assert isinstance(idx, int) and idx > 0, "'idx' must be a positive integer"
+        self._idx = idx
+
+    def get_nome(self) -> str:
+        return self._nome
+
+    def set_nome(self, nome: str):
+        assert isinstance(nome, str), "'nome' must be a string"
+        self._nome = nome
+
+    def get_edizione(self) -> int:
+        return self._edizione
+
+    def set_edizione(self, edizione: int):
+        assert isinstance(edizione, int) and edizione > 0, (
+            "Edition can only be a positive integer number"
+        )
+        self._edizione = edizione
+
+    def get_area_disciplinare(self) -> AreaDisciplinare:
+        return self._area_disciplinare
+
+    def set_area_disciplinare(self, area_disciplinare: AreaDisciplinare):
         _require_instance(area_disciplinare, AreaDisciplinare, "area_disciplinare")
-        self.area_disciplinare = area_disciplinare
-        self.moduli = _require_list(moduli, Modulo, "moduli")
+        self._area_disciplinare = area_disciplinare
 
-        type(self).corsi[self.idx] = self
+    def get_moduli(self) -> list[Modulo]:
+        return self._moduli
+
+    def set_moduli(self, moduli: Optional[list[Modulo]]):
+        self._moduli = _require_list(moduli, Modulo, "moduli")
 
     @classmethod
     def create(
@@ -506,16 +684,16 @@ class CorsoITS:
 
     def to_db(self) -> dict:
         return {
-            "nome": self.nome,
-            "edizione": self.edizione,
-            "area_disciplinare": self.area_disciplinare.idx,
-            "moduli": [m.idx for m in self.moduli],
+            "nome": self.get_nome(),
+            "edizione": self.get_edizione(),
+            "area_disciplinare": self.get_area_disciplinare().get_idx(),
+            "moduli": [m.get_idx() for m in self.get_moduli()],
         }
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
         for corso in cls.corsi.values():
-            if corso.nome.lower() == nome.lower():
+            if corso.get_nome().lower() == nome.lower():
                 return corso
         return None
 
@@ -524,7 +702,7 @@ class CorsoITS:
         return cls.corsi.get(idx, None)
 
     def __str__(self) -> str:
-        return f"Corso ITS: {self.nome}"
+        return f"Corso ITS: {self.get_nome()}"
 
 
 class Studente(Persona):
@@ -543,15 +721,42 @@ class Studente(Persona):
         corso: CorsoITS,
         moduli_superati: Optional[list[Modulo]] = None,
     ):
+        self.set_matricola(matricola)
+        self.set_nascita(nascita)
+        self.set_corso(corso)
+        self.set_moduli_superati(moduli_superati)
         super().__init__(idx, nome, cognome, codice_fiscale, citta_nascita)
-        self.matricola = matricola
-        _require_instance(nascita, date, "nascita")
-        self.nascita = nascita
-        _require_instance(corso, CorsoITS, "corso")
-        self.corso = corso
-        self.moduli_superati = _require_list(moduli_superati, Modulo, "moduli_superati")
 
-        type(self).studenti[self.idx] = self
+        type(self).studenti[self.get_idx()] = self
+
+    def get_matricola(self) -> str:
+        return self._matricola
+
+    def set_matricola(self, matricola: str):
+        assert isinstance(matricola, str), "'matricola' must be a string"
+        self._matricola = matricola
+
+    def get_nascita(self) -> date:
+        return self._nascita
+
+    def set_nascita(self, nascita: date):
+        _require_instance(nascita, date, "nascita")
+        self._nascita = nascita
+
+    def get_corso(self) -> CorsoITS:
+        return self._corso
+
+    def set_corso(self, corso: CorsoITS):
+        _require_instance(corso, CorsoITS, "corso")
+        self._corso = corso
+
+    def get_moduli_superati(self) -> list[Modulo]:
+        return self._moduli_superati
+
+    def set_moduli_superati(self, moduli_superati: Optional[list[Modulo]]):
+        self._moduli_superati = _require_list(
+            moduli_superati, Modulo, "moduli_superati"
+        )
 
     @classmethod
     def create(
@@ -623,20 +828,20 @@ class Studente(Persona):
 
     def to_db(self) -> dict:
         return {
-            "nome": self.nome,
-            "cognome": self.cognome,
-            "matricola": self.matricola,
-            "codice_fiscale": self.codice_fiscale,
-            "nascita": self.nascita.isoformat(),
-            "citta_nascita": self.citta_nascita.idx,
-            "corso": self.corso.idx,
-            "moduli_superati": [m.idx for m in self.moduli_superati],
+            "nome": self.get_nome(),
+            "cognome": self.get_cognome(),
+            "matricola": self.get_matricola(),
+            "codice_fiscale": self.get_codice_fiscale(),
+            "nascita": self.get_nascita().isoformat(),
+            "citta_nascita": self.get_citta_nascita().get_idx(),
+            "corso": self.get_corso().get_idx(),
+            "moduli_superati": [m.get_idx() for m in self.get_moduli_superati()],
         }
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
         for studente in cls.studenti.values():
-            if studente.nome.lower() == nome.lower():
+            if studente.get_nome().lower() == nome.lower():
                 return studente
         return None
 
@@ -645,7 +850,12 @@ class Studente(Persona):
         return cls.studenti.get(idx, None)
 
     def __str__(self) -> str:
-        return "[Studente] " + super().__str__()
+        moduli_superati = [m.get_nome() for m in self.get_moduli_superati()]
+        return "[Studente] " + super().__str__() + \
+        f" | Serial: {self.get_matricola()}" + \
+        f" | Course: {self.get_corso()}" + \
+        f" | Modules: {moduli_superati}\n"
+
 
     def aggiungi_moduli_superati(self, codici_str: str):
         """Riceve una stringa di codici separati da virgola (es: 'py1, java1'),
@@ -659,7 +869,7 @@ class Studente(Persona):
 
             modulo_trovato = None
             for m in Modulo.moduli.values():
-                if m.codice.lower() == codice_pulito.lower():
+                if m.get_codice().lower() == codice_pulito.lower():
                     modulo_trovato = m
                     break
 
@@ -670,12 +880,14 @@ class Studente(Persona):
                 continue
 
             # Simula il comportamento del SET
-            if modulo_trovato not in self.moduli_superati:
-                self.moduli_superati.append(modulo_trovato)
-                print(f"\n\r\t-> Module '{modulo_trovato.nome}' successfully added.")
+            if modulo_trovato not in self.get_moduli_superati():
+                self.get_moduli_superati().append(modulo_trovato)
+                print(
+                    f"\n\r\t-> Module '{modulo_trovato.get_nome()}' successfully added."
+                )
             else:
                 print(
-                    f"\n\r\t-> Info: The module '{modulo_trovato.nome}' is already present."
+                    f"\n\r\t-> Info: The module '{modulo_trovato.get_nome()}' is already present."
                 )
 
 
@@ -690,7 +902,7 @@ def ui_add_nazione():
         return
 
     nazione = Nazione.create(nome)
-    print(f"\nSuccess! {nazione} created with ID {nazione.idx}.")
+    print(f"\nSuccess! {nazione} created with ID {nazione.get_idx()}.")
 
 
 def ui_add_regione():
@@ -712,7 +924,7 @@ def ui_add_regione():
         return
 
     regione = Regione.create(nome, nazione)
-    print(f"\nSuccess! {regione} created with ID {regione.idx}.")
+    print(f"\nSuccess! {regione} created with ID {regione.get_idx()}.")
 
 
 def ui_add_citta():
@@ -734,7 +946,7 @@ def ui_add_citta():
         return
 
     citta = Citta.create(nome, regione)
-    print(f"\nSuccess! {citta} created with ID {citta.idx}.")
+    print(f"\nSuccess! {citta} created with ID {citta.get_idx()}.")
 
 
 def ui_add_area_disciplinare():
@@ -745,7 +957,7 @@ def ui_add_area_disciplinare():
         return
 
     area = AreaDisciplinare.create(nome)
-    print(f"\nSuccess! {area} created with ID {area.idx}.")
+    print(f"\nSuccess! {area} created with ID {area.get_idx()}.")
 
 
 def ui_add_corso():
@@ -776,7 +988,9 @@ def ui_add_corso():
 
     try:
         corso = CorsoITS.create(nome, edizione, area, moduli=[])
-        print(f"\nSuccess! {corso} (Ed. {edizione}) created with ID {corso.idx}.")
+        print(
+            f"\nSuccess! {corso} (Ed. {edizione}) created with ID {corso.get_idx()}."
+        )
     except AssertionError as e:
         print(f"Validation error: {e}")
 
@@ -801,7 +1015,7 @@ def ui_add_modulo():
     if Docente.docenti:
         print("\nAvailable teachers:")
         for idx, doc in Docente.docenti.items():
-            print(f"  [{idx}] {doc.nome} {doc.cognome}")
+            print(f"  [{idx}] {doc.get_nome()} {doc.get_cognome()}")
 
         ids_str = input(
             "Enter teacher IDs separated by comma (e.g., 1,2) or leave empty: "
@@ -820,7 +1034,7 @@ def ui_add_modulo():
 
     try:
         modulo = Modulo.create(codice, nome, ore, docenti_selezionati)
-        print(f"\nSuccess! {modulo} created with ID {modulo.idx}.")
+        print(f"\nSuccess! {modulo} created with ID {modulo.get_idx()}.")
     except AssertionError as e:
         print(f"Validation error: {e}")
 
@@ -849,7 +1063,7 @@ def ui_add_docente():
         return
 
     docente = Docente.create(nome, cognome, cf, citta)
-    print(f"\nSuccess! {docente} created with ID {docente.idx}.")
+    print(f"\nSuccess! {docente} created with ID {docente.get_idx()}.")
 
 
 def ui_add_studente():
@@ -893,13 +1107,13 @@ def ui_add_studente():
     studente = Studente.create(
         nome, cognome, cf, matricola, nascita, citta, corso, moduli_superati=[]
     )
-    print(f"\nSuccess! {studente} created with ID {studente.idx}.")
+    print(f"\nSuccess! {studente} created with ID {studente.get_idx()}.")
 
     # RICHIESTA DEI MODULI SUPERATI
     if Modulo.moduli:
         print("\nAvailable modules in the system:")
         for mod in Modulo.moduli.values():
-            print(f"  [{mod.codice}] {mod.nome}")
+            print(f"  [{mod.get_codice()}] {mod.get_nome()}")
 
         codici_input = input(
             "\nEnter the codes of passed modules separated by comma (e.g., py1,java1) or leave empty: "
@@ -912,14 +1126,26 @@ def ui_add_studente():
 
 def ui_show_all():
     print("\n--- CURRENT DATA SUMMARY ---")
-    print(f"\nNations: {len(Nazione.nazioni)}")
-    print(f"\nRegions: {len(Regione.regioni)}")
-    print(f"\nCities: {len(Citta.citta)}")
-    print(f"\nDisciplinary Areas: {len(AreaDisciplinare.aree_disciplinari)}")
-    print(f"\nITS Courses: {len(CorsoITS.corsi)}")
-    print(f"\nModules: {len(Modulo.moduli)}")
-    print(f"\nTeachers: {len(Docente.docenti)}")
-    print(f"\nStudents: {len(Studente.studenti)}")
+
+    registri = [
+        ("Nations", Nazione.nazioni),
+        ("Regions", Regione.regioni),
+        ("Cities", Citta.citta),
+        ("Disciplinary Areas", AreaDisciplinare.aree_disciplinari),
+        ("ITS Courses", CorsoITS.corsi),
+        ("Modules", Modulo.moduli),
+        ("Teachers", Docente.docenti),
+        ("Students", Studente.studenti),
+    ]
+
+    for titolo, registro in registri:
+        print(f"\n{titolo}: {len(registro)}")
+        if not registro:
+            print("\t- No records")
+            continue
+
+        for idx, entity in registro.items():
+            print(f"\t[{idx}] {entity}")
 
 
 def ui_ask_what_to_do():

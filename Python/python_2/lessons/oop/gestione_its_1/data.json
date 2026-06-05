@@ -86,6 +86,9 @@
     },
     "3": {
       "nome": "Marketing"
+    },
+    "4": {
+      "nome": "General informatics"
     }
   },
   "Teachers": {
@@ -185,6 +188,12 @@
       "moduli": [
         6
       ]
+    },
+    "4": {
+      "nome": "Sistemi digitali 1",
+      "edizione": 2025,
+      "area_disciplinare": 4,
+      "moduli": []
     }
   },
   "Students": {
@@ -223,6 +232,19 @@
       "moduli_superati": [
         1,
         2,
+        6
+      ]
+    },
+    "4": {
+      "nome": "John",
+      "cognome": "Doe",
+      "matricola": "JN83DO30",
+      "codice_fiscale": "J20ND300AD35",
+      "nascita": "2002-04-04",
+      "citta_nascita": 4,
+      "corso": 4,
+      "moduli_superati": [
+        1,
         6
       ]
     }
