@@ -79,8 +79,10 @@ class Nazione:
 
     def __init__(self, nome: str):
         self.set_nome(nome)
-
         type(self).get_nazioni()[self.get_nome()] = self
+
+    def get_key(self) -> str:
+        return self.get_nome()
 
     def get_nome(self) -> str:
         return self._nome
@@ -133,8 +135,10 @@ class Regione:
     def __init__(self, nome: str, nazione: Nazione):
         self.set_nome(nome)
         self.set_nazione(nazione)
-
         type(self).get_regioni()[self.get_nome()] = self
+
+    def get_key(self) -> str:
+        return self.get_nome()
 
     def get_nome(self) -> str:
         return self._nome
@@ -208,8 +212,10 @@ class Citta:
     def __init__(self, nome: str, regione: Regione):
         self.set_nome(nome)
         self.set_regione(regione)
-
         type(self).get_citta()[self.get_nome()] = self
+
+    def get_key(self) -> str:
+        return self.get_nome()
 
     def get_nome(self) -> str:
         return self._nome
@@ -292,6 +298,9 @@ class Persona(ABC):
         self.set_citta_nascita(citta_nascita)
         self.set_codice_fiscale(codice_fiscale)
 
+    def get_key(self) -> str:
+        return self.get_nome()
+
     def get_nome(self) -> str:
         return self._nome
 
@@ -370,8 +379,10 @@ class Docente(Persona):
         citta_nascita: Citta,
     ):
         super().__init__(nome, cognome, codice_fiscale, citta_nascita)
-
         type(self).get_docenti()[self.get_nome()] = self
+
+    def get_key(self) -> str:
+        return self.get_nome()
 
     def get_nome(self) -> str:
         return self._nome
@@ -453,6 +464,9 @@ class Modulo:
         self.set_docenti(docenti)
 
         type(self).get_moduli()[self.get_codice()] = self
+
+    def get_key(self) -> str:
+        return self.get_codice()
 
     def get_codice(self) -> str:
         return self._codice
@@ -538,8 +552,10 @@ class AreaDisciplinare:
 
     def __init__(self, nome: str):
         self.set_nome(nome)
-
         type(self).get_aree_disciplinari()[self.get_nome()] = self
+
+    def get_key(self) -> str:
+        return self.get_nome()
 
     def get_nome(self) -> str:
         return self._nome
@@ -607,8 +623,10 @@ class CorsoITS:
         self.set_edizione(edizione)
         self.set_area_disciplinare(area_disciplinare)
         self.set_moduli(moduli)
-
         type(self).get_corsi()[self.get_nome()] = self
+
+    def get_key(self) -> str:
+        return self.get_nome()
 
     def get_nome(self) -> str:
         return self._nome
@@ -719,8 +737,10 @@ class Studente(Persona):
         self.set_corso(corso)
         self.set_moduli_superati(moduli_superati)
         super().__init__(nome, cognome, codice_fiscale, citta_nascita)
-
         type(self).get_studenti()[self.get_codice_fiscale()] = self
+
+    def get_key(self) -> str:
+        return self.get_nome()
 
     def get_nome(self) -> str:
         return self._nome
@@ -1002,6 +1022,8 @@ def ui_add_corso():
         print(f"Validation error: {e}")
 
 
+# FIXME: mostrare il corso appartenente
+# TODO: far scegliere i docenti che insegnano
 def ui_add_modulo():
     print("\n--- NEW MODULE ---")
     nome = input("Module name: ").strip()
@@ -1030,7 +1052,7 @@ def ui_add_modulo():
         if ids_str:
             for id_str in ids_str.split(","):
                 try:
-                    t_id = int(id_str.strip())
+                    t_id = str(id_str.strip())
                     docente_obj = Docente.get(t_id)
                     if docente_obj:
                         docenti_selezionati.append(docente_obj)
@@ -1232,24 +1254,23 @@ def load_all(datafile, load_sequence):
 def save_all(datafile, load_sequence):
     print(f"\nSaving data to file '{datafile}':")
 
-    data_structure: dict = {}
+    # all_data_to_save will hold all data for the JSON file
+    all_data_to_save: dict = {}
 
-    # Iteriamo sulla struttura passata esternamente
+    # Iterate through the externally passed structure
     for key, _, registry in load_sequence:
         print(f"\n\t-> Serializing {key}...")
 
-        # Prepariamo il sotto-dizionario per la classe corrente (es: data_structure['Nazioni'] = {})
-        data_structure[key] = {}
-
-        # Prendiamo ogni istanza salvata nel registro di classe (es. Nazione.get_nazioni())
-        for idx, instance in registry.items():
-            # Invochiamo il metodo to_db() dell'oggetto per ottenere il dizionario pulito
-            # FIX da sistemare la chiave altrimenti l'ID intero viene usato come chiave
-            data_structure[key][instance.get_nome()] = instance.to_db()
+        # Create a dictionary for the current class's instances
+        class_data = {}
+        for _, instance_obj in registry.items():
+            class_data[instance_obj.get_key()] = instance_obj.to_db()
+        
+        all_data_to_save[key] = class_data # Add the serialized class data to the main dictionary
 
     try:
         with open(datafile, "wt", encoding="utf-8") as fp:
-            json.dump(data_structure, fp, indent=2)
+            json.dump(all_data_to_save, fp, indent=2)
         print("\nSuccess! Data saved successfully.\nGoodbye!\n")
     except Exception as e:
         print(f"Error during save execution: {type(e).__name__}: {e}")

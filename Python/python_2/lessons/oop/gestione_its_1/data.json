@@ -3,29 +3,25 @@
   "Regions": {},
   "Cities": {},
   "DisciplinaryAreas": {
-    "Full Stack": {
-      "nome": "Full Stack"
+    "Full stack": {
+      "nome": "Full stack"
     }
   },
   "Teachers": {},
   "Modules": {
-    "PGSQL1": {
-      "codice": "PGSQL1",
-      "nome": "PGSQL",
-      "ore": 40,
+    "javase1": {
+      "codice": "javase1",
+      "nome": "JavaSE",
+      "ore": 30,
       "docenti": []
     }
   },
   "ITSCourses": {
-    "PostgreSQL": {
-      "nome": "PostgreSQL",
-      "edizione": 2025,
-      "area_disciplinare": "Full Stack",
-      "moduli": {
-        "1": null,
-        "2": null,
-        "3": null
-      }
+    "Java": {
+      "nome": "Java",
+      "edizione": 2026,
+      "area_disciplinare": "Full stack",
+      "moduli": []
     }
   },
   "Students": {}
