@@ -1,6 +1,10 @@
-class Main {
+package it.example.test;
+
+public class Main {
 
     public static void main(String[] args) {
+        System.out.println("Hello, Java");
+
         int a = 5;
 
         if (a > 0) {
