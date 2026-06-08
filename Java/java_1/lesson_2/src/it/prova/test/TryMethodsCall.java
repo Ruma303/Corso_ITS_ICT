@@ -14,6 +14,8 @@ public class TryMethodsCall {
 
     System.out.println(sommaElementi(valori));
     System.out.println(trovaIlMaggiore(valori));
+    System.out.println(quantiDispariCiSono(valori));
+    System.out.println(calcolaSommaNumeriDispari(valori));
 
     // Usiamo anche args
     if (args.length > 0) {
@@ -36,7 +38,7 @@ public class TryMethodsCall {
     } else if (val1 == val2) {
       messaggio = "val1 (" + val1 + ") == val2 (" + val2 + ")";
     } else {
-      messaggio = "val1 (" + val1 + ") < val2 (" + val2 + ")";
+      messaggio = String.format("val1 (%d) < val2 (%d)", val1, val2);
     }
     return messaggio;
 
@@ -75,5 +77,25 @@ public class TryMethodsCall {
       }
     }
     return maggiore;
+  }
+
+  public static int quantiDispariCiSono(int[] valori) {
+    int quantita = 0;
+    for (int j = 0; j < valori.length; j++) {
+      if (valori[j] % 2 != 0) {
+        quantita++;
+      }
+    }
+    return quantita;
+  }
+
+  public static int calcolaSommaNumeriDispari(int[] valori) {
+    int somma = 0;
+    for (int j = 0; j < valori.length; j++) {
+      if (valori[j] % 2 != 0) {
+        somma+=valori[j];
+      }
+    }
+    return somma;
   }
 }

@@ -20,6 +20,5 @@ public class ArrayTests {
 
     for (String nome : listaDiNomi)
       System.out.println(nome);
-
   }
 }
