@@ -9,13 +9,17 @@ public class TryMethodsCall {
     System.out.println(stampaMaggiore(20, 20));
     System.out.println(stampaMaggiore(20, 10));
 
-    int[] valori = { 1, 3, 2, 6, 6, 7, 9, 8, 4, 12 };
+    int[] valori = { 1, 3, 2, 6, 6, 7, 9, 8, 4, 12, -2 };
+    String[] nomi = { "Mario", "Guido", "Marco", "Luca"};
     System.out.println(esisteElemento(valori, 04));
 
     System.out.println(sommaElementi(valori));
     System.out.println(trovaIlMaggiore(valori));
     System.out.println(quantiDispariCiSono(valori));
     System.out.println(calcolaSommaNumeriDispari(valori));
+    System.out.println(calcolaSommaNumeriPari(valori));
+    System.out.println(checkSeEsisteNegativo(valori));
+    System.out.println(checkSeEsisteNome(nomi, "Luca"));
 
     // Usiamo anche args
     if (args.length > 0) {
@@ -98,4 +102,29 @@ public class TryMethodsCall {
     }
     return somma;
   }
+
+  public static int calcolaSommaNumeriPari(int[] valori) {
+    int somma = 0;
+    for (int j = 0; j < valori.length; j++) {
+      if (valori[j] % 2 == 0) {
+        somma+=valori[j];
+      }
+    }
+    return somma;
+  }
+
+  public static boolean checkSeEsisteNegativo(int[] valori) {
+    for (int j = 0; j < valori.length; j++) {
+      if (valori[j] < 0) return true;
+    }
+    return false;
+  }
+
+  public static boolean checkSeEsisteNome(String[] nomi, String nome) {
+    for (String n: nomi) {
+      if (n.equalsIgnoreCase(nome)) return true;
+    }
+    return false;
+  }
+
 }
