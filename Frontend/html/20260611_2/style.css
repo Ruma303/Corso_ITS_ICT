@@ -32,16 +32,15 @@ article {
 
 h1,
 h2,
-h3 {
+h3,
+p,
+address {
     margin-bottom: 0.7em;
-}
-
-p {
-    margin-bottom: 0.8em;
 }
 
 footer {
     padding: 2em;
+    background-color: rgb(55, 134, 145);
 }
 
 label {
@@ -85,6 +84,10 @@ form > fieldset {
     max-width: 20rem;
     max-height: 12rem;
     background-size: cover;
+}
+
+.fields-with-aside {
+  display: flex;
 }
 
 input[type="submit"], input[type="reset"] {

@@ -1,0 +1,37 @@
+Lavoro da svolgere:
+
+Verificare che nel file siano presenti i tag introdotti dai mini-esercizi: <header>, <nav>, <main>, <footer>, <section id="campi"> con 3 <article>, <section id="prenota"> con form completo e label collegate. Se qualcosa manca, recuperatelo.
+
+Trasformare la sezione "Orari e contatti" in una <section id="info"> con <h2>. Al suo interno, separare chiaramente:
+un blocco indirizzo (usare <address>)
+gli orari di apertura (ogni orario wrappato in <time datetime="...">)
+i contatti (almeno un link mailto: e un tel:)
+ Aggiungere una nuova sezione "Prossimi eventi" tra #campi e #prenota, contenente:
+un <h2> "Prossimi eventi"
+3 <article>, ciascuno con titolo (<h3>), data nel contenuto wrappata in <time datetime="...">, breve descrizione
+per almeno 1 evento, includere un blocco <blockquote> o <p> con una citazione e relativo <cite>
+ Aggiungere un <footer> con 3 zone semanticamente distinte:
+copyright (<small> con anno corrente)
+link social (3 link esterni con target="_blank" e rel="noopener noreferrer")
+un link di ritorno all'<header> (anchor #top + attributi di accessibilità)
+ Aprire DevTools → Lighthouse → Accessibility → verificare punteggio ≥ 90 e risolvere eventuali warning.
+
+
+ Estensione opzionale (per chi ha finito):
+
+Aggiungere un campo Note con <textarea rows="3"> (non obbligatorio) al form di prenotazione
+Aggiungere min="2026-06-06" al campo data per impedire date nel passato
+Trasformare il bottone "Prenota" in un link che porta alla sezione #prenota dall'header
+Aggiungere un sesto campo opzionale al form: Telefono (<input type="tel">)
+
+Criteri minimi di accettazione:
+
+Sono presenti i tag semantici di base: <header>, <nav>, <main>, <footer>, <section>, <article>
+Ogni sezione ha un id univoco (campi, info, prenota + eventi)
+La sezione "Orari e contatti" usa <address> e almeno un <time datetime="...">
+La sezione "Prossimi eventi" contiene ALMENO 3 <article> con date in <time datetime="...">
+Almeno 1 <blockquote> con <cite> è presente
+Il footer contiene 3 link social con rel="noopener noreferrer«
+Il form di prenotazione ha ALMENO 5 campi con label collegate e required
+Tutti i <label> sono collegati con for ai rispettivi <input>
+Punteggio Lighthouse Accessibility ≥ 90
