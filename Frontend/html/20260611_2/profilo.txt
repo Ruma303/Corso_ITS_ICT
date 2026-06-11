@@ -1,0 +1,11 @@
+Creare un file profilo.html con 3 coppie <label> + <input> collegate tra loro:
+Label "Nome e cognome" + <input type="text" id="nome" name="nome">
+Label "Email" + <input type="email" id="email" name="email">
+Label "Età" + <input type="number" id="eta" name="eta">
+
+Obiettivi:
+Ogni <label> deve avere l'attributo for che corrisponde all'id dell'input
+Aprire il file nel browser e cliccare SU "Nome e cognome" (la scritta, non il campo) → il cursore deve entrare nel campo
+Cliccare su "Età" → il cursore deve entrare nel campo numerico
+Aprire F12 → Elements e verificare che gli id siano UNICI (non duplicati nella pagina)
+ 

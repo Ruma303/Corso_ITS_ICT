@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header>
+    <section id="nav-section">
+      <img id="logo" src="../../assets/img/logo/Gemini_Generated_Image_64fccu64fccu64fc.png" alt="SportBook Milano">
+      <h1>SportBook Milano</h1>
+    </section>
+    <section id="menu-navs">
+      <nav>
+        <h3>Vai alle pagine</h3>
+        <ul>
+          <li><a href="index.html">Homepage</a></li>
+          <li><a href="profilo.html">Profilo</a></li>
+          <li><a href="checkout.html">Checkout</a></li>
+          <li><a href="login.html">Login</a></li>
+          <li><a href="contatto.html">Contatto</a></li>
+          <li><a href="city.html">Città</a></li>
+          <li><a href="preferences.html">Preferenze</a></li>        </ul>
+      </nav>
+      <nav>
+        <h3>Naviga nella pagina</h3>
+        <ul>
+          <li><a href="#booking">Prenotazioni</a></li>
+        </ul>
+      </nav>
+    </section>
+  </header>
+  <main>
+    <section>
+      <h2>Riepilogo carrello</h2>
+      <article>
+        <div>
+          <ul>
+            <li>Maglietta - 20€</li>
+            <li>Scarpe - 50€</li>
+            <li>Cappello - 10€</li>
+          </ul>
+        </div>
+        <div>
+          <output>80€</output>
+          <small>Gli sconti si applicano al checkout</small>
+        </div>
+      </article>
+    </section>
+    <section>
+      <form action="#">
+        <article>
+          <label for="name">Nome</label>
+          <input type="text" id="name">
+        </article>
+
+        <article>
+
+          <label for="email">Email</label>
+          <input type="email" id="email">
+        </article>
+
+        <article>
+
+          <label for="address">Indirizzo</label>
+          <input type="text" id="address">
+        </article>
+
+        <article>
+
+          <label for="note">Note</label>
+          <textarea id="note" name="note" cols="40" rows="8"
+            style="display:block; width:100%; max-width:600px; box-sizing:border-box;"></textarea>
+        </article>
+
+        <input type="hidden" name="id_prodotto_1" value="10">
+        <input type="hidden" name="id_prodotto_2" value="2">
+        <input type="hidden" name="id_prodotto_30" value="5">
+
+        <input type="hidden" name="csrf_token" value="xyz123">
+
+        <input type="hidden" name="sconto" value="0">
+
+        <input type="submit" value="Conferma Ordine">
+        <input type="reset" value="Resetta i form">
+
+      </form>
+    </section>
+  </main>
+  <footer>
+    <article id="booking">
+      <a href="mailto:info@sportbool.it">Scrivici</a>
+      <a href="tel:112">Chiamaci</a>
+      <small>&copy; 2026 SportBook Milano</small>
+    </article>
+  </footer>
+</body>
+
+</html>

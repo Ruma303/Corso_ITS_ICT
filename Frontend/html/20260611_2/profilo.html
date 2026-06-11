@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profilo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header>
+    <section id="nav-section">
+      <img id="logo" src="../../assets/img/logo/Gemini_Generated_Image_64fccu64fccu64fc.png" alt="SportBook Milano">
+      <h1>SportBook Milano</h1>
+    </section>
+    <section id="menu-navs">
+      <nav>
+        <h3>Vai alle pagine</h3>
+        <ul>
+          <li><a href="index.html">Homepage</a></li>
+          <li><a href="profilo.html">Profilo</a></li>
+          <li><a href="checkout.html">Checkout</a></li>
+          <li><a href="login.html">Login</a></li>
+          <li><a href="contatto.html">Contatto</a></li>
+          <li><a href="city.html">Città</a></li>
+          <li><a href="preferences.html">Preferenze</a></li>        </ul>
+      </nav>
+      <nav>
+        <h3>Naviga nella pagina</h3>
+        <ul>
+          <li><a href="#booking">Prenotazioni</a></li>
+        </ul>
+      </nav>
+    </section>
+  </header>
+  <main>
+    <section>
+      <form action="./login.html" method="GET">
+        <label for="name">Inserisci il nome</label>
+        <input type="text" id="name" placeholder="Nome e cognome">
+        <label for="email">Inserisci la tua mail</label>
+        <input type="email" id="email" placeholder="email@gmail.com" unique>
+        <label for="age">Inserisci la tua età</label>
+        <input type="number" id="age" placeholder="18">
+
+        <select name="fields" id="select-fields">
+          <option value="soccer" name="fields">Calcio</option>
+          <option value="padel" name="fields">Padel</option>
+          <option value="tennis" name="fields">Tennis</option>
+        </select>
+        <input type="submit">Invia</input>
+      </form>
+    </section>
+  </main>
+  <footer>
+    <article id="booking">
+      <a href="mailto:info@sportbool.it">Scrivici</a>
+      <a href="tel:112">Chiamaci</a>
+      <small>&copy; 2026 SportBook Milano</small>
+    </article>
+  </footer>
+</body>
+
+</html>

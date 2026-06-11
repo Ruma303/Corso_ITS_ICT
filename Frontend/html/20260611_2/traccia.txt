@@ -1,0 +1,17 @@
+Riprendere l’esercizio del modulo precedente (la pagina SportBook) e avvolgere i contenuti nei tag semantici corretti:
+
+- <header> → titolo
+- <nav> → link ai campi e prenotazioni
+- <main> → tutto il contenuto principale, ex. (intro, lista campi, info/contatti)
+- <section> → una per hobby, una per esperienze, ex. (I nostri campi)
+- <article> → (opzionale) usato solo per elementi singoli ripetuti (campi / prenotazioni)
+- <aside> → (opzionale) separato come info secondarie reali
+- <footer> → contatti, copyright
+
+ Estensione opzionale (per chi ha finito prima):
+
+Trasformare ciascun `<li>` "I nostri campi" in un `<article>` con `<h3>` (nome campo) e `<p>` (breve descrizione)
+Aggiungere un `<aside>` con "Orari di apertura" e "Contatti" (info secondarie)
+Aggiungere `<small>` con anno corrente nel copyright del `<footer>`
+Aggiungere 3 link social nel `<footer>` con `target="_blank"` e `rel="noopener noreferrer"`
+
