@@ -17,7 +17,7 @@ un link di ritorno all'<header> (anchor #top + attributi di accessibilità)
  Aprire DevTools → Lighthouse → Accessibility → verificare punteggio ≥ 90 e risolvere eventuali warning.
 
 
- Estensione opzionale (per chi ha finito):
+Estensione opzionale (per chi ha finito):
 
 Aggiungere un campo Note con <textarea rows="3"> (non obbligatorio) al form di prenotazione
 Aggiungere min="2026-06-06" al campo data per impedire date nel passato
@@ -31,7 +31,7 @@ Ogni sezione ha un id univoco (campi, info, prenota + eventi)
 La sezione "Orari e contatti" usa <address> e almeno un <time datetime="...">
 La sezione "Prossimi eventi" contiene ALMENO 3 <article> con date in <time datetime="...">
 Almeno 1 <blockquote> con <cite> è presente
-Il footer contiene 3 link social con rel="noopener noreferrer«
+Il footer contiene 3 link social con rel="noopener noreferrer"
 Il form di prenotazione ha ALMENO 5 campi con label collegate e required
 Tutti i <label> sono collegati con for ai rispettivi <input>
 Punteggio Lighthouse Accessibility ≥ 90

@@ -7,17 +7,46 @@
     font-family: Montserrat;
 }
 
-body {
-  max-width: 100%;
+:root {
+  --bg-primary: rgb(87, 203, 219);
+  --bg-main: rgb(255, 236, 236);
+  --max-boxed-container-width: 900px;
 }
 
-header {
-  max-width: 100%;
-  padding: 0em 2em;
+body {
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header, main, footer {
+    width: 100%;
+    padding: 0em 2em;
+    background-color: var(--bg-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 main {
-    max-width: 1200px;
+    background-color: var(--bg-main);
+}
+
+header, footer {
+    background-color: var(--bg-primary);
+}
+
+.boxed-containers {
+  max-width: var(--max-boxed-container-width);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2em 0;
+}
+
+.boxed-containers > * {
+  width: 100%;
 }
 
 section {
@@ -38,10 +67,6 @@ address {
     margin-bottom: 0.7em;
 }
 
-footer {
-    padding: 2em;
-    background-color: rgb(55, 134, 145);
-}
 
 label {
     margin-right: 0.8em;
@@ -57,10 +82,10 @@ ul > li {
 }
 
 form > fieldset {
-  margin: 1.3em 0.8em;
-  padding: 1em;
-  border-radius: 5px;
-  border: 2px solid black;
+    margin: 1.3em 0.8em;
+    padding: 1em;
+    border-radius: 5px;
+    border: 2px solid black;
 }
 
 #nav-section {
@@ -76,8 +101,10 @@ form > fieldset {
 }
 
 #menu-navs {
+    width: 100%;
     display: flex;
     justify-content: space-between;
+
 }
 
 .field-thumbnail {
@@ -87,17 +114,29 @@ form > fieldset {
 }
 
 .fields-with-aside {
-  display: flex;
+    display: flex;
 }
 
-input[type="submit"], input[type="reset"] {
-  padding: 0.2em 0.3em;
-  font-weight: 500;
-  border-radius: 5px;
-  border: 2px solid black;
+input[type="submit"],
+input[type="reset"] {
+    padding: 0.2em 0.3em;
+    font-weight: 500;
+    border-radius: 5px;
+    border: 2px solid black;
 }
 
-input[type="submit"]:hover, input[type="reset"]:hover {
-  transform: scale(1.03);
-  transition: all 300ms;
+input[type="submit"]:hover,
+input[type="reset"]:hover {
+    transform: scale(1.03);
+    transition: all 300ms;
+}
+
+#footer-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 2em;
+}
+
+#last-row {
+    padding: 2em;
 }

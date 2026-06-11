@@ -50,7 +50,7 @@ PS: le targhe possono essere cambiate. Per identificare univocamente un veicolo 
 
 	A2.1 Associazione con officina dove lavorano
 
-	Op2.1 gli anni di servizio verranno calcolati da un'operazione (Dipendente, Officina) che conterrà il numero di anni
+	Op2.1 gli anni di servizio verranno calcolati da un'operazione (Dipendente, Officina) che conterrà il numero di anni a partire dalla data di assunzione
 
 
 ## 3. Requisiti sui direttori (Persona)

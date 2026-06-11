@@ -1,17 +1,11 @@
 package it.example.utility;
 
-/*
-1. public static String buildStringUntil(int until) . Se prende 5 restituisce 12345
-2. public static String inverti(String daInvertire)
-
-*/
-
 public class MyStringUtility {
   public static String[] getStringsArray;
   public static int[] getIntegerArray;
 
   static {
-    getStringsArray = new String[] { "Ugo", "Ada", "Zoi" };
+    getStringsArray = new String[] { "Ugo", "Ada", "Zoi"};
     getIntegerArray = new int[] { 1, 3, 2, 6, 6, 7, 9, 8, -7, 4, 12, -2 };
   }
 
@@ -57,10 +51,6 @@ public class MyStringUtility {
     return true;
   }
 
-  /*
-   * Dato un array di nomi voglio calcolare la somma delle lunghezze dei singoli
-   * elementi
-   */
   public static int sommaLunghezzeNomi(String[] nomi) {
     int result = 0;
     for (String n : nomi)
@@ -68,21 +58,12 @@ public class MyStringUtility {
     return result;
   }
 
-  /*
-   * Dato un array di interi verificare che siano tutti numeri pari
-   */
-
   public static boolean verificaTuttiNumeriPari(int[] numbers) {
     for (int num : numbers)
       if (num % 2 != 0)
         return false;
     return true;
   }
-
-  /*
-   * Dato un array in interi in input verificare se tra i negativi esista almeno
-   * un numero pari
-   */
 
   public static boolean verificaSeTraNegativiEsisteNumeroPari(int[] numbers) {
     for (int num : numbers)
@@ -104,4 +85,43 @@ public class MyStringUtility {
     return result;
   }
 
+  public static int dimmiQuantiElementiStrettamenteMinoriDi(int[] elementi, int soglia) {
+    int result = 0;
+    for (int num: elementi) {
+      if (num < soglia) {
+        result++;
+      }
+    }
+    return result;
+  }
+
+  public static boolean sonoTuttiDentroUnIntervallo(int[]valori, int sogliaMin, int sogliaMax) {
+    for (int num: valori)
+      if (num < sogliaMin || num > sogliaMax)
+        return false;
+    return true;
+  }
+
+  public static boolean nomiUgualiNellePrimeNPosizioni(String[]elenco, int nPosizioni) {
+    String prev = elenco[0];
+    for (int i = 0; i < nPosizioni; i++) {
+      if (!elenco[i].equals(prev)) {
+        return false;
+      }
+      prev = elenco[i];
+    }
+    return true;
+  }
+
+  public static boolean ePresenteSoloUnaVolta(String[] elenco, String nome) {
+    int presence_counter = 0;
+    for (String value : elenco) {
+      if (value == nome) {
+        if (presence_counter < 2)
+          return false;
+        presence_counter++;
+      }
+    }
+    return true;
+  }
 }
