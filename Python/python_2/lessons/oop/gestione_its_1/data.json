@@ -1,28 +1,212 @@
 {
-  "Nations": {},
-  "Regions": {},
-  "Cities": {},
-  "DisciplinaryAreas": {
-    "Full stack": {
-      "nome": "Full stack"
+  "Nations": {
+    "USA": {
+      "nome": "USA"
+    },
+    "UK": {
+      "nome": "UK"
+    },
+    "Italy": {
+      "nome": "Italy"
     }
   },
-  "Teachers": {},
+  "Regions": {
+    "Lazio": {
+      "nome": "Lazio",
+      "nazione": "Italy"
+    },
+    "Texas": {
+      "nome": "Texas",
+      "nazione": "USA"
+    },
+    "Sicilia": {
+      "nome": "Sicilia",
+      "nazione": "Italy"
+    },
+    "Liguria": {
+      "nome": "Liguria",
+      "nazione": "Italy"
+    },
+    "Lombardia": {
+      "nome": "Lombardia",
+      "nazione": "Italy"
+    }
+  },
+  "Cities": {
+    "Roma": {
+      "nome": "Roma",
+      "regione": "Lazio"
+    },
+    "Austin": {
+      "nome": "Austin",
+      "regione": "Texas"
+    },
+    "Palermo": {
+      "nome": "Palermo",
+      "regione": "Sicilia"
+    },
+    "Milano": {
+      "nome": "Milano",
+      "regione": "Lombardia"
+    },
+    "Genova": {
+      "nome": "Genova",
+      "regione": "Liguria"
+    }
+  },
+  "DisciplinaryAreas": {
+    "IT": {
+      "nome": "IT"
+    },
+    "Marketing": {
+      "nome": "Marketing"
+    },
+    "HR": {
+      "nome": "HR"
+    },
+    "Design": {
+      "nome": "Design"
+    }
+  },
+  "Teachers": {
+    "UGH03185": {
+      "nome": "Ugo",
+      "cognome": "Ughi",
+      "codice_fiscale": "UGH03185",
+      "citta_nascita": "Austin"
+    },
+    "FMDNZEO": {
+      "nome": "Domizio",
+      "cognome": "Udini",
+      "codice_fiscale": "FMDNZEO",
+      "citta_nascita": "Roma"
+    },
+    "AFD0484DEY": {
+      "nome": "Alfredo",
+      "cognome": "Dei",
+      "codice_fiscale": "AFD0484DEY",
+      "citta_nascita": "Genova"
+    }
+  },
   "Modules": {
-    "javase1": {
-      "codice": "javase1",
-      "nome": "JavaSE",
-      "ore": 30,
+    "SEO3": {
+      "codice": "SEO3",
+      "nome": "SEO on site",
+      "ore": 10,
       "docenti": []
+    },
+    "PY1": {
+      "codice": "PY1",
+      "nome": "Python 1",
+      "ore": 20,
+      "docenti": [
+        "UGH03185"
+      ]
+    },
+    "PY2": {
+      "codice": "PY2",
+      "nome": "Python 2",
+      "ore": 30,
+      "docenti": [
+        "UGH03185"
+      ]
+    },
+    "MDB1": {
+      "codice": "MDB1",
+      "nome": "MongoDB 1",
+      "ore": 20,
+      "docenti": [
+        "AFD0484DEY"
+      ]
+    },
+    "JV1": {
+      "codice": "JV1",
+      "nome": "Java 1",
+      "ore": 20,
+      "docenti": [
+        "AFD0484DEY"
+      ]
     }
   },
   "ITSCourses": {
-    "Java": {
-      "nome": "Java",
+    "Full Stack Developer": {
+      "nome": "Full Stack Developer",
       "edizione": 2026,
-      "area_disciplinare": "Full stack",
+      "area_disciplinare": "IT",
+      "moduli": [
+        "PY1",
+        "PY2",
+        "JV1"
+      ]
+    },
+    "CyberSecurity": {
+      "nome": "CyberSecurity",
+      "edizione": 2025,
+      "area_disciplinare": "IT",
+      "moduli": [
+        "PY1",
+        "PY2"
+      ]
+    },
+    "SEO and SEM": {
+      "nome": "SEO and SEM",
+      "edizione": 2023,
+      "area_disciplinare": "Marketing",
+      "moduli": [
+        "SEO3"
+      ]
+    },
+    "Database": {
+      "nome": "Database",
+      "edizione": 2025,
+      "area_disciplinare": "IT",
+      "moduli": [
+        "MDB1"
+      ]
+    },
+    "Web Design": {
+      "nome": "Web Design",
+      "edizione": 2020,
+      "area_disciplinare": "Design",
       "moduli": []
     }
   },
-  "Students": {}
+  "Students": {
+    "MRR9375RSS3": {
+      "nome": "Mario",
+      "cognome": "Rossi",
+      "matricola": "1055MR",
+      "codice_fiscale": "MRR9375RSS3",
+      "nascita": "2001-05-12",
+      "citta_nascita": "Palermo",
+      "corso": "Full Stack Developer",
+      "moduli_superati": {
+        "PY1": 9
+      }
+    },
+    "MRC819NRR87": {
+      "nome": "Marco",
+      "cognome": "Neri",
+      "matricola": "MR238",
+      "codice_fiscale": "MRC819NRR87",
+      "nascita": "1998-04-30",
+      "citta_nascita": "Roma",
+      "corso": "Database",
+      "moduli_superati": {
+        "PY1": 7
+      }
+    },
+    "ANGBNC887453": {
+      "nome": "Angela",
+      "cognome": "Bianci",
+      "matricola": "AB999",
+      "codice_fiscale": "ANGBNC887453",
+      "nascita": "1996-03-20",
+      "citta_nascita": "Austin",
+      "corso": "Web Design",
+      "moduli_superati": {
+        "SEO3": 10
+      }
+    }
+  }
 }

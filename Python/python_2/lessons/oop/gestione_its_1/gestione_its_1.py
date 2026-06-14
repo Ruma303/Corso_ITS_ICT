@@ -188,7 +188,7 @@ class Regione:
         return cls(nome, nazione)
 
     def to_db(self) -> dict:
-        return {"nome": self.get_nome(), "nazione": self.get_nazione().get_nome()}
+        return {"nome": self.get_nome(), "nazione": self.get_nazione().get_key()}
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
@@ -262,7 +262,7 @@ class Citta:
         return cls(nome, regione)
 
     def to_db(self) -> dict:
-        return {"nome": self.get_nome(), "regione": self.get_regione().get_nome()}
+        return {"nome": self.get_nome(), "regione": self.get_regione().get_key()}
 
     @classmethod
     def search(cls, nome: str) -> Optional[Self]:
@@ -299,7 +299,7 @@ class Persona(ABC):
         self.set_codice_fiscale(codice_fiscale)
 
     def get_key(self) -> str:
-        return self.get_nome()
+        return self.get_codice_fiscale()
 
     def get_nome(self) -> str:
         return self._nome
@@ -379,10 +379,10 @@ class Docente(Persona):
         citta_nascita: Citta,
     ):
         super().__init__(nome, cognome, codice_fiscale, citta_nascita)
-        type(self).get_docenti()[self.get_nome()] = self
+        type(self).get_docenti()[self.get_codice_fiscale()] = self
 
     def get_key(self) -> str:
-        return self.get_nome()
+        return self.get_codice_fiscale()
 
     def get_nome(self) -> str:
         return self._nome
@@ -429,7 +429,7 @@ class Docente(Persona):
             "nome": self.get_nome(),
             "cognome": self.get_cognome(),
             "codice_fiscale": self.get_codice_fiscale(),
-            "citta_nascita": self.get_citta_nascita().get_nome(),
+            "citta_nascita": self.get_citta_nascita().get_key(),
         }
 
     @classmethod
@@ -528,13 +528,15 @@ class Modulo:
             "codice": self.get_codice(),
             "nome": self.get_nome(),
             "ore": self.get_ore(),
-            "docenti": [d.get_nome() for d in self.get_docenti()],
+            "docenti": [d.get_key() for d in self.get_docenti()],
         }
 
     @classmethod
-    def search(cls, nome: str) -> Optional[Self]:
+    def search(cls, nome: str, codice: Optional[str] = None) -> Optional[Self]:
         for modulo in cls.get_moduli().values():
-            if modulo.get_nome().lower() == nome.lower():
+            if codice and modulo.get_codice().lower() == codice.lower():
+                return modulo
+            if not codice and modulo.get_nome().lower() == nome.lower():
                 return modulo
         return None
 
@@ -698,8 +700,8 @@ class CorsoITS:
         return {
             "nome": self.get_nome(),
             "edizione": self.get_edizione(),
-            "area_disciplinare": self.get_area_disciplinare().get_nome(),
-            "moduli": [m.get_nome() for m in self.get_moduli()],
+            "area_disciplinare": self.get_area_disciplinare().get_key(),
+            "moduli": [m.get_key() for m in self.get_moduli()],
         }
 
     @classmethod
@@ -730,17 +732,17 @@ class Studente(Persona):
         nascita: date,
         citta_nascita: Citta,
         corso: CorsoITS,
-        moduli_superati: Optional[list[Modulo]] = None,
+        moduli_superati: Optional[dict[str, int]] = None,
     ):
         self.set_matricola(matricola)
         self.set_nascita(nascita)
         self.set_corso(corso)
-        self.set_moduli_superati(moduli_superati)
+        self._moduli_superati = moduli_superati if moduli_superati is not None else {}
         super().__init__(nome, cognome, codice_fiscale, citta_nascita)
         type(self).get_studenti()[self.get_codice_fiscale()] = self
 
     def get_key(self) -> str:
-        return self.get_nome()
+        return self.get_codice_fiscale()
 
     def get_nome(self) -> str:
         return self._nome
@@ -777,13 +779,12 @@ class Studente(Persona):
         _require_instance(corso, CorsoITS, "corso")
         self._corso = corso
 
-    def get_moduli_superati(self) -> list[Modulo]:
+    def get_moduli_superati(self) -> dict[str, int]:
         return self._moduli_superati
 
-    def set_moduli_superati(self, moduli_superati: Optional[list[Modulo]]):
-        self._moduli_superati = _require_list(
-            moduli_superati, Modulo, "moduli_superati"
-        )
+    def set_moduli_superati(self, moduli_superati: dict[str, int]):
+        assert isinstance(moduli_superati, dict), "'moduli_superati' must be a dictionary"
+        self._moduli_superati = moduli_superati
 
     @classmethod
     def get_studenti(cls) -> dict[str, Self]:
@@ -803,7 +804,7 @@ class Studente(Persona):
         nascita: date,
         citta_nascita: Citta,
         corso: CorsoITS,
-        moduli_superati: Optional[list[Modulo]] = None,
+        moduli_superati: Optional[dict[str, int]] = None,
     ) -> Self:
         return cls(
             nome,
@@ -832,12 +833,7 @@ class Studente(Persona):
         if corso_obj is None:
             raise ValueError(f"CorsoITS ID {entity['corso']} non trovato")
 
-        lista_mod_sup = entity.get("moduli_superati", [])
-        moduli_obj: list[Modulo] = []
-        for m in lista_mod_sup:
-            mod_obj = Modulo.get(m)
-            if mod_obj is not None:
-                moduli_obj.append(mod_obj)
+        moduli_obj = entity.get("moduli_superati", {})
 
         result = cls(
             nome,
@@ -858,9 +854,9 @@ class Studente(Persona):
             "matricola": self.get_matricola(),
             "codice_fiscale": self.get_codice_fiscale(),
             "nascita": self.get_nascita().isoformat(),
-            "citta_nascita": self.get_citta_nascita().get_nome(),
-            "corso": self.get_corso().get_nome(),
-            "moduli_superati": [m.get_nome() for m in self.get_moduli_superati()],
+            "citta_nascita": self.get_citta_nascita().get_key(),
+            "corso": self.get_corso().get_key(),
+            "moduli_superati": self.get_moduli_superati(),
         }
 
     @classmethod
@@ -875,51 +871,18 @@ class Studente(Persona):
         return cls.get_studenti().get(k, None)
 
     def __str__(self) -> str:
-        moduli_superati = [m.get_nome() for m in self.get_moduli_superati()]
+        moduli_info = []
+        for m_code, grade in self.get_moduli_superati().items():
+            m_obj = Modulo.get(m_code)
+            m_name = m_obj.get_nome() if m_obj else m_code
+            moduli_info.append(f"{m_name} ({grade}/10)")
         return (
             "[Studente] "
             + super().__str__()
             + f" | Serial: {self.get_matricola()}"
             + f" | Course: {self.get_corso()}"
-            + f" | Modules: {moduli_superati}\n"
+            + f" | Modules: {moduli_info}"
         )
-
-    def aggiungi_moduli_superati(self, codici_str: str):
-        """Riceve una stringa di codici separati da virgola (es: 'py1, java1'),
-        cerca i moduli corrispondenti e li aggiunge evitando i duplicati."""
-
-        parti = codici_str.split(",")
-        for parte in parti:
-            codice_pulito = parte.strip()
-            if not codice_pulito:
-                continue
-
-            modulo_trovato = None
-            for m in Modulo.get_moduli().values():
-                if m.get_codice().lower() == codice_pulito.lower():
-                    modulo_trovato = m
-                    break
-
-            if modulo_trovato is None:
-                print(
-                    f"\n\r\t-> Warning: Module with code '{codice_pulito}' was not found in the system."
-                )
-                continue
-
-            # Simula il comportamento del SET
-            if modulo_trovato not in self.get_moduli_superati():
-                self.get_moduli_superati().append(modulo_trovato)
-                print(
-                    f"\n\r\t-> Module '{modulo_trovato.get_nome()}' successfully added."
-                )
-            else:
-                print(
-                    f"\n\r\t-> Info: The module '{modulo_trovato.get_nome()}' is already present."
-                )
-
-
-# --- User Interface (UI) Functions ---
-
 
 def ui_add_nazione():
     print("\n--- NEW NATION ---")
@@ -1022,17 +985,41 @@ def ui_add_corso():
         print(f"Validation error: {e}")
 
 
-# FIXME: mostrare il corso appartenente
-# TODO: far scegliere i docenti che insegnano
 def ui_add_modulo():
     print("\n--- NEW MODULE ---")
-    nome = input("Module name: ").strip()
 
-    if Modulo.search(nome):
-        print(f"Error: The module '{nome}' already exists.")
+    if not CorsoITS.get_corsi():
+        print("Error: You must create at least one ITS Course first.")
         return
 
+    print("\nAvailable courses:")
+    for i, corso_nome in enumerate(CorsoITS.get_corsi()):
+        print(f"\t- {(i + 1)}. {corso_nome} | {corso_nome}")
+
+    corsi_input = input("\nWhich course is the module associated with? (separate keys with commas): ").strip()
+    corsi_selezionati = []
+    if corsi_input:
+        for c_nome in corsi_input.split(","):
+            c_nome = c_nome.strip()
+            corso_obj = CorsoITS.get(c_nome)
+            if not corso_obj:
+                corso_obj = CorsoITS.search(c_nome)
+
+            if corso_obj:
+                corsi_selezionati.append(corso_obj)
+            else:
+                print(f"Warning: Course '{c_nome}' not found. Skipping.")
+
+    if not corsi_selezionati:
+        print("Error: You must associate the module with at least one valid course.")
+        return
+
+    nome = input("Module name: ").strip()
     codice = input("Module code: ").strip()
+
+    if Modulo.get(codice):
+        print(f"Error: A module with code '{codice}' already exists.")
+        return
 
     try:
         ore = int(input("Hours (integer number > 0): ").strip())
@@ -1044,10 +1031,10 @@ def ui_add_modulo():
     if Docente.get_docenti():
         print("\nAvailable teachers:")
         for idx, doc in Docente.get_docenti().items():
-            print(f"  [{idx}] {doc.get_nome()} {doc.get_cognome()}")
+            print(f"\t - [{idx}] {doc.get_nome()} {doc.get_cognome()}")
 
         ids_str = input(
-            "Enter teacher IDs separated by comma (e.g., 1,2) or leave empty: "
+            "Enter teacher IDs (Fiscal Codes) separated by comma (e.g., CF1,CF2) or leave empty: "
         ).strip()
         if ids_str:
             for id_str in ids_str.split(","):
@@ -1063,7 +1050,13 @@ def ui_add_modulo():
 
     try:
         modulo = Modulo.create(codice, nome, ore, docenti_selezionati)
-        print(f"\nSuccess! {modulo} created with ID {modulo.get_nome()}.")
+        for c in corsi_selezionati:
+            c.get_moduli().append(modulo)
+
+        corsi_nomi = ", ".join([c.get_nome() for c in corsi_selezionati])
+        print(
+            f"\nSuccess! {modulo} created and added to courses: {corsi_nomi}."
+        )
     except AssertionError as e:
         print(f"Validation error: {e}")
 
@@ -1085,13 +1078,33 @@ def ui_add_docente():
         return
 
     nome_citta = input("City of birth: ").strip()
-    citta = Citta.search(nome_citta)
+    citta = Citta.get(nome_citta)
+    if not citta:
+        citta = Citta.search(nome_citta)
 
     if not citta:
         print(f"Error: City '{nome_citta}' not found.")
         return
 
     docente = Docente.create(nome, cognome, cf, citta)
+    
+    # Associate teacher to modules
+    if Modulo.get_moduli():
+        print("\nAvailable modules in the system:")
+        for m_key, m_obj in Modulo.get_moduli().items():
+            print(f"  {m_key} | {m_obj.get_nome()}")
+
+        moduli_input = input("\nWhich modules does this teacher teach? (separate codes with commas): ").strip()
+        if moduli_input:
+            for m_code in moduli_input.split(","):
+                m_code = m_code.strip()
+                modulo_obj = Modulo.get(m_code)
+                if modulo_obj:
+                    if docente not in modulo_obj.get_docenti():
+                        modulo_obj.get_docenti().append(docente)
+                else:
+                    print(f"Warning: Module with code '{m_code}' not found. Skipping.")
+
     print(f"\nSuccess! {docente} created with ID {docente.get_nome()}.")
 
 
@@ -1121,36 +1134,62 @@ def ui_add_studente():
         print("Error: Invalid date format.")
         return
 
-    nome_citta = input("City of birth: ").strip()
-    citta = Citta.search(nome_citta)
+    print("\nAvailable cities:")
+    for c_key, c_obj in Citta.get_citta().items():
+        print(f"\t - {c_key}")
+
+    nome_citta = input("\nCity of birth: ").strip()
+    citta = Citta.get(nome_citta)
+    if not citta:
+        citta = Citta.search(nome_citta)
+
     if not citta:
         print(f"Error: City '{nome_citta}' not found.")
         return
 
-    nome_corso = input("ITS Course name: ").strip()
-    corso = CorsoITS.search(nome_corso)
+    print("\nAvailable courses:")
+    for corso_key, corso_obj in CorsoITS.get_corsi().items():
+        print(f"\t - {corso_key}")
+
+    nome_corso = input("\nITS Course name: ").strip()
+    corso = CorsoITS.get(nome_corso)
+    if not corso:
+        corso = CorsoITS.search(nome_corso)
+
     if not corso:
         print(f"Error: Course '{nome_corso}' not found.")
         return
 
-    studente = Studente.create(
-        nome, cognome, cf, matricola, nascita, citta, corso, moduli_superati=[]
-    )
-    print(f"\nSuccess! {studente} created with ID {studente.get_nome()}.")
-
-    # RICHIESTA DEI MODULI SUPERATI
+    moduli_superati = {}
     if Modulo.get_moduli():
         print("\nAvailable modules in the system:")
         for mod in Modulo.get_moduli().values():
-            print(f"  [{mod.get_codice()}] {mod.get_nome()}")
+            print(f"\t - [{mod.get_codice()}] {mod.get_nome()}")
 
-        codici_input = input(
-            "\nEnter the codes of passed modules separated by comma (e.g., py1,java1) or leave empty: "
-        ).strip()
-        if codici_input:
-            studente.aggiungi_moduli_superati(codici_input)
-    else:
-        print("\nNote: No modules available in the system yet to assign as passed.")
+        print("\nEnter the passed modules and grades. Enter '0' to stop.")
+        while True:
+            m_code = input("\nModule code (or 0 to exit): ").strip()
+            if m_code == "0" or m_code == "exit":
+                break
+
+            modulo_obj = Modulo.get(m_code)
+            if not modulo_obj:
+                print(f"Error: Module with code '{m_code}' not found.")
+                continue
+
+            try:
+                grade = int(input(f"Grade for {modulo_obj.get_nome()} (6-10): ").strip())
+                if 6 <= grade <= 10:
+                    moduli_superati[modulo_obj.get_key()] = grade
+                else:
+                    print("Error: Grade must be between 6 and 10.")
+            except ValueError:
+                print("Error: Grade must be an integer.")
+
+    studente = Studente.create(
+        nome, cognome, cf, matricola, nascita, citta, corso, moduli_superati=moduli_superati
+    )
+    print(f"\nSuccess! {studente} created with ID {studente.get_nome()}.")
 
 
 def ui_show_all():
@@ -1245,7 +1284,7 @@ def load_all(datafile, load_sequence):
         for i, obj in datajson[key].items():
             try:
                 # Invochiamo le factory delle specifiche classi
-                instance = cls.create_from_db(int(i), obj)
+                instance = cls.create_from_db(obj)
                 print(f"\r\t- [{i}] {instance} created")
             except Exception as e:
                 print(f"\tError while reading {cls.__name__} ID {i}: {e}")
@@ -1265,7 +1304,7 @@ def save_all(datafile, load_sequence):
         class_data = {}
         for _, instance_obj in registry.items():
             class_data[instance_obj.get_key()] = instance_obj.to_db()
-        
+
         all_data_to_save[key] = class_data # Add the serialized class data to the main dictionary
 
     try:
