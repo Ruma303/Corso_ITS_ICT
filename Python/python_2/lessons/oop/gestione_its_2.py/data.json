@@ -1,0 +1,36 @@
+{
+    "Citta": {
+        "0": {
+            "nome": "Roma",
+            "regione": "878523de-49c9-4149-9dfe-c58d026cf4a2"
+        },
+        "1": {
+            "nome": "L'aquila",
+            "regione": "d9579b51-4f42-4255-8b34-c4d69caf07d3"
+        }
+    },
+    "Nazione": {
+        "4c910c96-e1f4-4747-a9f2-4f77f7dbceaa": {
+            "nome": "USA"
+        },
+        "7d6b0d42-376c-4d9f-baea-eb2672c468c0": {
+            "nome": "Francia"
+        },
+        "9a100a65-55c8-4d5a-b3cc-7ae84b0b5eab": {
+            "nome": "Italia"
+        },
+        "c0f8ff5a-aa73-4ace-8aa3-328564107443": {
+            "nome": "UK"
+        }
+    },
+    "Regione": {
+        "878523de-49c9-4149-9dfe-c58d026cf4a2": {
+            "nazione": "9a100a65-55c8-4d5a-b3cc-7ae84b0b5eab",
+            "nome": "Lazio"
+        },
+        "d9579b51-4f42-4255-8b34-c4d69caf07d3": {
+            "nazione": "9a100a65-55c8-4d5a-b3cc-7ae84b0b5eab",
+            "nome": "Abruzzo"
+        }
+    }
+}
