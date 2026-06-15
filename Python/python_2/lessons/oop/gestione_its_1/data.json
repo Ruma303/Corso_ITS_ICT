@@ -207,6 +207,18 @@
       "moduli_superati": {
         "SEO3": 10
       }
+    },
+    "RNLDPCC7": {
+      "nome": "Arnaldo",
+      "cognome": "Paciotti",
+      "matricola": "77777D",
+      "codice_fiscale": "RNLDPCC7",
+      "nascita": "1999-09-09",
+      "citta_nascita": "Milano",
+      "corso": "Web Design",
+      "moduli_superati": {
+        "SEO3": 9
+      }
     }
   }
 }

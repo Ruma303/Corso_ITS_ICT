@@ -13,7 +13,11 @@
 - Regione
 - Città
 
-PS: le targhe possono essere cambiate. Per identificare univocamente un veicolo si usa un **Identificativo Unico Internazionale** (VIN - Vehicle Identification Number). Non avendo questo campo, identificheremo i veicoli in un altro modo.
+## Note sui vincoli
+
+1. Le targhe possono essere cambiate. Per identificare univocamente un veicolo si usa un **Identificativo Unico Internazionale** (VIN - Vehicle Identification Number).
+2. Il vincolo di integrità viene spostato sulla targa, ma potrebbe essere un vincolo composto da tutti gli altri campi dell'istanza veicolo.
+3. Nel mondo reale sia Dipendente che Direttore possono essere comunque Proprietari di un Veicolo e beneficiare di servizi di Riparazione.
 
 
 ## Legenda
@@ -41,16 +45,14 @@ PS: le targhe possono essere cambiate. Per identificare univocamente un veicolo 
 		C1.4.2 Direttore
 		C1.4.3 Proprietario
 
-	A1.1 Ogni sottoclasse ha il campo l'indirizzo che è un associazione con Città
+	A1.1 Ogni sottoclasse prende l'indirizzo dall'associazione con Città
 
 
 ## 2. Requisiti sui dipendenti (Persona)
 
-	2.1 anni servizio
-
 	A2.1 Associazione con officina dove lavorano
 
-	Op2.1 gli anni di servizio verranno calcolati da un'operazione (Dipendente, Officina) che conterrà il numero di anni a partire dalla data di assunzione
+	Op2.1 gli anni di servizio verranno calcolati da un'operazione (Dipendente, Officina) che conterrà il numero di anni
 
 
 ## 3. Requisiti sui direttori (Persona)
@@ -67,13 +69,11 @@ PS: le targhe possono essere cambiate. Per identificare univocamente un veicolo 
 	4.3 numero dipendenti
 	4.4 direttore
 
-	A4.1 associazione con i dipendenti per:
-		A4.1.1 ogni dipendente recuperare il numero di anni di servizio
-		A4.1.2 recuperare il numero di dipendenti per officina
+	A4.1 associazione con i dipendenti
 	A4.2 associazione con i direttori
 	A4.3 l'indirizzo è un'associazione con Città
 
-	Op4.1 Il numero dei dipendenti può essere ottenuto da un'operazione sommando i link (Officina, Persona)
+	Op4.1 Il numero dei dipendenti può essere ottenuto da un'operazione sommando i link (Officina, Dipendente)
 
 	C4.1 la coppia nome e indirizzo può fungere da vincolo d'integrità di classe in relazione con la città dove si trova
 
@@ -86,9 +86,7 @@ PS: le targhe possono essere cambiate. Per identificare univocamente un veicolo 
 	5.3 anno di immatricolazione
 
 	A5.1 associazione con il/i proprietario/i
-	A5.2 associazione con l'officina diventa una riparazione, una associazione con attributi
-	A5.3 associazione con i dipendenti per trovare il numero di impiegati
-	A5.4 associazione con il direttore che dirige l'officina
+	A5.2 associazione con l'officina per mezzo di una Riparazione
 
 	C5.1 il vincolo d'integrità può essere rappresentato da una tupla di tutti i valori (modello, tipo, targa, anno di immatricolazione), non potendo contare sul VIN
 	C5.2 le tipologie di veicoli sono prestabilite, quindi va usata un'enumerazione
@@ -97,7 +95,7 @@ PS: le targhe possono essere cambiate. Per identificare univocamente un veicolo 
 
 ## 6. Requisiti sui proprietari (Persona)
 
-	A6.1 associazione con Officina come cliente
+	A6.1 associazione con Officina come cliente per mezzo del servizio di Riparazione
 	A6.2 associazione con Veicolo come possessore
 
 
@@ -120,29 +118,30 @@ PS: le targhe possono essere cambiate. Per identificare univocamente un veicolo 
 ## 9. Requisiti sulle città
 
 	9.1 nome
+	9.2 CAP
 
 	A9.1 associati con le regioni di cui fanno parte
+	A9.2 associazione con le officine in merito alla loro sede
+	A9.3 associazione con le persone in merito alla loro residenza
 
 	C9.1 le città sono identificate dalla tupla (nome proprio, nome regione, nome nazione)
+		C9.1.1 Il sistema ammette due città omonime che si trovano nella stessa regione
+		C9.1.2 Il sistema impedisce due città omonime, nella stessa regione e stessa nazione
+	C9.2 le grandi città possono avere più CAP. Questo campo deve contenere un vincolo di molteplicità => 1
 
 
-# Associazioni con attributi
+## 10. Requisiti sulle riparazioni
 
-## Requisiti sulle riparazioni (Possibile classe autonoma)
+	10.1 codice
+	10.2 veicolo
+	10.3 data ora accettazione
+	10.4 data ora riconsegna
+	10.5 stato della riparazione
 
-	1.1 codice
-	1.2 veicolo (Veicolo)
-	1.3 data ora accettazione
-	1.4 data ora riconsegna
-	1.5 stato della riparazione
+	A10.1 associazione con il Veicolo da riparare
+		A10.1.1 dall'istanza del veicolo recuperare modello, tipo, targa, anno di immatricolazione
+	A10.2 associazione con il Proprietario a cui è intestata la riparazione
 
-	A1 associazione con il Veicolo da riparare quando si prende in consegna
-		A1.1 dall'istanza del veicolo recuperare modello, tipo, targa, anno di immatricolazione
-	A2 associazione con il Proprietario per prendere il veicolo da riparare
-	A3 associazione con il Proprietario per riconsegnare il Veicolo
-
-	C1 l'attributo veicolo è un'associazione verso la classe Veicolo
-	C2 una riparazione può esser appena stata presa in carica, in manutenzione, oppure terminata. È il caso quindi di creare un'enumerazione con questi valori
-	C3 il codice è univoco, diventerà il vincolo d'integrità
-
-	Op1 il numero dipendenti è calcolato sommando il numero di dipendenti che lavorano in una determinata officina, quindi dalle associazioni (Dipendente, Officina)
+	C10.1 l'attributo veicolo è l'associazione con la classe Veicolo
+	C10.2 una riparazione può esser appena stata presa in carico, in lavorazione, oppure terminata. È il caso quindi di creare un'enumerazione con questi valori
+	C10.3 il codice è univoco, diventerà il vincolo d'integrità
