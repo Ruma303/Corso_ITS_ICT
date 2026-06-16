@@ -8,6 +8,10 @@
             "nome": "Roma",
             "regione": "be153c19-d8c1-42f5-b63b-7f7fb4435abd"
         },
+        "9353b51e-c8c9-4996-a3ee-8ad0cc19ca99": {
+            "nome": "Catania",
+            "regione": "b5954fcc-7f4b-4bf2-946b-50738f03ce03"
+        },
         "a70a4a31-5afb-43ea-bb49-bcad203e796c": {
             "nome": "Roma",
             "regione": "4df39d50-249c-4070-972f-2012fe9a9f90"
@@ -26,6 +30,9 @@
         }
     },
     "Nazione": {
+        "1c177226-44ef-46bb-bd5e-d0d7ed9637af": {
+            "nome": "Russia"
+        },
         "6614d4bc-a62b-47df-b82e-718098e3876e": {
             "nome": "Italia"
         },
@@ -46,6 +53,10 @@
         "37d35e47-7e42-4f9f-be52-ba145a2d9e8f": {
             "nazione": "d823a852-b8b7-4698-b0ce-64010dea2847",
             "nome": "Bordeaux"
+        },
+        "3b960b97-b76d-4293-b4a6-eede19f6c1a5": {
+            "nazione": "1c177226-44ef-46bb-bd5e-d0d7ed9637af",
+            "nome": "Kamchaktka"
         },
         "4df39d50-249c-4070-972f-2012fe9a9f90": {
             "nazione": "d823a852-b8b7-4698-b0ce-64010dea2847",

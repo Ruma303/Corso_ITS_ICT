@@ -5,15 +5,15 @@ def list_db():
     print("Nazioni:")
     for n in Nazione.all_objects_by_uuid():
         print(f" - {n}")
-    
+
     print("Regioni:")
     for n in Regione.all_objects_by_uuid():
         print(f" - {n}")
-    
+
     print("Città:")
     for n in Citta.all_objects_by_uuid():
         print(f" - {n}")
-    
+
 
 # Funzioni di interfaccia ("ui": "User interface")
 
@@ -69,6 +69,6 @@ def ui_ask_what_to_do():
             crea_citta()
         elif choice in ("exit", "0"):
             print("Arrivederci!")
-            break
+            raise InterruptedError
         else:
             print(f"{choice}? mmm, unknown command...")

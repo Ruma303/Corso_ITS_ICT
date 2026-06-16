@@ -53,14 +53,13 @@ class Nazione(ClassUtilsNomi, ClassUtilsUUID):
         return (str(self.get_uuid()), {"nome": self.get_nome()})
 
 
-# TODO: Verificare che non esiste la tupla (regione, nazione)
 """
 Il sistema deve garantire l'inserimento di più regioni con lo stesso nome (ma UUID sempre diverso), purché la nazione (il suo UUID) sia diverso. Esempio, possono esistere due Lazio, purché in nazioni diverse: (Lazio, Francia) e (Lazio, Italia) è corretto
 """
 
 
 class Regione(ClassUtilsUUID, ClassUtilsNomi):
-    __tuple_registry: dict[tuple[str, UUID], Self] = {}
+    __tuple_registry: dict[tuple[str, Nazione], Self] = {}
 
     def __init__(self, nom: str, naz: Nazione, uuid_obj: UUID) -> None:
         self.__nome = nom
@@ -69,7 +68,7 @@ class Regione(ClassUtilsUUID, ClassUtilsNomi):
 
         type(self)._objects_by_uuid[self.__uuid] = self
         type(self)._objects_by_name[self.__nome] = self
-        type(self).__tuple_registry[(self.__nome, self.__nazione.get_uuid())] = self
+        type(self).__tuple_registry[(self.__nome, self.__nazione)] = self
 
     @classmethod
     def create(cls, nome: str, naz: Nazione) -> Self:
@@ -80,7 +79,7 @@ class Regione(ClassUtilsUUID, ClassUtilsNomi):
         reg_id = uuid4()
         if reg_id in cls.all_objects_by_uuid():
             raise KeyError("Regione.__uuid già presente")
-        # WARN: Verifica della coppia (regione.nome, nazione.uuid) PRIMA di crearla
+        # Verifica della coppia (regione.nome, nazione.uuid) PRIMA di crearla
         if (nome, naz.get_uuid()) in cls.__tuple_registry:
           raise ValueError(f"La regione '{nome}' è già associata alla nazione '{naz.get_nome()}'")
         return cls(nome, naz, reg_id)
@@ -113,9 +112,8 @@ class Regione(ClassUtilsUUID, ClassUtilsNomi):
         )
 
 
-# TODO: Verificare che non esiste la tupla (citta, regione)
 class Citta(ClassUtilsUUID):
-    __tuple_registry: dict[tuple[str, UUID], Self] = {}
+    __tuple_registry: dict[tuple[str, Regione], Self] = {}
 
     # da considerarsi privato
     def __init__(self, nome: str, reg: Regione, uuid_obj: UUID) -> None:
@@ -124,7 +122,7 @@ class Citta(ClassUtilsUUID):
         self.__uuid = uuid_obj
 
         type(self)._objects_by_uuid[self.__uuid] = self
-        type(self).__tuple_registry[(self.__nome, self.__regione.get_uuid())] = self
+        type(self).__tuple_registry[(self.__nome, self.__regione)] = self
 
     @classmethod
     def create(cls, nome: str, reg: Regione) -> Self:
@@ -135,7 +133,7 @@ class Citta(ClassUtilsUUID):
         citta_id = uuid4()
         if citta_id in cls.all_objects_by_uuid():
           raise KeyError(f"La città con uuid '{citta_id}' già esiste")
-        # WARN: Verificare che non esista già la coppia (città.nome, regione.uuid)
+        # Verificare che non esista già la coppia (città.nome, regione.uuid)
         if (nome, reg.get_uuid()) in cls.__tuple_registry:
           raise KeyError(f"Questa città é già associata con la regione con uuid '{reg.get_uuid()}'")
         return cls(nome, reg, citta_id)
