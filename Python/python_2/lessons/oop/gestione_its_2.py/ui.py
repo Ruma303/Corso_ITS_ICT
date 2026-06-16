@@ -1,11 +1,19 @@
 ﻿from classes import Citta, Nazione, Regione
 
 
-def list_nazioni():
+def list_db():
     print("Nazioni:")
-    for n in Nazione.all_objects():
+    for n in Nazione.all_objects_by_uuid():
         print(f" - {n}")
-
+    
+    print("Regioni:")
+    for n in Regione.all_objects_by_uuid():
+        print(f" - {n}")
+    
+    print("Città:")
+    for n in Citta.all_objects_by_uuid():
+        print(f" - {n}")
+    
 
 # Funzioni di interfaccia ("ui": "User interface")
 
@@ -19,7 +27,7 @@ def crea_nazione():
 def crea_regione():
     nome = input("Nome della regione? ")
     naz_nome = input("Nome della nazione associata? ")
-    naz = Nazione.get_by_nome(naz_nome)
+    naz = Nazione.get_object_by_nome(naz_nome)
     if naz is None:
         print(f'Errore: nazione "{naz_nome}" non trovata.')
         return
@@ -30,7 +38,7 @@ def crea_regione():
 def crea_citta():
     nome = input("Nome della città? ")
     reg_nome = input("Nome della regione associata? ")
-    reg = Regione.get_by_nome(reg_nome)
+    reg = Regione.get_object_by_nome(reg_nome)
     if reg is None:
         print(f'Errore: regione "{reg_nome}" non trovata.')
         return
@@ -42,7 +50,7 @@ def ui_ask_what_to_do():
     while True:
         print(
             "\n\n\n----------\n\nScegli un'azione:\n"
-            + "1. - elenca le nazioni\n"
+            + "1. - elenca database\n"
             + "2. - crea nazione\n"
             + "3. - crea regione\n"
             + "4. - crea città\n"
@@ -52,7 +60,7 @@ def ui_ask_what_to_do():
         choice = input("Azione? ")
 
         if choice in ("nazioni", "1"):
-            list_nazioni()
+            list_db()
         elif choice in ("crea nazione", "2"):
             crea_nazione()
         elif choice in ("crea regione", "3"):

@@ -1,69 +1,49 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
-import uuid
 from typing import Optional, Self
+from uuid import UUID, uuid4
+
+from class_utils import ClassUtilsNomi, ClassUtilsUUID
 
 # Class di interesse per il programma
 
 """
 livelli di visibilità (nei linguaggi "standard", come Java)
  - pubblico: visibile (R/W) da chiunque
- - privato: visibile (R/W) da tutti gli oggetti della clase
+ - privato: visibile (R/W) da tutti gli oggetti della classe
 """
 
 
-class Nazione:
-    __objects_by_uuid: dict[uuid.UUID, Nazione] = dict()
-
-    # TODO: per ogni classe aggiunge anche __objects_by_name
-    # Quando si aggiunge un nuovo oggetto, si aggiunge anche in __objects_by_name
-    # Quando si crea un oggetto, verificare sia se il nome è già presente in __objects_by_name
-    # e se è presente sia la UUID
-
-    @classmethod
-    def all_objects(cls):
-        return cls.__objects_by_uuid.values()
-
-    @classmethod
-    def get_object(cls, k: uuid.UUID):
-        return cls.__objects_by_uuid[k]
-
-    @classmethod
-    def get_by_nome(cls, nome: str) -> Self | None:
-        for obj in cls.all_objects():
-            if obj.get_nome() == nome:
-                return obj
-        return None
-
-    def __init__(self, name: str, _id: uuid.UUID) -> None:
-        if name is None or name == "":
-            raise ValueError("Nazione.nome non può essere None")
-        if _id in type(self).__objects_by_uuid:
-            raise KeyError("Nazione.__uuid già esiste")
-
+class Nazione(ClassUtilsNomi, ClassUtilsUUID):
+    def __init__(self, name: str, _id: UUID) -> None:
         self.__nome = name
         self.__uuid = _id
 
-        type(self).__objects_by_uuid[self.__uuid] = self
+        type(self)._objects_by_uuid[self.__uuid] = self
+        type(self)._objects_by_name[self.__nome] = self
 
     @classmethod
-    def create(cls, nom: str) -> Self:
-        if nom is None or nom == "":
-            raise ValueError("Nazione.nome non può essere None")
-        if nom in [n.get_nome() for n in cls.all_objects()]:
-            raise ValueError("Nazione.nome già esistente")
-        obj = cls(nom, uuid.uuid4())
+    def create(cls, nome: str) -> Self:
+        if nome is None or nome == "":
+            raise ValueError("Nome nazione non può essere vuoto")
+        if nome in [n.get_nome() for n in cls.all_objects_by_nome()]:
+            raise ValueError(f"Nazione '{nome}' già esistente")
+        naz_id = uuid4()
+        # INFO: Controllo superfluo, aggiunto per completezza
+        if naz_id in cls.all_objects_by_uuid():
+            raise KeyError("Nazione.__uuid già presente")
+        obj = cls(nome, naz_id)
         return obj
 
     @classmethod
-    def create_from_dict(cls, uuid_obj: uuid.UUID, data: dict) -> Self:
+    def create_from_dict(cls, uuid_obj: UUID, data: dict) -> Self:
         obj = cls(data["nome"], uuid_obj)
         return obj
 
     def get_nome(self) -> str:
         return self.__nome
 
-    def get_uuid(self) -> uuid.UUID:
+    def get_uuid(self) -> UUID:
         return self.__uuid
 
     def __str__(self) -> str:
@@ -73,48 +53,46 @@ class Nazione:
         return (str(self.get_uuid()), {"nome": self.get_nome()})
 
 
-class Regione:
-    __objects_by_uuid: dict[uuid.UUID, Regione] = dict()
+# TODO: Verificare che non esiste la tupla (regione, nazione)
+"""
+Il sistema deve garantire l'inserimento di più regioni con lo stesso nome (ma UUID sempre diverso), purché la nazione (il suo UUID) sia diverso. Esempio, possono esistere due Lazio, purché in nazioni diverse: (Lazio, Francia) e (Lazio, Italia) è corretto
+"""
 
-    @classmethod
-    def all_objects(cls):
-        return cls.__objects_by_uuid.values()
 
-    @classmethod
-    def get_object(cls, k: uuid.UUID):
-        return cls.__objects_by_uuid[k]
+class Regione(ClassUtilsUUID, ClassUtilsNomi):
+    __tuple_registry: dict[tuple[str, UUID], Self] = {}
 
-    @classmethod
-    def get_by_nome(cls, nome: str) -> Optional[Self]:
-        for obj in cls.all_objects():
-            if obj.get_nome() == nome:
-                return obj
-        return None
-
-    def __init__(self, nom: str, naz: Nazione, uuid_obj: uuid.UUID) -> None:
-        if nom is None or nom == "":
-            raise ValueError("Regione.nome non può essere None")
-
+    def __init__(self, nom: str, naz: Nazione, uuid_obj: UUID) -> None:
         self.__nome = nom
         self.__nazione = naz
         self.__uuid = uuid_obj
 
-        type(self).__objects_by_uuid[self.__uuid] = self
+        type(self)._objects_by_uuid[self.__uuid] = self
+        type(self)._objects_by_name[self.__nome] = self
+        type(self).__tuple_registry[(self.__nome, self.__nazione.get_uuid())] = self
 
     @classmethod
-    def create_from_dict(cls, _id: uuid.UUID, data: dict) -> Self:
-        naz = Nazione.get_object(uuid.UUID(data["nazione"]))
-        obj = cls(data["nome"], naz, _id)
-        return obj
-
-    @classmethod
-    def create(cls, nom: str, naz: Nazione) -> Self:
-        if nom is None or nom == "":
+    def create(cls, nome: str, naz: Nazione) -> Self:
+        if nome is None or nome == "":
             raise ValueError("Regione.nome non può essere None")
-        if naz not in Nazione.all_objects():
-            raise ValueError("Regione.nazione non è una Nazione valida")
-        obj = cls(nom, naz, uuid.uuid4())
-        return obj
+        if naz.get_uuid() not in [n.get_uuid() for n in Nazione.all_objects_by_uuid()]:
+            raise ValueError(f"La nazione con uuid {naz.get_uuid()} non è valida")
+        reg_id = uuid4()
+        if reg_id in cls.all_objects_by_uuid():
+            raise KeyError("Regione.__uuid già presente")
+        # WARN: Verifica della coppia (regione.nome, nazione.uuid) PRIMA di crearla
+        if (nome, naz.get_uuid()) in cls.__tuple_registry:
+          raise ValueError(f"La regione '{nome}' è già associata alla nazione '{naz.get_nome()}'")
+        return cls(nome, naz, reg_id)
+
+    @classmethod
+    def create_from_dict(cls, _uuid: UUID, data: dict) -> Self:
+        naz_uuid = UUID(data["nazione"])
+        naz = Nazione.get_object_by_uuid(naz_uuid)
+        if not naz:
+            raise KeyError(f"La nazione con uuid '{naz_uuid}' non esiste")
+        else:
+            return cls(data["nome"], naz, _uuid)
 
     def get_nome(self) -> str:
         return self.__nome
@@ -122,7 +100,7 @@ class Regione:
     def get_nazione(self) -> Nazione:
         return self.__nazione
 
-    def get_uuid(self) -> uuid.UUID:
+    def get_uuid(self) -> UUID:
         return self.__uuid
 
     def __str__(self) -> str:
@@ -135,60 +113,41 @@ class Regione:
         )
 
 
-class Citta:
-    __objects_by_uuid: dict[str, Citta] = dict()
-    __next_id: int = 0
-
-    @classmethod
-    def all_objects(cls):
-        return cls.__objects_by_uuid.values()
-
-    @classmethod
-    def get_object(cls, k: str):
-        return cls.__objects_by_uuid[k]
-
-    @classmethod
-    def get_by_nome(cls, nome: str) -> Optional[Self]:
-        for obj in cls.all_objects():
-            if obj.get_nome() == nome:
-                return obj
-        return None
+# TODO: Verificare che non esiste la tupla (citta, regione)
+class Citta(ClassUtilsUUID):
+    __tuple_registry: dict[tuple[str, UUID], Self] = {}
 
     # da considerarsi privato
-    def __init__(self, nom: str, reg: Regione, _id: int) -> None:
-        if nom is None or nom == "":
-            raise ValueError("Citta.nome non può essere None")
-
-        if reg is None:
-            raise ValueError("Citta.regione non può essere None")
-
-        if str(_id) in type(self).__objects_by_uuid:
-            raise KeyError(f"Errore: Citta.id {_id} già esistente")
-
-        self.__nome = nom
+    def __init__(self, nome: str, reg: Regione, uuid_obj: UUID) -> None:
+        self.__nome = nome
         self.__regione = reg
-        self._id = _id
+        self.__uuid = uuid_obj
 
-        type(self).__objects_by_uuid[str(self._id)] = self
-
-    @classmethod
-    def create(cls, nom: str, reg: Regione) -> Self:
-        obj = None
-        while obj is None:
-            try:
-                obj = cls(nom, reg, cls.__next_id)
-            except KeyError:
-                cls.__next_id += 1
-        cls.__next_id += 1
-        return obj
+        type(self)._objects_by_uuid[self.__uuid] = self
+        type(self).__tuple_registry[(self.__nome, self.__regione.get_uuid())] = self
 
     @classmethod
-    def create_from_dict(cls, _id: int, data: dict) -> Self:
-        reg = Regione.get_object(uuid.UUID(data["regione"]))
-        if _id >= cls.__next_id:
-            cls.__next_id = _id + 1
-        obj = cls(data["nome"], reg, _id)
-        return obj
+    def create(cls, nome: str, reg: Regione) -> Self:
+        if nome is None or nome == "":
+            raise ValueError("Il nome della città non può essere vuoto")
+        if reg.get_uuid() not in [n.get_uuid() for n in Regione.all_objects_by_uuid()]:
+            raise ValueError(f"La regione con uuid {reg.get_uuid()} non è una regione valida")
+        citta_id = uuid4()
+        if citta_id in cls.all_objects_by_uuid():
+          raise KeyError(f"La città con uuid '{citta_id}' già esiste")
+        # WARN: Verificare che non esista già la coppia (città.nome, regione.uuid)
+        if (nome, reg.get_uuid()) in cls.__tuple_registry:
+          raise KeyError(f"Questa città é già associata con la regione con uuid '{reg.get_uuid()}'")
+        return cls(nome, reg, citta_id)
+
+    @classmethod
+    def create_from_dict(cls, _uuid: UUID, data: dict) -> Self:
+        reg_uuid = UUID(data['regione'])
+        reg = Regione.get_object_by_uuid(reg_uuid)
+        if not reg:
+          raise KeyError(f"La regione con uuid {reg_uuid} non esiste")
+        else:
+          return cls(data['nome'], reg, _uuid)
 
     def get_nome(self) -> str:
         return self.__nome
@@ -196,8 +155,8 @@ class Citta:
     def get_regione(self) -> Regione:
         return self.__regione
 
-    def get_id(self) -> int:
-        return self._id
+    def get_id(self) -> UUID:
+        return self.__uuid
 
     def __str__(self) -> str:
         return f"{self.__nome}, {self.__regione}"

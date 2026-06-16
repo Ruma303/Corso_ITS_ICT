@@ -13,31 +13,31 @@ def load_all():
         data: dict = json.load(fp)
         fp.close()
 
-        print(f" - Nazione")
+        print(" - Nazione")
         try:
             for k, obj in data.get("Nazione", {}).items():
                 try:
-                    n = Nazione.create_from_dict(UUID(k), obj)
+                    Nazione.create_from_dict(UUID(k), obj)
                 except Exception as ex:
                     print(f"Error nazione {k}: {ex}")
         except Exception:
             pass
 
-        print(f" - Regione")
+        print(" - Regione")
         try:
             for k, obj in data.get("Regione", {}).items():
                 try:
-                    r = Regione.create_from_dict(UUID(k), obj)
+                    Regione.create_from_dict(UUID(k), obj)
                 except Exception as ex:
                     print(f"Error regione {k}: {ex}")
         except Exception:
             pass
 
-        print(f" - Citta")
+        print(" - Citta")
         try:
             for k, obj in data.get("Citta", {}).items():
                 try:
-                    c = Citta.create_from_dict(int(k), obj)
+                    Citta.create_from_dict(UUID(k), obj)
                 except Exception as ex:
                     print(f"Error citta {k}: {ex}")
         except Exception:
@@ -52,13 +52,13 @@ def save_all():
     print(f"Saving data file '{datafile}':")
     try:
         data = {"Nazione": {}, "Regione": {}, "Citta": {}}
-        for n in Nazione.all_objects():
+        for n in Nazione.all_objects_by_uuid():
             k, d = n.to_json()
             data["Nazione"][k] = d
-        for r in Regione.all_objects():
+        for r in Regione.all_objects_by_uuid():
             k, d = r.to_json()
             data["Regione"][k] = d
-        for c in Citta.all_objects():
+        for c in Citta.all_objects_by_uuid():
             k, d = c.to_json()
             data["Citta"][k] = d
         fp = open(datafile, "wt")

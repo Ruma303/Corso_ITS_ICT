@@ -1,36 +1,71 @@
 {
     "Citta": {
-        "0": {
-            "nome": "Roma",
-            "regione": "878523de-49c9-4149-9dfe-c58d026cf4a2"
+        "3d4c00f7-547c-458a-adcb-c47c61f4084e": {
+            "nome": "Milano",
+            "regione": "9b275e5f-a603-48e9-a862-9eb437d636dc"
         },
-        "1": {
-            "nome": "L'aquila",
-            "regione": "d9579b51-4f42-4255-8b34-c4d69caf07d3"
+        "59f52ba9-2f06-4f55-93b9-947052360c12": {
+            "nome": "Roma",
+            "regione": "be153c19-d8c1-42f5-b63b-7f7fb4435abd"
+        },
+        "a70a4a31-5afb-43ea-bb49-bcad203e796c": {
+            "nome": "Roma",
+            "regione": "4df39d50-249c-4070-972f-2012fe9a9f90"
+        },
+        "b60e0dc2-3a4b-49e1-8d30-cff3a4f3470a": {
+            "nome": "Palermo",
+            "regione": "b5954fcc-7f4b-4bf2-946b-50738f03ce03"
+        },
+        "cf58453b-f48d-444c-896a-5bf85c6c2e76": {
+            "nome": "Palermo",
+            "regione": "d2c74c36-3085-4276-bed0-b6bde7e4f3cc"
+        },
+        "e5bb30ac-8957-4722-ad8e-020c47611625": {
+            "nome": "Austin",
+            "regione": "d2c74c36-3085-4276-bed0-b6bde7e4f3cc"
         }
     },
     "Nazione": {
-        "4c910c96-e1f4-4747-a9f2-4f77f7dbceaa": {
-            "nome": "USA"
-        },
-        "7d6b0d42-376c-4d9f-baea-eb2672c468c0": {
-            "nome": "Francia"
-        },
-        "9a100a65-55c8-4d5a-b3cc-7ae84b0b5eab": {
+        "6614d4bc-a62b-47df-b82e-718098e3876e": {
             "nome": "Italia"
         },
-        "c0f8ff5a-aa73-4ace-8aa3-328564107443": {
-            "nome": "UK"
+        "6a5a496e-8ff5-4e75-bbb7-6fb1bf5ca56e": {
+            "nome": "USA"
+        },
+        "d396ccab-6ea9-4306-b29c-3ba0f2304c15": {
+            "nome": "Romania"
+        },
+        "d823a852-b8b7-4698-b0ce-64010dea2847": {
+            "nome": "Francia"
+        },
+        "f00df99f-39eb-415a-90c8-7d50113d8161": {
+            "nome": "Germiania"
         }
     },
     "Regione": {
-        "878523de-49c9-4149-9dfe-c58d026cf4a2": {
-            "nazione": "9a100a65-55c8-4d5a-b3cc-7ae84b0b5eab",
+        "37d35e47-7e42-4f9f-be52-ba145a2d9e8f": {
+            "nazione": "d823a852-b8b7-4698-b0ce-64010dea2847",
+            "nome": "Bordeaux"
+        },
+        "4df39d50-249c-4070-972f-2012fe9a9f90": {
+            "nazione": "d823a852-b8b7-4698-b0ce-64010dea2847",
             "nome": "Lazio"
         },
-        "d9579b51-4f42-4255-8b34-c4d69caf07d3": {
-            "nazione": "9a100a65-55c8-4d5a-b3cc-7ae84b0b5eab",
-            "nome": "Abruzzo"
+        "9b275e5f-a603-48e9-a862-9eb437d636dc": {
+            "nazione": "6614d4bc-a62b-47df-b82e-718098e3876e",
+            "nome": "Lombardia"
+        },
+        "b5954fcc-7f4b-4bf2-946b-50738f03ce03": {
+            "nazione": "6614d4bc-a62b-47df-b82e-718098e3876e",
+            "nome": "Sicilia"
+        },
+        "be153c19-d8c1-42f5-b63b-7f7fb4435abd": {
+            "nazione": "6614d4bc-a62b-47df-b82e-718098e3876e",
+            "nome": "Lazio"
+        },
+        "d2c74c36-3085-4276-bed0-b6bde7e4f3cc": {
+            "nazione": "6a5a496e-8ff5-4e75-bbb7-6fb1bf5ca56e",
+            "nome": "Texas"
         }
     }
 }
