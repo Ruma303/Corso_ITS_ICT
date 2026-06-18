@@ -14,8 +14,7 @@ public class Televisore {
       String marca,
       String modello,
       int prezzo,
-      int pollici
-    ) {
+      int pollici) {
     this.marca = marca;
     this.modello = modello;
     this.prezzo = prezzo;
