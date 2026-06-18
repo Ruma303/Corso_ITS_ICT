@@ -32,3 +32,4 @@ class ClassUtilsNomi:
     @classmethod
     def get_object_by_nome(cls, nome: str) -> Optional[Self]:
         return cls._objects_by_name.get(nome)
+

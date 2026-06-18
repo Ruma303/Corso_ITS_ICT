@@ -13,12 +13,13 @@ public class Televisore {
   public Televisore(
       String marca,
       String modello,
-      int pollici,
-      int prezzo) {
+      int prezzo,
+      int pollici
+    ) {
     this.marca = marca;
     this.modello = modello;
     this.prezzo = prezzo;
-    this.prezzo = prezzo;
+    this.pollici = pollici;
   }
 
   public String getMarca() {
@@ -60,11 +61,11 @@ public class Televisore {
   }
 
   public boolean stessaMarcaDi(Televisore input) {
-    return true;
+    return this.getMarca().equalsIgnoreCase(input.getMarca()) ? true : false;
   }
 
   public boolean piuGrandeDi(Televisore altroTelevisore) {
-return true;
+    return this.getPollici() == altroTelevisore.getPollici() ? true : false;
   }
 
   /*
@@ -72,7 +73,11 @@ return true;
    * inferiore
    */
   public boolean miglioreQualitaPrezzoDi(Televisore altroTelevisore) {
-return true;
+    double rapportoThisTv = this.getPrezzo() / this.getPollici();
+    double rapportoAltraTv = altroTelevisore.getPrezzo() / altroTelevisore.getPollici();
+    System.out.println("Rapporto prima tv: " + rapportoThisTv);
+    System.out.println("Rapporto tv di confronto: " + rapportoAltraTv);
+    return (rapportoAltraTv < rapportoThisTv) ? true : false;
   }
 
   @Override
