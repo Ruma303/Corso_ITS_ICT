@@ -14,7 +14,8 @@ public class Televisore {
       String marca,
       String modello,
       int prezzo,
-      int pollici) {
+      int pollici
+    ) {
     this.marca = marca;
     this.modello = modello;
     this.prezzo = prezzo;
@@ -79,6 +80,52 @@ public class Televisore {
     return (rapportoAltraTv < rapportoThisTv) ? true : false;
   }
 
+  public boolean esisteAlmenoUnoPiuEconomico(Televisore[] catalogo) {
+    for (Televisore tv : catalogo) {
+      if (tv.getPrezzo() < this.getPrezzo())
+        return true;
+    }
+    return false;
+  }
+
+  public int quantiSonoPiuGrandi(Televisore[] catalogo) {
+    int listaPiuGrandi = 0;
+    for (Televisore tv : catalogo) {
+      if (tv.getPollici() > this.getPollici())
+        listaPiuGrandi++;
+    }
+    return listaPiuGrandi;
+  }
+
+  public int quantiSonoPiuCariAvendoStessaMarca(Televisore[] catalogo) {
+    int listPiuCari = 0;
+    for (Televisore tv : catalogo) {
+      if (this.getMarca().equalsIgnoreCase(tv.getMarca()) && tv.getPrezzo() > this.getPrezzo())
+        listPiuCari++;
+    }
+    return listPiuCari;
+  }
+
+  public boolean ePiuCaroDellaMedia(Televisore[] input) {
+    int sommaPrezzi = 0;
+    for (Televisore tv : input) {
+      sommaPrezzi += tv.getPrezzo();
+    }
+    double mediaPrezzi = sommaPrezzi / input.length;
+    System.out.println("La media è: " + mediaPrezzi);
+    return (this.getPrezzo() > mediaPrezzi) ? true : false;
+  }
+
+  public static Televisore getPiuCostoso(Televisore[] catalogo) {
+    Televisore tvPiuCostosa = catalogo[0];
+    for (Televisore tv : catalogo) {
+      if (tv.getPrezzo() > tvPiuCostosa.getPrezzo()) {
+        tvPiuCostosa = tv;
+      }
+    }
+    return tvPiuCostosa;
+  }
+
   @Override
   public String toString() {
     return this.getMarca()
@@ -87,4 +134,7 @@ public class Televisore {
         + " " + this.getPrezzo();
   }
 
+  public String getNome() {
+    return this.getMarca() + " " + this.getModello();
+  }
 }
