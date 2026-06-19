@@ -1,7 +1,5 @@
 package it.prova.model;
 
-import it.prova.model.Indirizzo;
-
 public class Abitante {
   private String nome;
   private String cognome;
@@ -109,14 +107,14 @@ public class Abitante {
   }
 
   public boolean almenoLaMetaAbitanoNellaMiaStessaVia(Abitante[] elencoInput) {
-    int meta =  elencoInput.length / 2;
+    int meta = elencoInput.length / 2;
     int tizi = 0;
     for (Abitante tizio : elencoInput) {
       if (this.getIndirizzo().getCitta().equalsIgnoreCase(tizio.getIndirizzo().getCitta()) &&
           this.getIndirizzo().getVia().equalsIgnoreCase(tizio.getIndirizzo().getVia())) {
-            tizi++;
-            if (tizi > meta)
-              return true;
+        tizi++;
+        if (tizi > meta)
+          return true;
       }
     }
     return false;
