@@ -55,4 +55,23 @@ public class Biglietto {
         return true;
     return false;
   }
+
+  public boolean eIlPiuCaroTraIBigliettiDeiPaganti(Spettatore[] elencoSpettatoriPaganti) {
+    float prezzoBiglietto = this.getPrezzo();
+
+    for (Spettatore sp : elencoSpettatoriPaganti) {
+        if (sp.getBiglietto() == null) continue;
+        if (sp.getBiglietto().getPrezzo() > prezzoBiglietto) {
+            return false;
+        }
+    }
+    return true;
+}
+
+  public static boolean sonoTuttiBigliettiPerLoSpettacoloIntitolato(Biglietto[] elencoBiglietti, String titoloSpettacoloDaRicercare) {
+        for (Biglietto b : elencoBiglietti)
+          if (!b.getNomeSpettacolo().equalsIgnoreCase(titoloSpettacoloDaRicercare))
+            return false;
+    return true;
+  }
 }

@@ -66,28 +66,72 @@ public class Spettatore {
   // Esercizi
 
   public int incassoDeiPagantiNellaMiaFila(Spettatore[] elencoPagantiTotali) {
+    // Null Guard
+    if (this.getBiglietto() == null)
+      return 0;
+
     char fila = this.getBiglietto().getLetteraFila();
-    int incasso = 1; // Compreso io
+    float incasso = 0.0f;
+
     for (Spettatore pagante : elencoPagantiTotali) {
-      if (pagante.getBiglietto().getLetteraFila() == fila)
+      // Se non ha un biglietto (Evita il NullPointerException)
+      if (pagante.getBiglietto() == null)
+        continue;
+
+      if (pagante.getBiglietto().getLetteraFila() == fila) {
         incasso += pagante.getBiglietto().getPrezzo();
+      }
     }
-    return incasso;
+    return (int) incasso;
   }
 
   public int numeroSpettatoriDelMioStessoSpettacolo(Spettatore[] elencoPagantiTotali) {
+    // Null Guard
+    if (this.getBiglietto() == null)
+      return 0;
+
     String spettacolo = this.getBiglietto().getNomeSpettacolo();
-    int numeroSpettatori = 1; // Compreso io
-    for (Spettatore spettatore : elencoPagantiTotali)
-      if (spettatore.getBiglietto().getNomeSpettacolo().equalsIgnoreCase(spettacolo))
+    int numeroSpettatori = 0;
+
+    for (Spettatore spettatore : elencoPagantiTotali) {
+      // SALTA lo spettatore se non ha un biglietto
+      if (spettatore.getBiglietto() == null)
+        continue;
+
+      if (spettatore.getBiglietto().getNomeSpettacolo().equalsIgnoreCase(spettacolo)) {
         numeroSpettatori++;
+      }
+    }
     return numeroSpettatori;
   }
 
   public boolean numeroSpettatoriMioSpettacoloSuperaAspettativa(Spettatore[] paganti, int aspettativa) {
-    int numeroSpettatori = paganti.length;
-    if (aspettativa > numeroSpettatori)
-      return true;
-    return false;
+    // Prima dobbiamo calcolare quanti partecipano al MIO spettacolo
+    int spettatoriMioSpettacolo = numeroSpettatoriDelMioStessoSpettacolo(paganti);
+    return spettatoriMioSpettacolo > aspettativa;
+  }
+
+  public static int contaQuantiSenzaBiglietto(Spettatore[] elencoSpettatori) {
+    int spettatoriSenzaBiglietto = 0;
+    for (Spettatore sp : elencoSpettatori)
+      if (sp.getBiglietto() == null)
+        spettatoriSenzaBiglietto++;
+    return spettatoriSenzaBiglietto;
+  }
+
+  public int contaQuantiNellaMiaStessaFila(Spettatore[] elencoSpettatori) {
+    // Null Guard
+    if (this.getBiglietto() == null)
+      return 0;
+
+    int tizi = 0;
+    char miaFila = this.getBiglietto().getLetteraFila();
+
+    for (Spettatore sp : elencoSpettatori)
+      if (sp.getBiglietto() == null)
+        continue;
+      else if (sp.getBiglietto().getLetteraFila() == miaFila)
+        tizi++;
+    return tizi;
   }
 }
