@@ -1,0 +1,302 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Pliant:ital,wght@0,100..900;1,100..900&display=swap");
+
+:root {
+    /* 🎨 COLORI FISSI (Non cambiano tra i temi) */
+    --verde: #37913b;
+    --blu: #007bff;
+    --rosso: #ff3232;
+    --gap: 1.5rem;
+    --raggio: 8px;
+    --tr-btn: all 300ms;
+    --max-boxed-container-width: 900px;
+
+    /* ☀️ VARIABILI TEMA: LIGHT MODE (Default) */
+    --bg-body: #f5f5f5;          /* Vecchio --grigio */
+    --bg-main: #eeeeee;          /* Sfondo del main */
+    --bg-card: #ffffff;          /* Sfondo interno delle schede (Bianco fisso) */
+    --bordo-card: #f5f5f5;       /* Colore della cornice delle schede */
+    --colore-testo: #1a1a1a;     /* Vecchio --testo */
+    --bg-footer: rgb(53, 147, 209);
+    --ombra-card: rgba(0, 0, 0, 0.3);
+}
+
+/* 🌙 VARIABILI TEMA: DARK MODE */
+body.dark-mode {
+    --bg-body: #121212;          /* Sfondo scurissimo per la pagina */
+    --bg-main: #1a1a1a;          /* Il main diventa grigio scuro */
+    --bg-card: #242424;          /* Le schede rimangono leggermente più chiare dello sfondo */
+    --bordo-card: #2c2c2c;       /* La cornice spessa si adegua senza aggredire */
+    --colore-testo: #f5f5f5;     /* Il testo diventa bianco/grigio chiaro */
+    --bg-footer: #0f3d5c;        /* Opzionale: scurisce leggermente il blu del footer */
+    --ombra-card: rgba(0, 0, 0, 0.6);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Montserrat, sans-serif;
+}
+
+body {
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--bg-body);       /* Modificato */
+    color: var(--colore-testo);             /* Modificato */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+header,
+main,
+footer {
+    width: 100%;
+    max-width: 1200px;
+    padding: 0em 2em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+header {
+    background-color: var(--verde);
+    color: white;
+}
+
+main {
+    background-color: var(--bg-main);       /* Ora cambia dinamicamente */
+}
+
+footer {
+    background-color: var(--bg-footer);     /* Ora cambia dinamicamente */
+}
+
+.boxed-containers {
+    max-width: var(--max-boxed-container-width);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0; /* Unificato il duplicato nel tuo CSS */
+}
+
+.boxed-containers > * {
+    width: 100%;
+}
+
+section {
+    margin: 1em 0em 2em;
+    padding: 2em;
+}
+
+article {
+    margin-top: 1em;
+    margin-bottom: 2em;
+}
+
+h1,
+h2,
+h3,
+p,
+address {
+    margin-bottom: 0.7em;
+}
+
+label {
+    margin-right: 0.8em;
+    margin-bottom: 0.8em;
+}
+
+ul > li > a {
+    text-decoration: none;
+    color: var(--bg-cards)
+}
+
+ul > li {
+    list-style: none;
+}
+
+form > fieldset {
+    margin: 1.3em 0.8em;
+    padding: 2em 1.8em;
+    border-radius: 5px;
+    border: 2px solid var(--colore-testo); /* Si adatta al tema */
+}
+
+legend {
+    padding: 0 1em;
+}
+
+#nav-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2em;
+    margin: 0;
+    position: sticky;
+}
+
+#logo {
+    max-width: 10rem;
+    max-height: 5rem;
+    background-size: cover;
+}
+
+#menu-navs {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+}
+
+.img-with-badge {
+    position: relative;
+}
+
+.field-thumbnail {
+    width: 100%;
+    max-width: 20rem;
+    max-height: 12rem;
+    object-fit: cover;
+}
+
+.badge {
+    position: absolute;
+    font-size: 0.8em;
+    top: 5px;
+    right: 8px;
+    color: #f5f5f5;
+    padding: 2px 5px;
+    background-color: var(--verde);
+    border-radius: var(--raggio);
+}
+
+.fields-with-aside {
+    display: flex;
+}
+
+.btn {
+    background-color: var(--blu);
+    color: #ffffff;
+    padding: calc(var(--gap) / 2) var(--gap);
+    border-radius: var(--raggio);
+}
+
+.btn > a {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.btn:hover {
+    transform: scale(1.03);
+    transition: var(--tr-btn);
+    cursor: pointer;
+}
+
+input[type="submit"],
+input[type="reset"] {
+    padding: 0.2em 0.3em;
+    font-weight: 500;
+    border-radius: 5px;
+    border: 2px solid var(--colore-testo);
+    background-color: var(--bg-card);
+    color: var(--colore-testo);
+}
+
+input[type="submit"]:hover,
+input[type="reset"]:hover {
+    transform: scale(1.03);
+    transition: var(--tr-btn);
+    cursor: pointer;
+}
+
+#footer-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 2em;
+}
+
+#last-row {
+    padding: 2em;
+}
+
+#fields {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--gap);
+}
+
+.field-card {
+    display: flex;
+    flex-direction: column-reverse;
+    max-width: calc(100% - var(--gap));
+    background-color: var(--bg-card);       /* AGGIUNTO: Impedisce alle schede di restare bianche */
+    border: 10px solid var(--bordo-card);   /* Modificato con variabile */
+    box-shadow: 10px 5px 5px var(--ombra-card); /* Modificato con variabile */
+    transition: transform 0.3s ease-in-out, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.field-card:hover {
+    transform: scale(1.03);
+}
+
+.field-card > article > * {
+    text-align: center;
+}
+
+#prenota-titolo {
+    animation: prenota-titolo 1.5s infinite;
+    color: var(--rosso);
+}
+
+@keyframes prenota-titolo {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+}
+
+#torna-su-btn {
+    position: fixed;
+    right: 2em;
+    bottom: 4em;
+}
+
+.link-btn {
+    padding: .8em 1em;
+}
+
+button > a {
+    width: 100%;
+    height: 100%;
+    padding: .8em 1em;
+}
+
+#change-theme-btn {
+    position: fixed;
+    bottom: 10em;
+    right: 2em;
+    width: 3.5em;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--colore-testo); /* Il bottone si inverte automaticamente */
+    cursor: pointer;
+    padding: 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+#change-theme-btn:hover {
+    transform: scale(1.05);
+}
+
+#change-theme-btn i {
+    font-size: 1.5em;
+    color: var(--bg-main); /* L'icona prende sempre il colore di contrasto */
+    z-index: 9000;
+}

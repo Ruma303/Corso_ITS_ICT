@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SportBook Milano</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -13,7 +16,13 @@
     <div class="boxed-containers">
       <section id="nav-section">
         <img id="logo" src="../../assets/img/logo/Gemini_Generated_Image_64fccu64fccu64fc.png" alt="SportBook Milano">
-        <h1>SportBook Milano</h1>
+        <h1 class="logo">SportBook Milano</h1>
+        <button class="btn link-btn">
+          <a href="login.html">Accedi</a>
+        </button>
+        <button id="change-theme-btn">
+          <i class="fa-solid fa-lightbulb"></i>
+        </button>
       </section>
       <section id="menu-navs">
         <nav>
@@ -22,7 +31,6 @@
             <li><a href="index.html">Homepage</a></li>
             <li><a href="profilo.html">Profilo</a></li>
             <li><a href="checkout.html">Checkout</a></li>
-            <li><a href="login.html">Login</a></li>
             <li><a href="contatto.html">Contatto</a></li>
             <li><a href="city.html">Città</a></li>
             <li><a href="preferences.html">Preferenze</a></li>
@@ -44,27 +52,13 @@
   <main>
     <div id="main-center-container">
       <section id="intro">
-        <h2>Prenota il tuo campo in 30 secondi</h2>
+        <h2 id="prenota-titolo">Prenota il tuo campo in 30 secondi</h2>
         <p>Calcio, Padel, Tennis. Scegli il tuo sport, l'orario, e il <strong>gioco è fatto</strong>.</p>
       </section>
       <div id="fields">
-        <section class="fields-with-aside" tabindex="0">
+        <section class="field-card" tabindex="0">
           <article>
-            <p>Calcio</p>
-            <p>Lorem ipsum dolor sit amet <strong>consectetur</strong> adipisicing elit. Optio odio soluta nobis,
-              numquam
-              nihil <em>dignissimos quidem ex</em>, dicta aspernatur, et fugit commodi itaque iure blanditiis veniam.
-              Vero
-              ad
-              ullam dolorum?</p>
-          </article>
-          <aside><img class="field-thumbnail"
-              src="https://plus.unsplash.com/premium_photo-1768349852655-a1b638ab1c7d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              alt="Campo da Calcio"></aside>
-        </section>
-        <section class="fields-with-aside" tabindex="0">
-          <article>
-            <p>Padel</p>
+            <h3>Calcio</h3>
             <p>Lorem ipsum dolor sit amet <strong>consectetur</strong> adipisicing elit. Optio odio soluta nobis,
               numquam
               nihil <em>dignissimos quidem ex</em>, dicta aspernatur, et fugit commodi itaque iure blanditiis veniam.
@@ -73,14 +67,17 @@
               ullam dolorum?</p>
           </article>
           <aside>
-            <img class="field-thumbnail"
-              src="https://plus.unsplash.com/premium_photo-1684713510655-e6e31536168d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              alt="Campo da Padel">
+            <div class="img-with-badge">
+              <img class="field-thumbnail"
+                src="https://plus.unsplash.com/premium_photo-1684713510655-e6e31536168d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Campo da Calcio">
+              <p class="badge">Disponibile</p>
+            </div>
           </aside>
         </section>
-        <section class="fields-with-aside" tabindex="0">
+        <section class="field-card" tabindex="0">
           <article>
-            <p>Tennis</p>
+            <h3>Padel</h3>
             <p>Lorem ipsum dolor sit amet <strong>consectetur</strong> adipisicing elit. Optio odio soluta nobis,
               numquam
               nihil <em>dignissimos quidem ex</em>, dicta aspernatur, et fugit commodi itaque iure blanditiis veniam.
@@ -89,10 +86,33 @@
               ullam dolorum?</p>
           </article>
           <aside>
+            <div class="img-with-badge">
 
-            <img class="field-thumbnail"
-              src="https://images.unsplash.com/photo-1646343251574-a7b03ee3dbaf?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              alt="Campo da Tennis">
+              <img class="field-thumbnail"
+                src="https://plus.unsplash.com/premium_photo-1768349852655-a1b638ab1c7d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Campo da Padel">
+              <p class="badge">Disponibile</p>
+            </div>
+          </aside>
+        </section>
+        <section class="field-card" tabindex="0">
+          <article>
+            <h3>Tennis</h3>
+            <p>Lorem ipsum dolor sit amet <strong>consectetur</strong> adipisicing elit. Optio odio soluta nobis,
+              numquam
+              nihil <em>dignissimos quidem ex</em>, dicta aspernatur, et fugit commodi itaque iure blanditiis veniam.
+              Vero
+              ad
+              ullam dolorum?</p>
+          </article>
+          <aside>
+            <div class="img-with-badge">
+
+              <img class="field-thumbnail"
+                src="https://images.unsplash.com/photo-1646343251574-a7b03ee3dbaf?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Campo da Tennis">
+              <p class="badge">Disponibile</p>
+            </div>
           </aside>
         </section>
         </ol>
@@ -159,7 +179,6 @@
               <input type="email" id="name" required>
               <label for="tel">Telefono</label>
               <input type="tel" id="tel">
-
             </fieldset>
 
             <fieldset tabindex="0">
@@ -172,20 +191,18 @@
               </select>
               <label for="booking-date">Data prenotazione</label>
               <input type="date" name="booking-date" id="booking-date" min="2026-06-06">
-
-              <textarea rows="3"></textarea>
-
               <article style="display: flex; flex-direction: column;">
                 <label for="message">Messaggio</label>
                 <textarea name="" id="message" cols="40" rows="5" required></textarea>
               </article>
-
             </fieldset>
 
             <fieldset tabindex="0">
-              <input type="submit" value="Accedi">
-              <input type="reset" value="Resetta">
+              <legend>Bottoni di azione</legend>
+              <input type="submit" value="Accedi" class="btn">
+              <input type="reset" value="Resetta" class="btn">
             </fieldset>
+
           </form>
         </section>
       </section>
@@ -199,7 +216,7 @@
           <li><a href="#" target="_blank" rel="noopener noreferrer">Social 2</a></li>
           <li><a href="#" target="_blank" rel="noopener noreferrer">Social 3</a></li>
         </ul>
-        <button>
+        <button class="btn" id="torna-su-btn">
           <a href="#top">Torna su</a>
         </button>
       </section>
@@ -208,6 +225,7 @@
       </section>
     </div>
   </footer>
+  <script src="index.js"></script>
 </body>
 
 </html>

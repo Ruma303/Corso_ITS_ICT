@@ -92,25 +92,82 @@ public class Iscritto {
   public int contaIscrittiStessoTipo(Iscritto[] elencoIscritti) {
     // Controllo di sicurezza sull'array e su "this"
     if (elencoIscritti == null || this.getAbbonamento() == null) {
-        return 0;
+      return 0;
     }
 
     int result = 0;
     String mioTipo = this.getAbbonamento().getNomeTipo();
 
     for (Iscritto is : elencoIscritti) {
-        // 2. Salta l'iscritto se l'oggetto iscritto è null o se non ha un abbonamento
-        if (is == null || is.getAbbonamento() == null) {
-            continue;
-        }
+      // 2. Salta l'iscritto se l'oggetto iscritto è null o se non ha un abbonamento
+      if (is == null || is.getAbbonamento() == null) {
+        continue;
+      }
 
-        // 3. Confronto sicuro tra stringhe
-        if (is.getAbbonamento().getNomeTipo().equalsIgnoreCase(mioTipo)) {
-            result++;
-        }
+      // 3. Confronto sicuro tra stringhe
+      if (is.getAbbonamento().getNomeTipo().equalsIgnoreCase(mioTipo)) {
+        result++;
+      }
     }
 
     return result;
-}
+  }
 
+  public static double spesaTotaleStessoGruppo(Iscritto[] elencoIscritti) {
+    double somma = 0.0d;
+    String tipoAbbonamento = elencoIscritti[0].getAbbonamento().getNomeTipo();
+
+    for (Iscritto is : elencoIscritti) {
+      if (tipoAbbonamento.equalsIgnoreCase(is.getAbbonamento().getNomeTipo()))
+        somma += is.getAbbonamento().getPrezzoMensile();
+    }
+
+    return somma;
+  }
+
+  public boolean isIscrittoConPiuDiN(Iscritto[] elencoIscritti, int n) {
+    int numeroIscritti = 0;
+    String tipoAbbonamento = elencoIscritti[0].getAbbonamento().getNomeTipo();
+    for (Iscritto is : elencoIscritti) {
+      if (tipoAbbonamento.equalsIgnoreCase(is.getAbbonamento().getNomeTipo())) {
+        numeroIscritti++;
+        if (numeroIscritti > n) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public static Iscritto trovaCompagnoDiGruppoConPiuAccessi(Iscritto[] elencoIscritti) {
+    Iscritto result = null;
+    int numeroAccessi = 0;
+    String tipoAbbonamento = elencoIscritti[0].getAbbonamento().getNomeTipo();
+
+    for (Iscritto is : elencoIscritti) {
+      int numAccessiCompagno = is.getAbbonamento().getNumeroDiAccessi();
+      if (tipoAbbonamento.equalsIgnoreCase(is.getAbbonamento().getNomeTipo()) && numAccessiCompagno > numeroAccessi) {
+        numeroAccessi = numAccessiCompagno;
+        result = is;
+      }
+    }
+    return result;
+  }
+
+  public static double mediaPrezzoDiversiTipi(Iscritto[] elencoIscritti) {
+    double somma = 0.0d;
+    int numeroIscritti = elencoIscritti.length;
+    if (elencoIscritti == null || numeroIscritti == 0) return 0.0d;
+    for (Iscritto is : elencoIscritti)
+      somma += is.getAbbonamento().getPrezzoMensile();
+    double media = somma / numeroIscritti;
+    return media;
+  }
+
+  public boolean isIlPiuCostoso(Iscritto[] elencoIscritti) {
+    for (Iscritto is: elencoIscritti)
+      if (this.getAbbonamento().getPrezzoMensile() > is.getAbbonamento().getPrezzoMensile())
+        return true;
+    return false;
+  }
 }

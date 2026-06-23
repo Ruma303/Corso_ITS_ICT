@@ -1,0 +1,51 @@
+/* Specificità */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1 {
+  color: blue;
+}
+
+.rosso {
+  color: red;
+}
+
+/* #titolo {
+  color: green;
+} */
+
+/* h1 {
+  color: orange !important;
+} */
+
+h1.rosso {
+  color: purple;
+}
+
+/* Box model */
+.box {
+  width: 200px;
+  height: 100px;
+  margin: 20px;
+}
+
+.box1 {
+  background-color: lightblue;
+  padding: 0px;
+  border: 0px;
+}
+
+.box2 {
+  background-color: lightgreen;
+  padding: 20px;
+  border: 0px;
+}
+
+.box3{
+  background-color: lightcoral;
+  padding: 20px;
+  border: 10px solid black;
+}
