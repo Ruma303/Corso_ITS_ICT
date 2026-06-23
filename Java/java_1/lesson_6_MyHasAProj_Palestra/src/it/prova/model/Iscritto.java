@@ -84,32 +84,26 @@ public class Iscritto {
    */
 
   public boolean isAbbonamentiStessoTipo(Iscritto altro) {
-    if (altro.getAbbonamento().getTipoAbbonamento() == this.getAbbonamento().getTipoAbbonamento())
-      return true;
-    return false;
+    if (this.getAbbonamento() == null || altro == null || altro.getAbbonamento() == null) {
+      return false;
+    }
+    return altro.getAbbonamento().getTipoAbbonamento() == this.getAbbonamento().getTipoAbbonamento();
   }
 
   public int contaIscrittiStessoTipo(Iscritto[] elencoIscritti) {
-    // Controllo di sicurezza sull'array e su "this"
-    if (elencoIscritti == null || this.getAbbonamento() == null) {
+    if (elencoIscritti == null || this.getAbbonamento() == null)
       return 0;
-    }
 
     int result = 0;
     String mioTipo = this.getAbbonamento().getNomeTipo();
 
     for (Iscritto is : elencoIscritti) {
-      // 2. Salta l'iscritto se l'oggetto iscritto è null o se non ha un abbonamento
-      if (is == null || is.getAbbonamento() == null) {
+      if (is == null || is.getAbbonamento() == null)
         continue;
-      }
-
-      // 3. Confronto sicuro tra stringhe
       if (is.getAbbonamento().getNomeTipo().equalsIgnoreCase(mioTipo)) {
         result++;
       }
     }
-
     return result;
   }
 
@@ -118,6 +112,8 @@ public class Iscritto {
     String tipoAbbonamento = elencoIscritti[0].getAbbonamento().getNomeTipo();
 
     for (Iscritto is : elencoIscritti) {
+      if (is.getAbbonamento() == null)
+        continue;
       if (tipoAbbonamento.equalsIgnoreCase(is.getAbbonamento().getNomeTipo()))
         somma += is.getAbbonamento().getPrezzoMensile();
     }
@@ -126,25 +122,19 @@ public class Iscritto {
   }
 
   public boolean isIscrittoConPiuDiN(Iscritto[] elencoIscritti, int n) {
-    int numeroIscritti = 0;
-    String tipoAbbonamento = elencoIscritti[0].getAbbonamento().getNomeTipo();
-    for (Iscritto is : elencoIscritti) {
-      if (tipoAbbonamento.equalsIgnoreCase(is.getAbbonamento().getNomeTipo())) {
-        numeroIscritti++;
-        if (numeroIscritti > n) {
-          return true;
-        }
-      }
-    }
-    return false;
+    int quanti = this.contaIscrittiStessoTipo(elencoIscritti);
+    return quanti > n;
   }
 
   public static Iscritto trovaCompagnoDiGruppoConPiuAccessi(Iscritto[] elencoIscritti) {
+    if (elencoIscritti == null)
+      return null;
     Iscritto result = null;
     int numeroAccessi = 0;
     String tipoAbbonamento = elencoIscritti[0].getAbbonamento().getNomeTipo();
 
     for (Iscritto is : elencoIscritti) {
+      if (is.getAbbonamento() == null) continue;
       int numAccessiCompagno = is.getAbbonamento().getNumeroDiAccessi();
       if (tipoAbbonamento.equalsIgnoreCase(is.getAbbonamento().getNomeTipo()) && numAccessiCompagno > numeroAccessi) {
         numeroAccessi = numAccessiCompagno;
@@ -156,18 +146,29 @@ public class Iscritto {
 
   public static double mediaPrezzoDiversiTipi(Iscritto[] elencoIscritti) {
     double somma = 0.0d;
-    int numeroIscritti = elencoIscritti.length;
-    if (elencoIscritti == null || numeroIscritti == 0) return 0.0d;
+    int numeroIscrittiValidi = elencoIscritti.length;
+    if (elencoIscritti == null || numeroIscrittiValidi == 0)
+      return 0.0d;
     for (Iscritto is : elencoIscritti)
-      somma += is.getAbbonamento().getPrezzoMensile();
-    double media = somma / numeroIscritti;
-    return media;
+      if (is != null && is.getAbbonamento() != null) {
+        somma += is.getAbbonamento().getPrezzoMensile();
+        numeroIscrittiValidi++;
+      }
+    if (numeroIscrittiValidi <= 0)
+      return 0.0d;
+    return somma / numeroIscrittiValidi;
   }
 
   public boolean isIlPiuCostoso(Iscritto[] elencoIscritti) {
-    for (Iscritto is: elencoIscritti)
-      if (this.getAbbonamento().getPrezzoMensile() > is.getAbbonamento().getPrezzoMensile())
-        return true;
-    return false;
+    if (elencoIscritti == null || this.getAbbonamento() == null)
+      return false;
+    double mioPrezzo = this.getAbbonamento().getPrezzoMensile();
+    for (Iscritto is : elencoIscritti) {
+      if (is == null || is.getAbbonamento() == null)
+        continue;
+      if (is.getAbbonamento().getPrezzoMensile() > mioPrezzo)
+        return false;
+    }
+    return true;
   }
 }

@@ -69,5 +69,32 @@ public class MyPalestraTest {
       "Esistono " + i4.contaIscrittiStessoTipo(tuttiIscritti) + " che hanno lo stesso tipo di abbonamento"
     );
 
+    String spesaTotale = String.valueOf(Iscritto.spesaTotaleStessoGruppo(tuttiIscritti));
+    System.out.println(
+      "Spesa totale gruppo dello stesso tipo di abbonamento: " + spesaTotale + "€"
+    );
+
+    int soglia = 2;
+    System.out.println(
+      i3.isIscrittoConPiuDiN(tuttiIscritti, soglia)
+      ? "Numero di iscritti supera la soglia " + soglia
+      : "Numero di iscritti NON supera la soglia " + soglia
+    );
+
+    System.out.println(
+      "Il compagno di gruppo con più accessi è " + Iscritto.trovaCompagnoDiGruppoConPiuAccessi(tuttiIscritti).toNome()
+    );
+
+    double rounded = Math.round(Iscritto.mediaPrezzoDiversiTipi(tuttiIscritti) * 100.0) / 100.0;
+    System.out.println(
+      "La media del prezzo è " + rounded + "€"
+    );
+
+    System.out.println(
+      i7.isIlPiuCostoso(tuttiIscritti)
+      ? "L'abbonamento di " + i7.toNome() + " è il più costoso"
+      : "L'abbonamento di " + i7.toNome() + " NON è il più costoso"
+    );
+
   }
 }
