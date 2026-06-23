@@ -1,7 +1,8 @@
 import json
 from uuid import UUID
 
-from classes import Citta, Nazione, Regione, AreaDisciplinare
+from datatypes import CodiceFiscale
+from classes import Citta, Nazione, Regione, AreaDisciplinare, Docente, Studente, Modulo, CorsoITS
 
 datafile = "data.json"
 
@@ -52,6 +53,29 @@ def load_all():
                     print(f"Error area disciplinare {k}: {ex}")
         except Exception:
             pass
+
+        print(" - Docente")
+        try:
+            for k, obj in data.get("Docente", {}).items():
+                try:
+                    Docente.create_from_dict(CodiceFiscale(k), obj)
+                except Exception as ex:
+                    print(f"Error docente {k}: {ex}")
+        except Exception:
+            pass
+            
+        print(" - Studente")
+        try:
+            for k, obj in data.get("Studente", {}).items():
+                try:
+                    Studente.create_from_dict(CodiceFiscale(k), obj)
+                except Exception as ex:
+                    print(f"Error studente {k}: {ex}")
+        except Exception:
+            pass
+
+
+            
     except FileNotFoundError:
         print("File not found")
     except Exception as ex:
@@ -79,6 +103,12 @@ def save_all():
         for c in AreaDisciplinare.all_objects_by_uuid():
             k, d = c.to_json()
             data["AreaDisciplinare"][k] = d
+        for c in Docente.all_objects_by_cf():
+            k, d = c.to_json()
+            data["Docente"][k] = d
+        for c in Studente.all_objects_by_cf():
+            k, d = c.to_json()
+            data["Studente"][k] = d
         
         fp = open(datafile, "wt")
         json.dump(data, fp, indent=4, sort_keys=True)

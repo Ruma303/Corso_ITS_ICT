@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from datetime import datetime
+from abc import ABC, abstractmethod
+from datetime import date, datetime
 from typing import Self
 from uuid import UUID, uuid4
+from weakref import KeyedRef
 
-from class_utils import ClassUtilsNomi, ClassUtilsUUID
-from datatypes import CodiceFiscale
+from class_utils import ClassUtilsCF, ClassUtilsNomi, ClassUtilsUUID
+from datatypes import CodiceFiscale, IntGEZ, IntGZ, RealGEZ, Voto
 
 # Class di interesse per il programma
 
@@ -127,9 +129,8 @@ class Regione(ClassUtilsUUID, ClassUtilsNomi):
         )
 
 
-class Citta(ClassUtilsUUID):
+class Citta(ClassUtilsUUID, ClassUtilsNomi):
     __tuple_registry: dict[tuple[str, Regione], Self] = {}
-    __objects_by_names: dict[str, Self] = {}
 
     # da considerarsi privato
     def __init__(self, nome: str, reg: Regione, _id: UUID) -> None:
@@ -219,7 +220,6 @@ class Citta(ClassUtilsUUID):
 
 
 class AreaDisciplinare(ClassUtilsUUID, ClassUtilsNomi):
-  
     @classmethod
     def create(cls, nome: str) -> Self:
         if nome in [n.get_nome() for n in cls.all_objects_by_nome()]:
@@ -250,68 +250,301 @@ class AreaDisciplinare(ClassUtilsUUID, ClassUtilsNomi):
         return (str(self.get_id()), {"nome": self.get_nome()})
 
 
-class CorsoITS: ...
+class Persona(ABC, ClassUtilsNomi, ClassUtilsCF):
+    # Prototipi da implementare nelle sottoclassi
+    @classmethod
+    @abstractmethod
+    def create(cls, *args, **kwargs) -> Self: ...
 
+    @classmethod
+    @abstractmethod
+    def create_from_dict(cls, cf: CodiceFiscale, data: dict) -> Self: ...
 
-class Modulo: ...
-
-
-class Persona(ClassUtilsUUID, ClassUtilsNomi):
     def __init__(
         self,
-        _uuid: UUID,
         nome: str,
         cognome: str,
         cf: CodiceFiscale,
         citta_nascita: Citta,
     ):
-        self.__uuid = _uuid
         self.__nome = nome
         self.__cognome = cognome
         self.__cf = cf
         self.__citta_nascita = citta_nascita
 
-        type(self)._objects_by_uuid[self.__uuid] = self
+        # Tutti gli oggetti delle sottoclassi verranno inserite qui automaticamente
+        # se viene richiamato questo inizializzatore
+        type(self)._objects_by_cf[self.__cf] = self
 
+    def get_nome(self) -> str:
+        return self.__nome
+
+    def get_cognome(self) -> str:
+        return self.__cognome
+
+    def get_codice_fiscale(self) -> CodiceFiscale:
+        return self.__cf
+
+    def get_citta_nascita(self) -> Citta:
+        return self.__citta_nascita
+
+    def __str__(self) -> str:
+        return f"{self.get_nome()}, {self.get_cognome()}"
+
+
+class Docente(Persona):
+  
     @classmethod
     def create(
         cls,
-        _uuid: UUID,
         nome: str,
         cognome: str,
         cf: CodiceFiscale,
         citta_nascita: Citta,
-    ): ...
+    ) -> Self:
+        if cf in cls.all_objects_by_cf():
+            raise KeyError(f"Il codice fiscale '{cf}' già esiste. Dev'essere univoco")
+        return cls(nome, cognome, cf, citta_nascita)
 
     @classmethod
     def create_from_dict(
         cls,
-        _uuid: UUID,
+        cf: CodiceFiscale,
+        data: dict,
+    ) -> Self:
+        citta_uuid = UUID(data["citta_nascita"])
+        citta = Citta.get_object_by_uuid(citta_uuid)
+        if not citta:
+            raise KeyError(f"La città di nascita con UUID '{citta_uuid}' non esiste")
+        return cls(data["nome"], data["cognome"], cf, citta)
+
+    def __init__(
+        self,
         nome: str,
         cognome: str,
         cf: CodiceFiscale,
         citta_nascita: Citta,
-    ): ...
+    ):
+        super().__init__(nome, cognome, cf, citta_nascita)
 
-    def get_nome(self): ...
-    def get_conome(self): ...
-    def get_codice_fiscale(self): ...
-    def get_citta_nascita(self): ...
-    def __str__(self) -> str: ...
-    def to_json(self): ...
+    def get_moduli(self) -> set[Modulo]: ...
+
+    def add_modulo(self, modulo: Modulo): ...
+
+    def __str__(self) -> str:
+      return f"{self.get_nome()}, {self.get_cognome()} | CF: {self.get_codice_fiscale()} | nato a {self.get_citta_nascita()}"
+      
+    def to_json(self) -> tuple[str, dict]:
+        return (
+            str(self.get_codice_fiscale()),
+            {
+                "nome": self.get_nome(),
+                "cognome": self.get_cognome(),
+                "codice_fiscale": str(self.get_codice_fiscale()),
+                "citta_nascita": str(self.get_citta_nascita().get_id()),
+            },
+        )
 
 
-# class Docente(Persona): ...
-
-"""
 class Studente(Persona):
-    __matricola: str
-    __nascita: datetime
-    esami: set[Self]
+    __esami_superati: set = set()
+    __all_objects_by_matricole: dict[str, Self] = dict()
 
-    def __init__(): ...
+    @classmethod
+    def create(
+        cls,
+        nome: str,
+        cognome: str,
+        cf: CodiceFiscale,
+        citta_nascita: Citta,
+        matricola: str,
+        data_nascita: datetime,
+    ) -> Self:
+        if cf in cls.all_objects_by_cf():
+            raise KeyError(f"Il codice fiscale '{cf}' già esiste. Dev'essere univoco")
+        if matricola in cls.__all_objects_by_matricole:
+            raise KeyError(f"La matricola {matricola} esiste già e dev'essere univoca")
+        return cls(nome, cognome, cf, citta_nascita, matricola, data_nascita)
 
+    @classmethod
+    def create_from_dict(
+        cls,
+        cf: CodiceFiscale,
+        data: dict,
+    ) -> Self:
+        citta_uuid = UUID(data["citta_nascita"])
+        citta = Citta.get_object_by_uuid(citta_uuid)
+        if not citta:
+            raise KeyError(f"La città di nascita con UUID '{citta_uuid}' non esiste")
+        data_nascita_dt = datetime.fromisoformat(data['data_nascita'])
+        return cls(data["nome"], data["cognome"], cf, citta, data['matricola'], data_nascita_dt)
+
+    """ 
+    @classmethod
+    def search_for_matricola(cls, matricola: str) -> set[Self]:
+      return {(_id, st) for st in cls.__all_objects_by_matricole if st.get_matricola() == matricola}
+      """
+    def __init__(
+        self,
+        nome: str,
+        cognome: str,
+        cf: CodiceFiscale,
+        citta_nascita: Citta,
+        matricola: str,
+        data_nascita: datetime,
+    ):
+        super().__init__(nome, cognome, cf, citta_nascita)
+        self.__matricola = matricola
+        self.__data_nascita = data_nascita
+        self.__esami_superati = set()  # Inizializziamo un set vuoto di esami
+        type(self).__all_objects_by_matricole[self.__matricola] = self
+
+    # TODO: Implementare
+    def get_moduli_voto_piu_alto(self) -> set[Modulo]:
+      return set()
+
+    def get_matricola(self) -> str:
+        return self.__matricola
+
+    def get_data_nascita(self) -> datetime:
+      return self.__data_nascita
+  
     def get_esame(self, modulo: Modulo) -> Voto: ...
 
     def add_esame(self, modulo: Modulo, voto: Voto): ...
- """
+
+    def get_corso(self) -> CorsoITS: ...
+
+    def __str__(self) -> str:
+      return f"[{self.get_matricola()}] | {self.get_nome()}, {self.get_cognome()} | CF: {self.get_codice_fiscale()} | nato a {self.get_citta_nascita()} il {self.get_data_nascita()}"
+    
+    def to_json(self) -> tuple[str, dict]:
+        return (
+            str(self.get_codice_fiscale()),
+            {
+                "nome": self.get_nome(),
+                "cognome": self.get_cognome(),
+                "codice_fiscale": str(self.get_codice_fiscale()),
+                "citta_nascita": str(self.get_citta_nascita().get_id()),
+                "matricola": str(self.get_matricola()),
+                "data_nascita": self.get_data_nascita().isoformat()
+            },
+        )
+
+
+class CorsoITS(ClassUtilsNomi):
+    __objects_by_keys: dict[tuple[str, IntGZ], Self]
+
+    """ @classmethod
+    def create(cls, nome, edizione) -> Self:
+      for (nome, edizione) in { k: v for corso in cls.get_corsi()}:
+        if nome == k and edizione == v:
+          raise KeyError(f"Esiste già un corso con il nome '{nome}' e edizione '{edizione}'.")
+      return cls(nome, edizione) """
+      
+
+    @classmethod 
+    def get_corsi(cls) -> dict[tuple[str, IntGZ], Self]:
+      return cls.__objects_by_keys
+
+    def numero_medio_esami(): ...
+
+
+  
+
+
+    
+    """
+    def moduli_con_voto_piu_alto() -> set[Modulo]:
+       algoritmo:
+                   # i moduli per i quali lo studente 'this' ha preso voto_max
+                   result = {}
+
+                   # il voto di tutti gli esami per i moduli in 'result'
+                   voto_max = None
+
+                   per ogni link (self, m) in self.esame_superato:
+
+                           se voto_max is None or
+                                   (this, m).voto > voto_max:
+
+                                           result = { m }
+
+                           altrimenti se (this,m).voto == voto_max:
+
+                                           result = result unione { m }
+
+                   return result
+
+    """
+
+
+class Modulo(ClassUtilsNomi):
+    __docenti_by_modulo: dict[str, Docente] = {}
+    __all_objects_by_codice: dict[str, Self] = {}
+
+    """ @classmethod
+    def get_all_objects_by_codice(cls) -> set[Self]:
+      return { cls.__all_objects_by_codice} 
+    """
+
+    @classmethod
+    def create(cls, codice, nome, ore) -> Self:
+      if codice in cls.__all_objects_by_codice:
+        raise KeyError(f"Esiste già un modulo con questo codice '{codice}'")
+      return cls(codice, nome, ore)
+
+    @classmethod
+    def create_from_dict(cls, codice, data) -> Self:
+      if codice in cls.__all_objects_by_codice:
+        raise KeyError(f"Esiste già un modulo con questo codice '{codice}'")
+      return cls(codice, data['nome'], data['ore'])
+      
+
+    def __init__(self, 
+      codice: str,
+      nome: str,
+      ore: IntGZ
+    ): 
+      self.__codice = codice
+      self.__nome = nome
+      self.__ore = ore
+
+      type(self)._objects_by_name[self.__codice] = self
+
+    def get_codice(self) -> str:
+      return self.__codice
+
+    def get_nome(self) -> str:
+      return self.__nome
+
+    def get_ore(self) -> IntGZ:
+      return self.__ore
+
+    def add_docenti(self, docenti: set[Docente]):
+      for cf in docenti:
+        self.__docenti_by_modulo[cf.get_codice_fiscale()] = cf
+  
+    """
+    def numero_esami(self) -> IntGEZ:
+      return len(self.__esami_superati)
+    """
+
+    
+    def get_docenti(self) -> set[Docente]:
+      docenti = set()
+      for docente in self.get_docenti():
+        docenti.add(docente)
+      return docenti
+    
+      
+    def __str__(self) -> str: 
+      base_str = f"{self.get_nome()} | durata {str(self.get_ore())}"
+      if not self.get_docenti():
+        base_str += " | NESSUN DOCENTE ASSOCIATO\n"
+      else: 
+        base_str += " | con docenti:\n"
+        for docente in self.get_docenti():
+          base_str += f"\t- {docente}"
+
+      return base_str
