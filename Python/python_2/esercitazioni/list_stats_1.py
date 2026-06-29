@@ -34,7 +34,7 @@ def stats(list1):
 
     sum_num += num
 
-  now_avg = sum_num / 2
+  now_avg = sum_num / len(list1)
 
   return now_min, now_max, now_avg
 

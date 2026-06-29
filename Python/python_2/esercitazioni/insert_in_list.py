@@ -46,6 +46,8 @@ def insert_in_strings(strings: list[str], pos: int, new: str, substitute: bool =
         strings.append("")  # placeholder per fare spazio
         i = len(strings) - 1
         while i > pos:
+            #debug
+            print(f"{i = }, al posto di: '", strings[i], "' assegno '", strings[i -1], "' ", strings, sep="")
             strings[i] = strings[i - 1]  # shifta a destra
             i = i - 1
         strings[pos] = new
@@ -71,11 +73,15 @@ def insert_in_strings(strings: list[str], pos: int, new: str, substitute: bool =
 
 
 def main():
-  strings = get_strings()
+  """  strings = get_strings()
   print(f"Lista di stringhe originale: {strings = }")
 
   pos = int(input("Inserisci una posizione numerica: ").strip())
   new = input("Inserisci una stringa da inserire: ").strip()
+  """
+  strings = ["ciao", "hello", "hola"]
+  pos = 1
+  new = 'xxx'
   new_list = insert_in_strings(strings, pos, new)
   print(f"\nProva con nuova lista: {new_list = }")
 

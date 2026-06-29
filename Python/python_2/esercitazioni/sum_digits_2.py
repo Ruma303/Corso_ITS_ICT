@@ -14,25 +14,31 @@ le sue singole cifre come numeri interi e non stringhe.
 
 from sys import exit
 
-def sum_digits_2(n: int) -> int:
+def sum_digits_2(n1: int) -> int:
 
-  if type(n) is not int: 
+  if type(n1) is not int:
     raise TypeError("L'input inserito deve essere un intero")
-  if n < 0: 
+  if n1 < 0:
     raise ValueError("Il numero inserito non può essere negativo")
 
   result: int = 0
+  n = n1 # evitiamo di consumare il numero originale
+  # lavoriamo su una copia
 
+  # n è la posizione della cifra in esame
   while n > 0:
       # Prende l'ultima cifra a destra
       digit = n % 10
+      # print(digit)
 
       # La aggiunge al totale
       result += digit
 
+      # print(result)
       # Rimuovere l'ultima cifra dal numero originale
       # Esempio: 64 // 10 diventa 6
       n = n // 10
+      # print(n)
 
   return result
 

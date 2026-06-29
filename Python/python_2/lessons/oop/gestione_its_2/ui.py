@@ -1,9 +1,9 @@
-﻿from classes import AreaDisciplinare, Citta, Nazione, Regione
+﻿from classes import AreaDisciplinare, Citta, Nazione, Regione, Docente, Studente, CorsoITS, Modulo
 
 
 def list_db():
     print("Nazioni:")
-    for n in Nazione.all_objects_by_uuid():
+    for n in Nazione.all_objects_by_nome():
         print(f" - {n}")
 
     print("Regioni:")
@@ -14,6 +14,26 @@ def list_db():
     for n in Citta.all_objects_by_uuid():
         print(f" - {n}")
 
+    print("Aree disciplinari:")
+    for n in AreaDisciplinare.all_objects_by_nome():
+        print(f" - {n}")
+
+    print("Docenti:")
+    for n in Docente.all_objects_by_nome():
+        print(f" - {n}")
+
+    print("Studenti:")
+    for n in Studente.all_objects_by_nome():
+        print(f" - {n}")
+
+    print("Corsi ITS:")
+    for n in CorsoITS.all_objects_by_nome():
+        print(f" - {n}")
+
+    print("Moduli:")
+    for n in Modulo.all_objects_by_nome():
+        print(f" - {n}")
+    
 
 # Funzioni di interfaccia ("ui": "User interface")
 

@@ -1,10 +1,51 @@
 {
     "AreaDisciplinare": {
-        "ab9cd00f-cb05-4421-864e-efac71aa64c3": {
+        "IT": {
             "nome": "IT"
+        },
+        "Marketing and Communication": {
+            "nome": "Marketing and Communication"
+        },
+        "Robotics": {
+            "nome": "Robotics"
         }
     },
-    "Citta": {},
-    "Nazioni": {},
-    "Regioni": {}
+    "Citta": {
+        "4fbd5ba0-be7e-490d-8a9a-b82c339f0d4d": {
+            "nome": "Roma",
+            "regione": "66335fda-fb5a-43f6-a275-2b940446fc17"
+        },
+        "e0a94861-2489-4d6b-afe4-bfc1a0c85dbc": {
+            "nome": "Roma",
+            "regione": "088c5058-47c2-4719-a164-3b364073ca20"
+        }
+    },
+    "Nazioni": {
+        "Cina": {
+            "nome": "Cina"
+        },
+        "Francia": {
+            "nome": "Francia"
+        },
+        "Italia": {
+            "nome": "Italia"
+        },
+        "USA": {
+            "nome": "USA"
+        }
+    },
+    "Regioni": {
+        "088c5058-47c2-4719-a164-3b364073ca20": {
+            "nazione": "Francia",
+            "nome": "Lazio"
+        },
+        "66335fda-fb5a-43f6-a275-2b940446fc17": {
+            "nazione": "Italia",
+            "nome": "Lazio"
+        },
+        "9bd4b18f-88bd-4f6d-a77e-17392b7d67b0": {
+            "nazione": "USA",
+            "nome": "Texas"
+        }
+    }
 }

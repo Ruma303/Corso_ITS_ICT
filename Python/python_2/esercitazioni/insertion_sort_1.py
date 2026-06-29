@@ -41,22 +41,17 @@ from sys import exit
 def insertion_sort(lista: list[int]) -> list[int]:
     result: list[int] = []
 
-    # TODO: Completa
     for idx, ele in enumerate(lista):
         result.append(ele)
-        # Ultima posizione
+        # Indice ultima posizione attuale 
         j = len(result) - 1
 
         while j > 0 and result[j] < result[j - 1]:
+            # scambio di posizioni fin quando sono tutti ordinati 
             temp = result[j]
             result[j] = result[j - 1]
             result[j - 1] = temp
-
-            # Spostamento a sinistra per verificare se
-            # result[j] è ancora minore in altre posizioni
-
-            j -= 1  # Errore di indentazione intenzionale.
-            # Da aggiustare con formattatori
+            j -= 1
 
     return result
 

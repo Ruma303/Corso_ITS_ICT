@@ -13,16 +13,17 @@ def find_last_char(string, char):
     raise TypeError("Il valore non è una stringa. Inserire una stringa.")
 
   if len(char) != 1:
-    print("Puoi inserire soltanto un carattere di ricerca: ")
-    return
+    raise ValueError("Puoi inserire soltanto un carattere di ricerca: ")
 
   if char not in string:
+    print(f"{char = } non appare nella {string = }")
     return -1
 
   else:
     last_idx = 0
     for idx, c in enumerate(string):
       if c in string:
+        # assegno l'ultima posizione in cui appare c 
         last_idx = idx
     return last_idx
 
@@ -32,9 +33,7 @@ def main():
   char = input("Inserisci un carattere di ricerca: ").strip()
 
   pos = find_last_char(string, char)
-  if pos == -1:
-    print(f"Ultima posizione di {char} è {pos}")
-  else:
+  if pos != -1:
     print(f"Ultima posizione di {char} è {pos}")
 
   return 0

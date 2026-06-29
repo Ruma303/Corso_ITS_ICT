@@ -17,42 +17,35 @@ livelli di visibilità (nei linguaggi "standard", come Java)
 """
 
 
-class Nazione(ClassUtilsNomi, ClassUtilsUUID):
+class Nazione(ClassUtilsNomi):
     @classmethod
     def create(cls, nome: str) -> Self:
         if nome is None or nome == "":
             raise ValueError("Nome nazione non può essere vuoto")
-        if nome in [n.get_nome() for n in cls.all_objects_by_nome()]:
+        if cls.get_object_by_nome(nome) is not None:
             raise ValueError(f"Nazione '{nome}' già esistente")
-        naz_id = uuid4()
-        # INFO: Controllo superfluo, aggiunto per completezza
-        if naz_id in cls.all_objects_by_uuid():
-            raise KeyError("Nazione.__uuid già presente")
-        obj = cls(nome, naz_id)
-        return obj
+        return cls(nome)
 
     @classmethod
-    def create_from_dict(cls, _id: UUID, data: dict) -> Self:
-        return cls(data["nome"], _id)
+    def create_from_dict(cls, nome: str, data: dict) -> Self:
+        # Se l'oggetto è già presente nel registro, lo restituisce
+        istanza_esistente = cls.get_object_by_nome(nome)
+        if istanza_esistente is not None:
+            return istanza_esistente
+        return cls(data.get("nome", nome))
 
-    def __init__(self, name: str, _id: UUID) -> None:
+    def __init__(self, name: str) -> None:
         self.__nome = name
-        self.__id = _id
-
-        type(self)._objects_by_uuid[self.__id] = self
         type(self)._objects_by_name[self.__nome] = self
 
     def get_nome(self) -> str:
         return self.__nome
 
-    def get_uuid(self) -> UUID:
-        return self.__id
-
     def __str__(self) -> str:
         return self.__nome
 
     def to_json(self) -> tuple[str, dict]:
-        return (str(self.get_uuid()), {"nome": self.get_nome()})
+        return (str(self.get_nome()), {"nome": self.get_nome()})
 
 
 """
@@ -61,47 +54,48 @@ Il sistema deve garantire l'inserimento di più regioni con lo stesso nome (ma U
 
 
 class Regione(ClassUtilsUUID, ClassUtilsNomi):
+    # Registro per garantire l'univocità della coppia (NomeRegione, OggettoNazione)
     __tuple_registry: dict[tuple[str, Nazione], Self] = {}
 
     @classmethod
     def get_objects_by_name(cls, name: str) -> set[Self]:
+        """Restituisce tutte le regioni con quel nome"""
         trovati = set()
-
         for (value, _), obj in cls.__tuple_registry.items():
             if name == value:
                 trovati.add(obj)
-
         return trovati
-
-        # return {r for (n, naz), r in cls.__tuple_registry.items() if n == name}
 
     @classmethod
     def create(cls, nome: str, naz: Nazione) -> Self:
         if nome is None or nome == "":
             raise ValueError("Regione.nome non può essere None")
-        if naz.get_uuid() not in [n.get_uuid() for n in Nazione.all_objects_by_uuid()]:
-            raise ValueError(f"La nazione con uuid {naz.get_uuid()} non è valida")
-        reg_id = uuid4()
-        if reg_id in cls.all_objects_by_uuid():
-            raise KeyError("Regione.__uuid già presente")
-        # Verifica della coppia (regione.nome, nazione) non sia già creata
+
+        # Verifica che la nazione passata sia effettivamente censita nel sistema
+        if Nazione.get_object_by_nome(naz.get_nome()) is None:
+            raise ValueError(f"La nazione '{naz.get_nome()}' non è valida o non esiste")
+
+        # Verifica della coppia (regione.nome, nazione)
         if (nome, naz) in cls.__tuple_registry:
             raise ValueError(
                 f"La regione '{nome}' è già associata alla nazione '{naz.get_nome()}'"
             )
+
+        reg_id = uuid4()
         return cls(nome, naz, reg_id)
 
     @classmethod
     def create_from_dict(cls, _id: UUID, data: dict) -> Self:
-        naz_uuid = UUID(data["nazione"])
-        naz = Nazione.get_object_by_uuid(naz_uuid)
-        if not naz:
-            raise KeyError(f"La nazione con uuid '{naz_uuid}' non esiste")
-        else:
-            return cls(data["nome"], naz, _id)
+      naz_nome = data["nazione"]
+      naz = Nazione.get_object_by_nome(naz_nome)
+      if not naz:
+          raise KeyError(f"Impossibile caricare la regione: la nazione '{naz_nome}' non esiste.")
 
-    def __init__(self, nom: str, naz: Nazione, _id: UUID) -> None:
-        self.__nome = nom
+      nome_regione = data["nome"]
+      return cls(nome_regione, naz, _id)
+
+    def __init__(self, nome: str, naz: Nazione, _id: UUID) -> None:
+        self.__nome = nome
         self.__nazione = naz
         self.__id = _id
 
@@ -119,25 +113,26 @@ class Regione(ClassUtilsUUID, ClassUtilsNomi):
         return self.__id
 
     def __str__(self) -> str:
-        return f"{self.__nome} ({self.__nazione})"
+        return f"{self.__nome} ({self.__nazione.get_nome()})"
 
     def to_json(self) -> tuple[str, dict]:
         return (
             str(self.get_uuid()),
-            {"nome": self.get_nome(), "nazione": str(self.get_nazione().get_uuid())},
+            {"nome": self.get_nome(), "nazione": self.get_nazione().get_nome()},
         )
 
 
 class Citta(ClassUtilsUUID, ClassUtilsNomi):
+    # Registro per garantire l'univocità della coppia (NomeCittà, OggettoRegione)
     __tuple_registry: dict[tuple[str, Regione], Self] = {}
 
-    # da considerarsi privato
     def __init__(self, nome: str, reg: Regione, _id: UUID) -> None:
         self.__nome = nome
         self.__regione = reg
         self.__id = _id
 
         type(self)._objects_by_uuid[self.__id] = self
+        type(self)._objects_by_name[self.__nome] = self
         type(self).__tuple_registry[(self.__nome, self.__regione)] = self
 
     @classmethod
@@ -145,56 +140,59 @@ class Citta(ClassUtilsUUID, ClassUtilsNomi):
         if nome is None or nome == "":
             raise ValueError("Il nome della città non può essere vuoto")
 
-        if reg.get_uuid() not in [n.get_uuid() for n in Regione.all_objects_by_uuid()]:
+        if Regione.get_object_by_uuid(reg.get_uuid()) is None:
             raise ValueError(
-                f"La regione con uuid {reg.get_uuid()} non è una regione valida"
+                f"La regione con uuid {reg.get_uuid()} non è una regione valida o registrata"
             )
 
-        # Cerchiamo tutte le regioni che hanno lo stesso nome di quello fornito
+        
         reg_nome = reg.get_nome()
         matching_regions = Regione.get_objects_by_name(reg_nome)
         matching_regions_list = list(matching_regions)
 
-        # Se esistono più regioni con lo stesso nome in nazioni diverse, chiediamo all'utente
         if len(matching_regions) > 1:
-            print(f"Esistono più nazioni per la regione '{reg_nome}':")
-            for i, r in enumerate(matching_regions):
+            print(f"\nEsistono più nazioni che possiedono la regione '{reg_nome}':")
+            for i, r in enumerate(matching_regions_list):
                 print(f"\t{i + 1}) {r.get_nazione().get_nome()}")
 
             while True:
                 try:
                     scelta = int(
-                        input("Seleziona la nazione digitando il numero associato: ")
+                        input("Seleziona la nazione corretta digitando il numero associato: ")
                     )
-                    if 1 <= scelta <= len(matching_regions):
+                    if 1 <= scelta <= len(matching_regions_list):
                         reg = matching_regions_list[scelta - 1]
                         break
                     else:
-                        print(
-                            f"Indice fuori scala, inserisci un numero tra 1 e {len(matching_regions)}."
-                        )
+                        print(f"Indice fuori scala. Inserisci un numero tra 1 e {len(matching_regions_list)}.")
                 except ValueError:
-                    print("Input non valido. Inserisci un numero.")
+                    print("Input non valido. Inserisci un numero intero.")
 
         citta_id = uuid4()
-        if citta_id in cls.all_objects_by_uuid():
-            raise KeyError(f"La città con uuid '{citta_id}' già esiste")
+        if cls.get_object_by_uuid(citta_id) is not None:
+            raise KeyError(f"La città con uuid '{citta_id}' esiste già nel registro.")
 
-        if not (citta_id, reg.get_uuid(), reg.get_nazione().get_uuid()):
-            return cls(nome, reg, citta_id)
-        else:
+        # Verifica dell'univocità della coppia (Nome, Regione)
+        if (nome, reg) in cls.__tuple_registry:
             raise ValueError(
-                f"La città {nome} è già associata alla regione {reg.get_nome()} in ({reg.get_nazione().get_nome()})"
+                f"La città '{nome}' è già associata alla regione '{reg.get_nome()}' nella nazione ({reg.get_nazione().get_nome()})"
             )
+
+        return cls(nome, reg, citta_id)
 
     @classmethod
     def create_from_dict(cls, _id: UUID, data: dict) -> Self:
         reg_uuid = UUID(data["regione"])
         reg = Regione.get_object_by_uuid(reg_uuid)
         if not reg:
-            raise KeyError(f"La regione con uuid {reg_uuid} non esiste")
-        else:
-            return cls(data["nome"], reg, _id)
+            raise KeyError(f"Impossibile caricare la città: la regione con uuid {reg_uuid} non esiste")
+
+        nome = data["nome"]
+        # Se l'oggetto è già presente in memoria nel registro tuple, lo restituisce evitando duplicati
+        if (nome, reg) in cls.__tuple_registry:
+            return cls.__tuple_registry[(nome, reg)]
+
+        return cls(nome, reg, _id)
 
     def get_nome(self) -> str:
         return self.__nome
@@ -206,7 +204,7 @@ class Citta(ClassUtilsUUID, ClassUtilsNomi):
         return self.__id
 
     def __str__(self) -> str:
-        return f"{self.__nome}, {self.__regione}"
+        return f"{self.__nome} ({self.__regione})"
 
     def to_json(self) -> tuple[str, dict]:
         return (
@@ -218,37 +216,224 @@ class Citta(ClassUtilsUUID, ClassUtilsNomi):
         )
 
 
-class AreaDisciplinare(ClassUtilsUUID, ClassUtilsNomi):
+class AreaDisciplinare(ClassUtilsNomi):
     @classmethod
     def create(cls, nome: str) -> Self:
-        if nome in [n.get_nome() for n in cls.all_objects_by_nome()]:
-            raise ValueError("Esiste già un'area disciplinare con questo nome")
-        area_id = uuid4()
-        if area_id in [n for n in AreaDisciplinare.all_objects_by_uuid()]:
-            raise ValueError(f"L'area disciplinare con uuid '{area_id}' già esiste")
-        return cls(nome, area_id)
+        if nome is None or nome == "":
+            raise ValueError("Il nome dell'area disciplinare non può essere vuoto")
+        
+        if cls.get_object_by_nome(nome) is not None:
+            raise ValueError(f"Esiste già un'area disciplinare con il nome '{nome}'")
+            
+        return cls(nome)
 
-    # TODO: L'area disciplinare potrebbe contenere soltanto il nome come
-    # vincolo d'integrità
     @classmethod
-    def create_from_dict(cls, _id: UUID, data: dict) -> Self:
-        return cls(data["nome"], _id)
+    def create_from_dict(cls, nome: str, data: dict) -> Self:
+        istanza_esistente = cls.get_object_by_nome(nome)
+        if istanza_esistente is not None:
+            return istanza_esistente
+            
+        return cls(data.get("nome", nome))
 
-    def __init__(self, nome: str, _id: UUID):
+    def __init__(self, nome: str) -> None:
         self.__nome = nome
-        self.__id = _id
-
-        type(self)._objects_by_uuid[self.__id] = self
         type(self)._objects_by_name[self.__nome] = self
 
     def get_nome(self) -> str:
         return self.__nome
 
+    def __str__(self) -> str:
+        return self.__nome
+
+    def to_json(self) -> tuple[str, dict]:
+        return (self.get_nome(), {"nome": self.get_nome()})
+
+
+class Modulo(ClassUtilsNomi):
+    __all_objects_by_codice: dict[str, Self] = {}
+
+    @classmethod
+    def get_object_by_codice(cls, codice: str) -> Optional[Self]:
+        return cls.__all_objects_by_codice.get(codice)
+
+    @classmethod
+    def all_objects_by_codice(cls) -> list[Self]:
+        return list(cls.__all_objects_by_codice.values())
+
+    @classmethod
+    def create(cls, codice: str, nome: str, ore: IntGZ) -> Self:
+        if codice in cls.__all_objects_by_codice:
+            raise KeyError(f"Esiste già un modulo con il codice '{codice}'")
+        return cls(codice, nome, ore)
+
+    @classmethod
+    def create_from_dict(cls, codice: str, data: dict) -> Self:
+        if codice in cls.__all_objects_by_codice:
+            obj = cls.__all_objects_by_codice[codice]
+        else:
+            obj = cls(codice, data["nome"], IntGZ(data["ore"]))
+        
+        # Ripristiniamo l'associazione con i docenti partendo dai loro Codici Fiscali
+        if "docenti" in data:
+            for cf_str in data["docenti"]:
+                docente_obj = Docente.get_object_by_cf(CodiceFiscale(cf_str))
+                if docente_obj:
+                    obj.add_docente(docente_obj)
+                    
+        return obj
+
+    def __init__(self, codice: str, nome: str, ore: IntGZ):
+        self.__codice = codice
+        self.__nome = nome
+        self.__ore = ore
+
+        # Dizionario specifico di docenti per ogni modulo (Chiave: CF, Valore: Docente)
+        self.__docenti_by_modulo: dict[CodiceFiscale, Docente] = {}
+
+        # Registrazione nei dizionari di classe
+        type(self)._objects_by_name[self.__nome] = self 
+        type(self).__all_objects_by_codice[self.__codice] = self
+
+    def get_codice(self) -> str:
+        return self.__codice
+
+    def get_nome(self) -> str:
+        return self.__nome
+
+    def get_ore(self) -> IntGZ:
+        return self.__ore
+
+    """=== Gestione docenti ==="""
+    def add_docenti(self, docenti: set[Docente]) -> None:
+        for docente in docenti:
+            self.__docenti_by_modulo[docente.get_codice_fiscale()] = docente
+            
+    def add_docente(self, docente: Docente) -> None:
+        self.__docenti_by_modulo[docente.get_codice_fiscale()] = docente
+
+    def get_docenti(self) -> set[Docente]:
+        return set(self.__docenti_by_modulo.values())
+
+    def __str__(self) -> str:
+        base_str = f"[{self.__codice}] {self.get_nome()} | durata {self.get_ore()} ore"
+        docenti = self.get_docenti()
+        
+        if not docenti:
+            base_str += " | NESSUN DOCENTE ASSOCIATO"
+        else:
+            base_str += " | con docenti:\n"
+            for docente in docenti:
+                base_str += f"\t- {docente.get_nome()} {docente.get_cognome()} ({docente.get_codice_fiscale()})"
+        return base_str
+
+    def to_json(self) -> tuple[str, dict]:
+        return (
+            str(self.get_codice()),
+            {
+                "codice": self.get_codice(),
+                "nome": self.get_nome(),
+                "ore": self.get_ore(),
+                "docenti": [str(cf) for cf in self.__docenti_by_modulo.keys()]
+            },
+        )
+
+
+class CorsoITS(ClassUtilsUUID, ClassUtilsNomi):
+    __objects_by_keys: dict[tuple[str, IntGEZ], Self] = {}
+
+    @classmethod
+    def get_corsi(cls) -> dict[tuple[str, IntGEZ], Self]:
+        """Restituisce il dizionario di tutti i corsi indicizzati per (nome, edizione)."""
+        return cls.__objects_by_keys
+
+    @classmethod
+    def create(cls, nome: str, edizione: IntGEZ) -> Self:
+        # Controllo di integrità sulla coppia univoca
+        chiave = (nome, edizione)
+        if chiave in cls.__objects_by_keys:
+            raise KeyError(
+                f"Esiste già un corso con il nome '{nome}' e edizione '{edizione}'."
+            )
+        nuovo_id = uuid4()
+        return cls(nome, edizione, nuovo_id)
+
+    @classmethod
+    def create_from_dict(cls, _id: UUID, data: dict) -> Self:
+        nome = data["nome"]
+        edizione = IntGEZ(data["edizione"])
+
+        chiave = (nome, edizione)
+        if chiave in cls.__objects_by_keys:
+            return cls.__objects_by_keys[chiave]
+
+        # Ricostruiamo il set di moduli associati partendo dai codici salvati nel JSON
+        moduli_associati = set()
+        if "moduli" in data:
+            for codice_modulo in data["moduli"]:
+                modulo_obj = Modulo.get_object_by_codice(codice_modulo)
+                if modulo_obj:
+                    moduli_associati.add(modulo_obj)
+
+        return cls(nome, edizione, _id, moduli_associati)
+
+    def __init__(
+        self,
+        name: str,
+        edition: IntGEZ,
+        _id: UUID,
+        modules: Optional[set[Modulo]] = None,
+    ):
+        self.__name = name
+        self.__edition = edition
+        self.__id = _id
+        # Se non vengono passati moduli, inizializziamo un set vuoto
+        self.__modules = modules if modules is not None else set()
+
+        # Popolamento dei registri di classe e delle superclassi utili
+        type(self)._objects_by_uuid[self.__id] = self
+        type(self)._objects_by_name[self.__name] = self
+        type(self).__objects_by_keys[(self.__name, self.__edition)] = self
+
     def get_id(self) -> UUID:
         return self.__id
 
+    def get_nome(self) -> str:
+        return self.__name
+
+    def get_edizione(self) -> IntGEZ:
+        return self.__edition
+
+    def get_moduli(self) -> set[Modulo]:
+        return self.__modules
+
+    def get_num_moduli(self) -> int:
+        return len(self.__modules)
+
+    def add_modulo(self, modulo: Modulo) -> None:
+        self.__modules.add(modulo)
+
+    def __str__(self) -> str:
+        return f"Corso: {self.get_nome()} [Edizione: {self.get_edizione()}] - Moduli totali: {self.get_num_moduli()}"
+
     def to_json(self) -> tuple[str, dict]:
-        return (str(self.get_nome()), {"nome": self.get_nome()})
+        return (
+            str(self.get_id()),
+            {
+                "nome": self.get_nome(),
+                "edizione": self.get_edizione(),
+                "moduli": [m.get_codice() for m in self.get_moduli()],
+            },
+        )
+
+
+    # TODO: completa funzione
+    """ 
+    def numero_medio_esami_per_modulo(self):
+        # da implementare get_voto()
+        voti = [mod.get_voto() for mod in self.get_moduli()]
+        somma_voti = sum(voti)
+        return somma_voti / self.get_num_moduli() 
+    """
 
 
 class Persona(ABC, ClassUtilsNomi, ClassUtilsCF):
@@ -274,8 +459,10 @@ class Persona(ABC, ClassUtilsNomi, ClassUtilsCF):
         self.__citta_nascita = citta_nascita
 
         # Tutti gli oggetti delle sottoclassi verranno inserite qui automaticamente
-        # se viene richiamato questo inizializzatore
         type(self)._objects_by_cf[self.__cf] = self
+        
+        # Avendo ereditato da ClassUtilsNomi, registriamo l'oggetto anche per nome completo
+        type(self)._objects_by_name[f"{self.__nome} {self.__cognome}"] = self
 
     def get_nome(self) -> str:
         return self.__nome
@@ -290,7 +477,7 @@ class Persona(ABC, ClassUtilsNomi, ClassUtilsCF):
         return self.__citta_nascita
 
     def __str__(self) -> str:
-        return f"{self.get_nome()}, {self.get_cognome()}"
+        return f"{self.get_cognome()}, {self.get_nome()}"
 
 
 class Docente(Persona):
@@ -312,11 +499,13 @@ class Docente(Persona):
         cf: CodiceFiscale,
         data: dict,
     ) -> Self:
+        if cf in cls._objects_by_cf:
+          return cls._objects_by_cf[cf]
         citta_uuid = UUID(data["citta_nascita"])
         citta = Citta.get_object_by_uuid(citta_uuid)
         if not citta:
             raise KeyError(f"La città di nascita con UUID '{citta_uuid}' non esiste")
-        return cls(data["nome"], data["cognome"], cf, citta)
+        return cls(nome=data["nome"], cognome=data["cognome"], cf=cf, citta_nascita=citta)
 
     def __init__(
         self,
@@ -327,12 +516,8 @@ class Docente(Persona):
     ):
         super().__init__(nome, cognome, cf, citta_nascita)
 
-    def get_moduli(self) -> set[Modulo]: ...
-
-    def add_modulo(self, modulo: Modulo): ...
-
     def __str__(self) -> str:
-        return f"{self.get_nome()}, {self.get_cognome()} | CF: {self.get_codice_fiscale()} | nato a {self.get_citta_nascita()}"
+        return f"{self.get_cognome()}, {self.get_nome()} | CF: {self.get_codice_fiscale()} | nato a {self.get_citta_nascita()}"
 
     def to_json(self) -> tuple[str, dict]:
         return (
@@ -347,7 +532,6 @@ class Docente(Persona):
 
 
 class Studente(Persona):
-    __esami_superati: set = set()
     __all_objects_by_matricole: dict[str, Self] = dict()
 
     @classmethod
@@ -372,20 +556,27 @@ class Studente(Persona):
         cf: CodiceFiscale,
         data: dict,
     ) -> Self:
+        if cf in cls._objects_by_cf:
+            return cls._objects_by_cf[cf]
         citta_uuid = UUID(data["citta_nascita"])
         citta = Citta.get_object_by_uuid(citta_uuid)
         if not citta:
             raise KeyError(f"La città di nascita con UUID '{citta_uuid}' non esiste")
         data_nascita_dt = datetime.fromisoformat(data["data_nascita"])
         return cls(
-            data["nome"], data["cognome"], cf, citta, data["matricola"], data_nascita_dt
+            nome=data["nome"], 
+            cognome=data["cognome"], 
+            cf=cf, 
+            citta_nascita=citta, 
+            matricola=data["matricola"], 
+            data_nascita=data_nascita_dt
         )
 
     """
     @classmethod
     def search_for_matricola(cls, matricola: str) -> set[Self]:
       return {(_id, st) for st in cls.__all_objects_by_matricole if st.get_matricola() == matricola}
-      """
+    """
 
     def __init__(
         self,
@@ -399,146 +590,11 @@ class Studente(Persona):
         super().__init__(nome, cognome, cf, citta_nascita)
         self.__matricola = matricola
         self.__data_nascita = data_nascita
-        self.__esami_superati = set()  # Inizializziamo un set vuoto di esami
+        self.__esami_superati: set = set()  # Inizializziamo un set vuoto di esami
         type(self).__all_objects_by_matricole[self.__matricola] = self
 
+    """=== Gestione esami e voti ==="""
     # TODO: Implementare
-    def get_moduli_voto_piu_alto(self) -> set[Modulo]:
-        return set()
-
-    def get_matricola(self) -> str:
-        return self.__matricola
-
-    def get_data_nascita(self) -> datetime:
-        return self.__data_nascita
-
-    def get_esame(self, modulo: Modulo) -> Voto: ...
-
-    def add_esame(self, modulo: Modulo, voto: Voto): ...
-
-    def get_corso(self) -> CorsoITS: ...
-
-    def __str__(self) -> str:
-        return f"[{self.get_matricola()}] | {self.get_nome()}, {self.get_cognome()} | CF: {self.get_codice_fiscale()} | nato a {self.get_citta_nascita()} il {self.get_data_nascita()}"
-
-    def to_json(self) -> tuple[str, dict]:
-        return (
-            str(self.get_codice_fiscale()),
-            {
-                "nome": self.get_nome(),
-                "cognome": self.get_cognome(),
-                "codice_fiscale": str(self.get_codice_fiscale()),
-                "citta_nascita": str(self.get_citta_nascita().get_id()),
-                "matricola": str(self.get_matricola()),
-                "data_nascita": self.get_data_nascita().isoformat(),
-            },
-        )
-
-
-class Modulo(ClassUtilsNomi):
-    __docenti_by_modulo: dict[str, Docente] = {}
-    __all_objects_by_codice: dict[str, Self] = {}
-
-    """ @classmethod
-    def get_all_objects_by_codice(cls) -> set[Self]:
-      return { cls.__all_objects_by_codice}
-    """
-
-    @classmethod
-    def create(cls, codice, nome, ore) -> Self:
-        if codice in cls.__all_objects_by_codice:
-            raise KeyError(f"Esiste già un modulo con questo codice '{codice}'")
-        return cls(codice, nome, ore)
-
-    @classmethod
-    def create_from_dict(cls, codice, data) -> Self:
-        if codice in cls.__all_objects_by_codice:
-            raise KeyError(f"Esiste già un modulo con questo codice '{codice}'")
-        return cls(codice, data["nome"], data["ore"])
-
-    def __init__(self, codice: str, nome: str, ore: IntGZ):
-        self.__codice = codice
-        self.__nome = nome
-        self.__ore = ore
-
-        type(self)._objects_by_name[self.__codice] = self
-
-    def get_codice(self) -> str:
-        return self.__codice
-
-    def get_nome(self) -> str:
-        return self.__nome
-
-    def get_ore(self) -> IntGZ:
-        return self.__ore
-
-    def add_docenti(self, docenti: set[Docente]):
-        for cf in docenti:
-            self.__docenti_by_modulo[cf.get_codice_fiscale()] = cf
-
-    """
-    def numero_esami(self) -> IntGEZ:
-      return len(self.__esami_superati)
-    """
-
-    def get_docenti(self) -> set[Docente]:
-        docenti = set()
-        for docente in self.get_docenti():
-            docenti.add(docente)
-        return docenti
-
-    def __str__(self) -> str:
-        base_str = f"{self.get_nome()} | durata {str(self.get_ore())}"
-        if not self.get_docenti():
-            base_str += " | NESSUN DOCENTE ASSOCIATO\n"
-        else:
-            base_str += " | con docenti:\n"
-            for docente in self.get_docenti():
-                base_str += f"\t- {docente}"
-
-        return base_str
-
-    def to_json(self) -> tuple[str, dict]:
-        return (
-            str(self.get_codice()),
-            {
-                "codice": self.get_codice(),
-                "nome": self.get_nome(),
-                "ore": self.get_ore(),
-            },
-        )
-
-
-class CorsoITS(ClassUtilsUUID, ClassUtilsNomi):
-    __objects_by_keys: dict[tuple[str, IntGZ], Self]
-    __modules_by_name: dict[str, set[Modulo]]
-
-    """
-    @classmethod
-    def create(cls, nome, edizione) -> Self:
-      for (nome, edizione) in { k: v for corso in cls.get_corsi()}:
-        if nome == k and edizione == v:
-          raise KeyError(f"Esiste già un corso con il nome '{nome}' e edizione '{edizione}'.")
-      return cls(nome, edizione)
-    """
-
-    @classmethod
-    def get_corsi(cls) -> dict[tuple[str, IntGZ], Self]:
-        return cls.__objects_by_keys
-
-    def __init__(
-        self, name: str, edition: IntGEZ, _id: UUID, modules: Optional[set[Modulo]]
-    ):
-        self.__name = name
-        self.__edition = edition
-        self.__id = id
-        self.__name = name
-        self.__modules = modules
-
-        # type(self)._objects_by_uuid[self.__id] = self
-
-    def numero_medio_esami(): ...
-
     """
     def moduli_con_voto_piu_alto() -> set[Modulo]:
        algoritmo:
@@ -561,4 +617,32 @@ class CorsoITS(ClassUtilsUUID, ClassUtilsNomi):
 
                    return result
 
-    """
+      """
+
+    def get_matricola(self) -> str:
+        return self.__matricola
+
+    def get_data_nascita(self) -> datetime:
+        return self.__data_nascita
+
+    def get_esame(self, modulo: Modulo) -> Voto: ...
+
+    def add_esame(self, modulo: Modulo, voto: Voto): ...
+
+    def get_corso(self) -> CorsoITS: ...
+
+    def __str__(self) -> str:
+        return f"[{self.get_matricola()}] | {self.get_cognome()}, {self.get_nome()} | CF: {self.get_codice_fiscale()} | nato a {self.get_citta_nascita()} il {self.get_data_nascita()}"
+
+    def to_json(self) -> tuple[str, dict]:
+        return (
+            str(self.get_codice_fiscale()),
+            {
+                "nome": self.get_nome(),
+                "cognome": self.get_cognome(),
+                "codice_fiscale": str(self.get_codice_fiscale()),
+                "citta_nascita": str(self.get_citta_nascita().get_id()),
+                "matricola": str(self.get_matricola()),
+                "data_nascita": self.get_data_nascita().isoformat(),
+            },
+        )

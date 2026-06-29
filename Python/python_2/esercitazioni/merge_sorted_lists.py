@@ -47,13 +47,19 @@ def get_list():
 
   while True:
     # Acquisizione altri numeri per confronti
-    num = int(input("Inserire un numero: ").strip())
+    num = input("Inserire un numero: ").strip()
 
+    if not num: 
+      print("\n=== Terminazione lista ===\n")
+      break
+
+    num = int(num)
     if num >= prev:
       lists.append(num)
       prev = num
 
     else:
+      print("\n=== Terminazione lista ===\n")
       break
 
   return lists
@@ -87,15 +93,13 @@ def merge_sorted_lists(list1: list[int], list2: list[int]) -> list[int]:
 
   # Se non esistono elementi in una delle due liste,
   # caricare gli ultimi elementi già ordinati della lista rimanente
-  if i < len(list1):
-    while i < len(list1):
-      result.append(list1[i])
-      i += 1
+  while i < len(list1):
+    result.append(list1[i])
+    i += 1
 
-  if j < len(list2):
-    while j < len(list2):
-      result.append(list2[j])
-      j += 1
+  while j < len(list2):
+    result.append(list2[j])
+    j += 1
 
   return result
 

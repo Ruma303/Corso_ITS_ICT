@@ -22,7 +22,10 @@ def sum_digits(num):
 
   dig_sum = 0
 
-  for i, digit in enumerate(num):
+  # con enumerate possiamo prendere posizione (che non ci interessa)
+  # e il valore effettivo di ogni cifra
+  for _, digit in enumerate(num):
+    print(digit)
     dig_sum += int(digit)
 
   return dig_sum
@@ -30,4 +33,5 @@ def sum_digits(num):
 
 if __name__ == "__main__":
   num = input("Scrivi un numero con più cifre non negativo: ").strip()
-  print(sum_digits(num))
+  if sum_digits(num):
+    print(sum_digits(num))

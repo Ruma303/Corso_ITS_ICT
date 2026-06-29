@@ -28,11 +28,13 @@ def get_strings():
   while True:
     string = input("Digita una stringa o premi invio per interrompere: ")
 
-    if string == "":
+    if not string:
       break
     l.append(string)
 
   s = input("Scrivi la stringa di ricerca: ")
+  if not s:
+    raise ValueError("La stringa di ricerca non può essere vuota")
 
   return l, s
 
