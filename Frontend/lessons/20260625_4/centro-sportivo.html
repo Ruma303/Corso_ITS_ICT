@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="style.css">
+  <title>SportBook Milano - Dashboard Centro Sportivo</title>
+</head>
+<body>
+  <header id="top">
+    <div class="logo">🏆 SportBook Milano</div>
+    <nav aria-label="Navigazione principale">
+      <ul>
+        <li><a href="#campi">I nostri campi</a></li>
+        <li><a href="#eventi">Prossimi eventi</a></li>
+        <li><a href="#prenota">Prenota</a></li>
+        <li><a href="#info">Orari e contatti</a></li>
+      </ul>
+      <button class="btn-accedi">Accedi</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="intro">
+      <h2>Prenota il tuo campo in 30 secondi</h2>
+      <p>Calcio, Padel, Tennis. Scegli il tuo sport, l'orario, e il <strong>gioco è fatto</strong>.</p>
+    </section>
+
+    <section id="campi">
+      <h2>I nostri campi</h2>
+      <div class="griglia-campi">
+      <article class="card">
+        <span class="badge">Badge</span>
+        <h3>Calcio</h3>
+        <p>Campo a 11 in erba sintetica, ideale per partite amatoriali e tornei aziendali.</p>
+        <button class="btn-prenota">Prenota</button>
+      </article>
+      <article class="card">
+        <span class="badge">Badge</span>
+        <h3>Padel</h3>
+        <p>4 campi coperti, 2vs2. Perfetti per partite rapide anche in inverno.</p>
+        <button class="btn-prenota">Prenota</button>
+      </article>
+      <article class="card">
+        <span class="badge">Badge</span>
+        <h3>Tennis</h3>
+        <p>2 campi in terra rossa e 1 in cemento. Lezioni con maestro disponibili.</p>
+        <button class="btn-prenota">Prenota</button>
+      </article>
+      </div>
+    </section>
+
+    <section id="eventi">
+      <h2>Prossimi eventi</h2>
+
+      <article>
+        <h3>Torneo di Padel estivo</h3>
+        <p>Data: <time datetime="2026-07-15">15 luglio 2026</time></p>
+        <p>Torneo amatoriale a coppie, iscrizione €20 a persona. Premi per i primi 3 classificati.</p>
+        <blockquote>
+          <p>"Un evento che unisce agonismo e divertimento, aperto a tutti i livelli."</p>
+          <cite>— Marco Bianchi, organizzatore</cite>
+        </blockquote>
+      </article>
+
+      <article>
+        <h3>Open Day Tennis</h3>
+        <p>Data: <time datetime="2026-06-22">22 giugno 2026</time></p>
+        <p>Lezione gratuita aperta a tutti con i nostri maestri. Porta la tua racchetta!</p>
+      </article>
+
+      <article>
+        <h3>Notturna di Calcio a 7</h3>
+        <p>Data: <time datetime="2026-08-05">5 agosto 2026</time></p>
+        <p>Torneo serale sotto le stelle. Iscrizioni a squadre, max 8 squadre.</p>
+      </article>
+    </section>
+
+    <section id="prenota">
+      <h2>Nuova Prenotazione</h2>
+      <form action="/prenotazioni" method="post" class="form-stilizzato">
+        <p>
+          <div class="container-label">
+            <label for="nome">Nome e cognome:</label>
+            <span class="required">*</span>
+          </div>
+          <br>
+          <input type="text" id="nome" name="nome" minlength="2" required>
+        </p>
+        <p>
+          <div class="container-label">
+            <label for="email">Email:</label>
+            <span class="required">*</span>
+          </div>
+          <br>
+          <input type="email" id="email" name="email" required>
+        </p>
+        <p>
+          <div class="container-label">
+            <label for="campo">Campo:</label>
+            <span class="required">*</span>
+          </div>
+          <br>
+          <select id="campo" name="campo" required>
+            <option value="" disabled selected>-- seleziona --</option>
+            <option value="calcio">Calcio</option>
+            <option value="padel">Padel</option>
+            <option value="tennis">Tennis</option>
+          </select>
+        </p>
+        <p>
+          <div class="container-label">
+            <label for="data">Data:</label>
+            <span class="required">*</span>
+          </div>
+          <br>
+          <input type="date" id="data" name="data" min="2026-06-09" required>
+        </p>
+        <p>
+          <div class="container-label">
+          <label for="ora">Ora:</label>
+          <span class="required">*</span>
+          </div>
+
+          <br>
+
+          <input type="time" id="ora" name="ora" required>
+        </p>
+        <p>
+          <input type="checkbox" id="gdpr" name="gdpr" required>
+
+          <div class="container-label">
+          <label for="gdpr">Acconsento al trattamento dei dati personali (GDPR)</label>
+          <span class="required">*</span>
+          </div>
+        </p>
+        <button class="btn-submit" type="submit">Prenota</button>
+      </form>
+    </section>
+
+    <section id="info">
+      <h2>Orari e contatti</h2>
+
+      <h3>Indirizzo</h3>
+      <address>
+        SportBook Milano<br>
+        Via Roma 1, 20100 Milano (MI)
+      </address>
+
+      <h3>Orari di apertura</h3>
+      <p>Lun-Ven: dalle <time datetime="09:00">09:00</time> alle <time datetime="23:00">23:00</time></p>
+      <p>Sab-Dom: dalle <time datetime="09:00">09:00</time> alle <time datetime="20:00">20:00</time></p>
+
+      <h3>Contatti</h3>
+      <p>Email: <a href="mailto:info@sportbook.it">info@sportbook.it</a></p>
+      <p>Tel: <a href="tel:+390123456789">+39 0123 456 789</a></p>
+    </section>
+  </main>
+
+  <footer>
+    <p><small>© 2026 SportBook Milano</small></p>
+
+    <nav aria-label="Social">
+      <ul>
+        <li><a href="https://facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+        <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+        <li><a href="https://twitter.com" target="_blank" rel="noopener noreferrer">Twitter</a></li>
+      </ul>
+    </nav>
+
+    <p><a href="#top" aria-label="Torna in cima alla pagina">↑ Torna su</a></p>
+  </footer>
+</body>
+</html>

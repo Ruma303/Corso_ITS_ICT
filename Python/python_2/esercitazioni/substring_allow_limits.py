@@ -38,7 +38,8 @@ max_occurrences = {
   'i': 0,
   'o': 2
 }
-
+# Versione 1
+"""
 def substring_allow_limits(string: str, max_occurrences: dict[str, int]) -> str:
     best_result: str = ""
 
@@ -74,15 +75,61 @@ def substring_allow_limits(string: str, max_occurrences: dict[str, int]) -> str:
             best_result = current_result
 
     return best_result
+"""
+# Versione 2
 
+def sottostr_piu_lunga(start, string, max_occurrences) -> str:
+  # invariante: assumiamo che max_occurrences è legale, in quanto è verificato nella funzione chiamante
+  result = ""
+  temp_dict = max_occurrences.copy()
+
+  for end in range(start, len(string)):
+    # se il carattere si trova nel dizionario
+    curr_char = string[end]
+    if string[end] in temp_dict:
+      if temp_dict[curr_char] == 0:
+        break # sono finiti i caratteri. esci
+      else:
+        temp_dict[curr_char] -= 1 # decrementa il contatore dell'occorrenza del carattere
+    result += curr_char
+
+
+    # la sottostringa che va da start a end è la più lunga trovata
+
+  return result
+
+def substring_allow_limits(string: str, max_occurrences: dict[str, int]) -> str:
+  result = ""
+
+  # Verifica che max_occurrences è legale
+  for _, v in max_occurrences.items():
+      assert 0 >= v <= 10, "Non è possibile inserire un numero di occorrenze fuori dall'intervallo 0 e 10"
+
+
+  # cambiamo sempre il punto di partenza fino a str -1
+
+  # invariante: la sottostringa è la più lunga (vero sempre)
+  for start in range(len(string)):
+    # cerca la str legale più lunga che parte da start
+    # questo è un contratto, una promessa. Qui ha senso
+    # creare una funzione che ritorni quella promessa
+    curr_sottostr = sottostr_piu_lunga(start, string, max_occurrences)
+
+    # verificare se sottostr >  o curr_sottostr = None
+    # riassegnare la nuova sottostr
+    if curr_sottostr is None or len(curr_sottostr) > len(result):
+      result = curr_sottostr
+
+  # invariante: result è la sottostringa più lunga
+  return result
 
 def main() -> int:
+  test_string_1 = "parallelepipedo"
   test_dict_1 = {
     'l' : 2,
     'p': 2,
     'e': 3
   }
-  test_string_1 = "parallelepipedo"
   test_substring_1 = substring_allow_limits(test_string_1, test_dict_1)
   print(test_substring_1)
 
