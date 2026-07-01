@@ -11,31 +11,47 @@ def normalize(string: str) -> str:
     result = ""
     if not string:
         raise ValueError("La stringa di confronto non può essere vuota")
-
     result = "".join(char for char in string if "A" <= char <= "Z")
-    print(result)
     return result
 
 
 def find_longest_substring(string: str) -> str:
-  string = normalize(string)
+  # Invariante: la stringa è normalizzata e contiene solo caratteri alfa
+  norm_string = normalize(string)
+  print(norm_string)
+
   # Calcolare la sottostringa da analizzare
   i = 0
-  j = len(string) -1
+  j = len(norm_string) -1
   substr = ""
   curr_substr = ""
 
+  # FIXME: la sotto_stringa qui non viene modificata
   while i < j:
-    check_substr = check_palindrome(string, i, j)
-    if check_substr:
-      curr_substr += string[i]
-      curr_substr += string[j]
-    else:
-      curr_substr = ""
+    palyndrome_substr = is_char_palyndrome(norm_string, i, j)
+    print(palyndrome_substr, norm_string, norm_string[i], norm_string[j])
+    if palyndrome_substr:
+      # Se i due caratteri sono palindromi, creo la stringa a partire
+      # dai lati opposti (posizione i-esima e j-esima)
+      curr_substr += norm_string[i]
+      curr_substr += norm_string[j]
+     
+      # decrementare l'indice J
+      j -= 1
 
-    print(f"Substr: ", (string, i, j), (curr_substr, string[i], string[j]), "Palindroma" if check_substr else "Non palindroma")
-    i += 1
-    j -= 1
+      # TODO: controllare fin quando tutti i caratteri sono uguali
+      # Avanzando gli indici sia da sx che da dx
+      curr_i = i # Non so se serve un indice temporaneo per la sottostringa
+      # che avanzi fin quando i caratteri sono uguali.
+
+      
+    else:
+      # Altrimenti, reset
+      curr_substr = ""
+      # Partire dal prossimo indice i
+      i += 1
+      
+    print(f"\nSubstr: ", (norm_string, i, j), "Palindroma" if palyndrome_substr else "Non palindroma")
 
     if len(curr_substr) > len(substr):
       substr = curr_substr
@@ -43,22 +59,14 @@ def find_longest_substring(string: str) -> str:
   return substr
 
 
-def check_palindrome(string: str, start, end) -> bool:
+def is_char_palyndrome(string: str, start, end) -> bool:
     # invariante la stringa in esame è normalizzata e ha solo caratteri validi
+    # Verifico esclusivamente se i singoli caratteri sono uguali
+    print(f"\ndentro while in is_char_palyndrome {string[start] = }, {string[end] = }")
+    if string[start] == string[end]:
+      return True
 
-    i = start  # indice che parte all'inizio della stringa (Sinistra)
-    j = end  # indice dalla fine della stringa (Destra)
-
-    # Ci fermiamo quando gli indici si incontrano
-    # invariante: i sarà sempre minore di j
-    while i < j:
-        if string[i] != string[j]:
-          return False
-
-        i += 1
-        j -= 1
-
-    return True
+    return False
 
 
 def main() -> int:
@@ -67,9 +75,9 @@ def main() -> int:
     test1_check = find_longest_substring(normalize(test1))
 
     if test1_check:
-        print(f"La sottostringa più lunga è '{test1}'.")
+        print(f"\nLa sottostringa più lunga è '{test1}'.")
     else:
-        print(f"La frase'{test1}' NON è palindroma.")
+        print(f"\nLa frase'{test1}' NON è palindroma.")
 
     return 0
 
