@@ -15,7 +15,7 @@ def normalize(string: str) -> str:
     return result
 
 
-def is_char_palyndrome(string: str, start, end) -> bool:
+def is_char_palindrome(string: str, start, end) -> bool:
     # invariante la stringa in esame è normalizzata e ha solo caratteri validi
     # Verifico esclusivamente se i singoli caratteri sono uguali
     if string[start] == string[end]:
@@ -41,7 +41,7 @@ def get_all_substring(string: str) -> set[str]:
     curr_substr = norm_string[char_pos]
 
 
-    while i >= 0 and j < len(norm_string) and is_char_palyndrome(norm_string, i, j):
+    while i >= 0 and j < len(norm_string) and is_char_palindrome(norm_string, i, j):
 
         # Per aggiungere il carattere precedente, ricreare la stringa. 1) Partiamo dal primo carattere palindromo, 2) la sottostringa corrente più lunga, 3) l'ultimo carattere più lungo trovato
         curr_substr = norm_string[i] + curr_substr + norm_string[j]
@@ -59,7 +59,7 @@ def get_all_substring(string: str) -> set[str]:
     j = char_pos + 1
     curr_substr = ""
 
-    while i >= 0 and j < len(norm_string) and is_char_palyndrome(norm_string, i, j):
+    while i >= 0 and j < len(norm_string) and is_char_palindrome(norm_string, i, j):
         curr_substr = norm_string[i] + curr_substr + norm_string[j]
         i -= 1
         j += 1

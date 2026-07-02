@@ -23,66 +23,66 @@ def get_strings():
   Legge una lista di stringhe da input e una stringa di ricerca.
   Restituisce la lista e la stringa.
   """
-  l = []
+  result = []
 
   while True:
     string = input("Digita una stringa o premi invio per interrompere: ")
 
     if not string:
       break
-    l.append(string)
+    result.append(string)
 
   s = input("Scrivi la stringa di ricerca: ")
   if not s:
     raise ValueError("La stringa di ricerca non può essere vuota")
 
-  return l, s
+  return result, s
 
 
-def find_in_list(l, s, case_insensitive=False, remove_whitespaces=True):
+def find_in_list(lista, s, case_insensitive=False, remove_whitespaces=True):
   """
   Cerca la stringa s come elemento nella lista l.
   Stampa la posizione se presente; altrimenti segnala che non occorre.
   """
 
-  if len(l) <= 0:
+  if len(lista) <= 0:
     raise IndexError("La lista non può essere vuota!")
 
   # Condizioni progressive per flessibilità
   def normalize(val):
     res = val
-    if remove_whitespaces == True:
+    if remove_whitespaces:
       res = res.strip()
 
-    if case_insensitive == True:
+    if case_insensitive:
       res = res.lower()
     return res
 
   # Pre-elabora la stringa da cercare una volta sola
   s_norm = normalize(s)
 
-  for i in range(len(l)):
-      el_norm = normalize(l[i])
+  for i in range(len(lista)):
+      el_norm = normalize(lista[i])
       # Confronto con le stringhe normalizzate nella lista
       if el_norm == s_norm:
-          return f"La stringa {s} occorre in {l} alla posizione {i}"
+          return f"La stringa {s} occorre in {lista} alla posizione {i}"
 
-  return f"La stringa {s} non occorre in {l}"
+  return f"La stringa {s} non occorre in {lista}"
 
 
 if __name__ == "__main__":
-  l, s = get_strings()
+  lista, s = get_strings()
 
   # Ricerca base
-  match1 = find_in_list(l, s)
+  match1 = find_in_list(lista, s)
   print(match1)
 
   # Ricerca case-insensitive e senza spazi
-  match2 = find_in_list(l, s, case_insensitive=True, remove_whitespaces=True)
+  match2 = find_in_list(lista, s, case_insensitive=True, remove_whitespaces=True)
   print(match2)
 
   # Ricerca case-sensitive e con spazi ammessi
-  match3 = find_in_list(l, s, case_insensitive=False, remove_whitespaces=False)
+  match3 = find_in_list(lista, s, case_insensitive=False, remove_whitespaces=False)
   print(match3)
 
 """
