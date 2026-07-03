@@ -24,7 +24,7 @@ def is_char_palindrome(string: str, start, end) -> bool:
     return False
 
 
-def get_all_substring(string: str) -> set[str]:
+def get_all_palindrome_substring(string: str) -> set[str]:
   # Invariante: la stringa è normalizzata e contiene solo caratteri alfa
   norm_string = normalize(string)
 
@@ -35,16 +35,22 @@ def get_all_substring(string: str) -> set[str]:
   # verso all'esterno, verificando la palindromicità dei caratteri.
   for char_pos in range(len(norm_string)):
 
+    # INFO: i due cicli vengono effettuati sempre.
+    # Per ogni posizione della stringa vengono fatti due tentativi:
+    # - cercare un palindromo dispari
+    # - cercare un palindromo pari
+    # Quindi, cambia solo la definizione di 'centro'
+
     # CASO 1: Palindromi di lunghezza DISPARI (es. "ABA", centro su norm_string[char_pos])
     i = char_pos - 1
     j = char_pos + 1
-    curr_substr = norm_string[char_pos]
-
+    curr_substr = norm_string[char_pos] # Partiamo dal singolo carattere centrale.
 
     while i >= 0 and j < len(norm_string) and is_char_palindrome(norm_string, i, j):
 
         # Per aggiungere il carattere precedente, ricreare la stringa. 1) Partiamo dal primo carattere palindromo, 2) la sottostringa corrente più lunga, 3) l'ultimo carattere più lungo trovato
         curr_substr = norm_string[i] + curr_substr + norm_string[j]
+        
         # muovere gli indici verso l'esterno
         i -= 1
         j += 1
@@ -57,7 +63,8 @@ def get_all_substring(string: str) -> set[str]:
     # CASO 2: Palindromi di lunghezza PARI (es. "ABBA", centro tra char_pos e char_pos+1)
     i = char_pos
     j = char_pos + 1
-    curr_substr = ""
+    curr_substr = "" # Non vi è un centro. Verranno confrontati e forse aggiunti i caratteri 
+    # verificando le loro posizioni i e j.
 
     while i >= 0 and j < len(norm_string) and is_char_palindrome(norm_string, i, j):
         curr_substr = norm_string[i] + curr_substr + norm_string[j]
@@ -67,6 +74,7 @@ def get_all_substring(string: str) -> set[str]:
     # Salvataggio solo se la sottostringa ha almeno 2 caratteri
     if len(curr_substr) >= 2:
         set_longest_substr.add(curr_substr)
+        
   return set_longest_substr
 
 
@@ -78,10 +86,10 @@ def find_longest_substrings(set_substrs: set[str]) -> set[str]:
     for string in set_substrs:
         if len(string) > max_len:
             max_len = len(string)
-
-    # Estrae tutte le sottostringhe che hanno quella lunghezza massima
-    for string in set_substrs:
-        if len(string) == max_len:
+            # Resetta il set delle sottostringhe più lunghe
+            longest_set = { string }
+        elif len(string) == max_len:
+            # Aggiunge la sottostringa al set
             longest_set.add(string)
 
     return longest_set
@@ -89,16 +97,17 @@ def find_longest_substrings(set_substrs: set[str]) -> set[str]:
 
 def main() -> int:
     # test1 = "Ed Irene se ne ride.".strip()
-    test1 = "Ed Irene se ne"
-    test1_set = get_all_substring(test1)
-    test1_longest_substr = find_longest_substrings(test1_set)
+    tests = {"Ed Irene se ne ride.", "Ed Irene se ne", "banANA", "rAdaRAd"}
 
-    if test1_longest_substr:
-        print(f"\nL'insieme delle sottostringhe più lunghe di '{test1}' sono : ", [s for s in test1_set])
-    else:
-        print(f"\nLa frase '{test1_longest_substr}' NON è palindroma.")
+    for test in tests:
 
-    test2 = "banANA"
+      test_set = get_all_palindrome_substring(test)
+      test_longest_substr = find_longest_substrings(test_set)
+  
+      if test_longest_substr:
+          print(f"\nL'insieme delle sottostringhe più lunghe di '{test}' sono : ", {s for s in test_longest_substr})
+      else:
+          print(f"\nLa frase '{test_longest_substr}' NON è palindroma.")
 
     return 0
 

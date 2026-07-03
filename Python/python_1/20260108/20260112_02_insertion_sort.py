@@ -5,7 +5,8 @@ Versione iterativa
 
 array1 = [8, 4, 34, 6, 86, 4, 0]
 
-for i in range(1, len(array1)):  # Si parte dall'indice 1 (secondo elemento)
+# Si parte dall'indice 1 (secondo elemento)
+for i in range(1, len(array1)): 
     value = array1[i]
     j = i - 1
     while j >= 0 and array1[j] > value:

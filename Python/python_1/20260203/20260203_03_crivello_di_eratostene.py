@@ -1,5 +1,5 @@
 """
-Il crivello di Eratostene è un antico ed efficiente algoritmo greco (circa 200 a.C.) per trovare tutti i numeri primi fino a un numero prefissato n. Funziona "setacciando" i numeri: si elencano i numeri da 2 a n, si elimina il 2 e tutti i suoi multipli, poi il 3 e i suoi, procedendo con i primi successivi. 
+Il crivello di Eratostene è un antico ed efficiente algoritmo greco (circa 200 a.C.) per trovare tutti i numeri primi fino a un numero prefissato n. Funziona "setacciando" i numeri: si elencano i numeri da 2 a n, si elimina il 2 e tutti i suoi multipli, poi il 3 e i suoi, procedendo con i primi successivi.
 """
 
 def get_crivello(max_ele):

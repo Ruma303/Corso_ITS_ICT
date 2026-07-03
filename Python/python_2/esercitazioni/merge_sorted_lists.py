@@ -57,11 +57,7 @@ def get_list():
     if num >= prev:
       lists.append(num)
       prev = num
-
-    else:
-      print("\n=== Terminazione lista ===\n")
-      break
-
+      
   return lists
 
 
@@ -84,7 +80,7 @@ def merge_sorted_lists(list1: list[int], list2: list[int]) -> list[int]:
       result.append(list2[j])
       j += 1
 
-    # Se sono uguali, inserirli entrambi
+    # Se sono uguali, inserirli entrambi (ordine arbitrario)
     else:
       result.append(list1[i])
       result.append(list2[j])
