@@ -53,26 +53,6 @@ def load_all():
             print(" - Aree Disciplinari loaded")
         except Exception:
             pass
-
-        try:
-            for k, obj in data.get("Docente", {}).items():
-                try:
-                    Docente.create_from_dict(CodiceFiscale(k), obj)
-                except Exception as ex:
-                    print(f"Error docente {k}: {ex}")
-            print(" - Docenti loaded")
-        except Exception:
-            pass
-            
-        try:
-            for k, obj in data.get("Studente", {}).items():
-                try:
-                    Studente.create_from_dict(CodiceFiscale(k), obj)
-                except Exception as ex:
-                    print(f"Error studente {k}: {ex}")
-            print(" - Studenti loaded")
-        except Exception:
-            pass
             
         try:
             for k, obj in data.get("Modulo", {}).items():
@@ -94,7 +74,25 @@ def load_all():
         except Exception:
             pass
 
-
+        try:
+            for k, obj in data.get("Docente", {}).items():
+                try:
+                    Docente.create_from_dict(CodiceFiscale(k), obj)
+                except Exception as ex:
+                    print(f"Error docente {k}: {ex}")
+            print(" - Docenti loaded")
+        except Exception:
+            pass
+            
+        try:
+            for k, obj in data.get("Studente", {}).items():
+                try:
+                    Studente.create_from_dict(CodiceFiscale(k), obj)
+                except Exception as ex:
+                    print(f"Error studente {k}: {ex}")
+            print(" - Studenti loaded")
+        except Exception:
+            pass
             
     except FileNotFoundError:
         print("File not found")
@@ -110,10 +108,14 @@ def save_all():
             "Regioni": {},
             "Citta": {},
             "AreaDisciplinare": {},
-            
+            "Modulo": {},
+            "CorsoITS": {},
+            "Docente": {},
+            "Studente": {}
         }
         for n in Nazione.all_objects_by_nome():
             k, d = n.to_json()
+            
             data["Nazioni"][k] = d
         for r in Regione.all_objects_by_uuid():
             k, d = r.to_json()

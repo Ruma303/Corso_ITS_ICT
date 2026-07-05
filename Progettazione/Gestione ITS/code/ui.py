@@ -73,6 +73,7 @@ def crea_area_disciplinare():
     AreaDisciplinare.create(nome)
     print(f"Area disciplinare '{nome}' creata!")
 
+
 # TODO: def crea_docente
 # TODO: def crea_studente
 # TODO: def crea_corso_its
