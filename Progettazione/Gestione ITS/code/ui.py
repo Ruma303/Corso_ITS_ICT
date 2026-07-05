@@ -1,4 +1,17 @@
-﻿from classes import AreaDisciplinare, Citta, Nazione, Regione, Docente, Studente, CorsoITS, Modulo
+﻿from datetime import datetime
+from uuid import NAMESPACE_DNS, uuid5
+
+from classes import (
+    AreaDisciplinare,
+    Citta,
+    CorsoITS,
+    Docente,
+    Modulo,
+    Nazione,
+    Regione,
+    Studente,
+)
+from datatypes import CodiceFiscale, IntGEZ, IntGZ
 
 
 def list_db():
@@ -18,6 +31,14 @@ def list_db():
     for n in AreaDisciplinare.all_objects_by_nome():
         print(f" - {n}")
 
+    print("Moduli:")
+    for n in Modulo.all_objects_by_nome():
+        print(f" - {n}")
+
+    print("Corsi ITS:")
+    for n in CorsoITS.all_objects_by_nome():
+        print(f" - {n}")
+
     print("Docenti:")
     for n in Docente.all_objects_by_nome():
         print(f" - {n}")
@@ -25,17 +46,6 @@ def list_db():
     print("Studenti:")
     for n in Studente.all_objects_by_nome():
         print(f" - {n}")
-
-    print("Corsi ITS:")
-    for n in CorsoITS.all_objects_by_nome():
-        print(f" - {n}")
-
-    print("Moduli:")
-    for n in Modulo.all_objects_by_nome():
-        print(f" - {n}")
-    
-
-# Funzioni di interfaccia ("ui": "User interface")
 
 
 def crea_nazione():
@@ -74,10 +84,79 @@ def crea_area_disciplinare():
     print(f"Area disciplinare '{nome}' creata!")
 
 
-# TODO: def crea_docente
-# TODO: def crea_studente
-# TODO: def crea_corso_its
-# TODO: def crea_modulo
+def crea_modulo():
+    nome = input("Nome Modulo? ")
+    if not nome:
+        raise ValueError("Il nome non può essere vuoto.")
+    try:
+        ore = int(input("Ore modulo? ").strip())
+    except ValueError as te:
+        print(f"Errore: {te}")
+        return
+    # INFO: nell'esempio creiamo un codice DETERMINISTICO
+    # a partire dalla stringa composta da nome e ore del modulo
+    codice = uuid5(NAMESPACE_DNS, f"{nome.strip().lower()}:{ore}")
+    Modulo.create(str(codice), nome, IntGZ(ore))
+    print(f"Modulo '{nome}' creato!")
+
+
+def crea_corso_its():
+    nome = input("Nome Corso? ")
+    if not nome:
+        raise ValueError("Il nome non può essere vuoto.")
+    try:
+        edizione = int(input("Anno di edizione del corso? ").strip())
+    except ValueError as te:
+        print(f"Errore: {te}")
+        return
+    CorsoITS.create(nome, IntGEZ(edizione))
+    print(f"CorsoITS '{nome}' creato!")
+
+
+def crea_docente():
+    nome = input("Nome docente? ").strip()
+    cognome = input("Cognome docente? ").strip()
+    try:
+        cf = CodiceFiscale(input("Codice fiscale? ").strip())
+        nome_citta_nascita = input("Città di nascita? ").strip()
+        citta_nascita = Citta.get_object_by_nome(nome_citta_nascita)
+        if citta_nascita is None:
+            raise KeyError(
+                f"La città {nome_citta_nascita} non esiste. Impossibile continuare"
+            )
+    except Exception as te:
+        print(f"Errore: {te}")
+        return
+    Docente.create(nome, cognome, cf, citta_nascita)
+    print(f"Docente {nome} creato!")
+
+
+def crea_studente():
+    nome = input("Nome studente? ").strip()
+    cognome = input("Cognome studente? ").strip()
+    try:
+        cf = CodiceFiscale(input("Codice fiscale? ").strip())
+        nome_citta_nascita = input("Città di nascita? ").strip()
+        if nome_citta_nascita not in Citta.all_objects_by_nome():
+            raise KeyError(
+                f"La città {nome_citta_nascita} non esiste. Impossibile continuare"
+            )
+        citta_nascita = Citta.get_object_by_nome(nome_citta_nascita)
+        if citta_nascita is None:
+            raise KeyError(
+                f"La città {nome_citta_nascita} non esiste. Impossibile continuare"
+            )
+        matricola = input("Inserisci la matricola:").strip()
+        if Studente.search_for_matricola(matricola):
+            raise KeyError(f"Lo studente con questa matricola {matricola} esiste già")
+        data_nascita_str = input("Data nascita? gg/MM/AAAA").strip()
+        data_nascita_dt = datetime.strptime(data_nascita_str, "%d/%m/%Y")
+    except Exception as te:
+        print(f"Errore: {te}")
+        return
+    Studente.create(nome, cognome, cf, citta_nascita, matricola, data_nascita_dt)
+    print(f"Studente {nome} creato!")
+
 
 def ui_ask_what_to_do():
     menu_actions = {
@@ -86,17 +165,17 @@ def ui_ask_what_to_do():
         "3": {"item": "Crea regione", "function": crea_regione},
         "4": {"item": "Crea città", "function": crea_citta},
         "5": {"item": "Crea area disciplinare", "function": crea_area_disciplinare},
-        "6": {"item": "Crea corso ITS (prossimamente)", "function": None},  # TODO
-        "7": {"item": "Crea modulo (prossimamente)", "function": None},  # TODO
-        "8": {"item": "Crea docente (prossimamente)", "function": None},  # TODO
-        "9": {"item": "Crea studente (prossimamente)", "function": None},  # TODO
+        "6": {"item": "Crea modulo", "function": crea_modulo},
+        "7": {"item": "Crea corso ITS", "function": crea_corso_its},
+        "8": {"item": "Crea docente", "function": crea_docente},
+        "9": {"item": "Crea studente", "function": crea_studente},
         "0": {"item": "Esci", "function": None},
     }
 
     while True:
         print("\n\n\n----------\n\nScegli un'azione:\n")
-        for key, action in menu_actions.items():  # .items(), non enumerate()
-            print(f"\t{key}) {action['item']}")  # key è "1","2"... non un indice
+        for key, action in menu_actions.items():
+            print(f"\t{key}) {action['item']}")
 
         while True:
             try:

@@ -16,7 +16,6 @@ livelli di visibilità (nei linguaggi "standard", come Java)
  - privato: visibile (R/W) da tutti gli oggetti della classe
 """
 
-
 class Nazione(ClassUtilsNomi):
     @classmethod
     def create(cls, nome: str) -> Self:
@@ -145,7 +144,6 @@ class Citta(ClassUtilsUUID, ClassUtilsNomi):
                 f"La regione con uuid {reg.get_uuid()} non è una regione valida o registrata"
             )
 
-        
         reg_nome = reg.get_nome()
         matching_regions = Regione.get_objects_by_name(reg_nome)
         matching_regions_list = list(matching_regions)
@@ -481,6 +479,7 @@ class Persona(ABC, ClassUtilsNomi, ClassUtilsCF):
 
 
 class Docente(Persona):
+  
     @classmethod
     def create(
         cls,
@@ -550,6 +549,7 @@ class Studente(Persona):
             raise KeyError(f"La matricola {matricola} esiste già e dev'essere univoca")
         return cls(nome, cognome, cf, citta_nascita, matricola, data_nascita)
 
+
     @classmethod
     def create_from_dict(
         cls,
@@ -572,11 +572,19 @@ class Studente(Persona):
             data_nascita=data_nascita_dt
         )
 
-    """
+
     @classmethod
-    def search_for_matricola(cls, matricola: str) -> set[Self]:
-      return {(_id, st) for st in cls.__all_objects_by_matricole if st.get_matricola() == matricola}
-    """
+    def get_objects_by_matricole(cls): 
+      return cls.__all_objects_by_matricole
+    
+        
+    @classmethod
+    def search_for_matricola(cls, matricola: str) -> Optional[Self]:
+      for m, student in cls.get_objects_by_matricole().items():
+        if m == matricola:
+          return student
+      return None
+    
 
     def __init__(
         self,
@@ -597,27 +605,8 @@ class Studente(Persona):
     # TODO: Implementare
     """
     def moduli_con_voto_piu_alto() -> set[Modulo]:
-       algoritmo:
-                   # i moduli per i quali lo studente 'this' ha preso voto_max
-                   result = {}
 
-                   # il voto di tutti gli esami per i moduli in 'result'
-                   voto_max = None
-
-                   per ogni link (self, m) in self.esame_superato:
-
-                           se voto_max is None or
-                                   (this, m).voto > voto_max:
-
-                                           result = { m }
-
-                           altrimenti se (this,m).voto == voto_max:
-
-                                           result = result unione { m }
-
-                   return result
-
-      """
+    """
 
     def get_matricola(self) -> str:
         return self.__matricola
