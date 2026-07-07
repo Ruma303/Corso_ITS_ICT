@@ -1,0 +1,27 @@
+/* Colori del brand (override variabili root di Bootstrap) */
+:root {
+  --bs-primary: #007bff;   /* Blu primario brand */
+  --bs-success: #2e7d32;   /* Verde di successo */
+  --bs-dark: #343a40;      /* Sfondo footer antracite */
+}
+
+/* Animazione custom per i badge "animate-pulse" */
+.animate-pulse {
+  animation: pulse 1.8s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.9;
+  }
+}
+
+/* Semplici utility hover */
+.hover-underline:hover {
+  text-decoration: underline !important;
+}
