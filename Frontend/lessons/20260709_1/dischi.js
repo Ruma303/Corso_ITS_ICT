@@ -5,6 +5,7 @@ const inventario = [
   { id: "d4", titolo: "Aretha Now", artista: "Aretha Franklin", prezzo: 28, inStock: true }
 ];
 
+
 // 1. Crea un nuovo disco
 console.log("\n1. Crea un nuovo disco\n");
 const titolo = "Blue";
@@ -15,8 +16,8 @@ console.table(nuovoDisco);
 
 // 2. Aggiungi in fondo
 console.log("\n2. Aggiungi in fondo\n");
-inventario.push(nuovoDisco);
-console.log(inventario.length);
+const nuovaLunghezza = inventario.push(nuovoDisco);
+console.log("Nuova lunghezza:", nuovaLunghezza);
 
 
 // 3. Applica uno sconto del 10%
@@ -24,7 +25,8 @@ const indiceDiscoDaScontare = inventario
   .findIndex(({ id }) => id === "d1")
 
 if (indiceDiscoDaScontare !== -1) {
-  const prezzo = inventario[indiceDiscoDaScontare].prezzo * 0.9
+  const prezzo = inventario[indiceDiscoDaScontare].prezzo * 0.9;
+  inventario[indiceDiscoDaScontare].prezzo = prezzo;
   console.log(prezzo.toFixed(2));
 }
 
@@ -39,18 +41,28 @@ if (idxDaRimuovere !== -1) {
   arrRimossi.map(({ titolo }) => console.log(`Elemento rimosso: ${titolo}`));
 }
 
+
 // 5. Tenta con id inesistente
 console.log("\n5. Tenta con id inesistente\n");
 const idInesistente = inventario.findIndex(({ id }) => id === "d9");
+
 if (idInesistente !== -1) {
-  const arrRimossi = inventario.splice(idInesistente, 1);
-  arrRimossi.map(({ titolo }) => console.log(`Elemento rimosso: ${titolo}`));
+  const rimosso = inventario.splice(idInesistente, 1);
+  console.log(`Elemento rimosso: ${rimosso.titolo}`);
 } else {
-  console.log("d9 non trovato")
+  console.log("d9 non trovato");
+  console.log("Lunghezza invariata:", inventario.length);
 }
 
 
-// 6. Versione immutabile
+// 6. Valore totale dell'inventario
+console.log("\n6. Valore totale dell'inventario\n")
+const valoreTotaleInventario = inventario.reduce((acc, disco) => acc + disco.prezzo, 0)
+console.log("Valore totale inventario:", valoreTotaleInventario.toFixed(2), "€")
+
+
+// 7. Versione immutabile
 console.log("\n6. Versione immutabile\n");
 const senzaD3 = inventario.filter(d => d.id !== "d3");
-console.log("Array senza d3 ", senzaD3);
+console.log("Lunghezza array originale:", inventario.length);
+console.log("Lunghezza nuovo array (senza d3):", senzaD3.length);
