@@ -20,6 +20,22 @@
             "regione": "088c5058-47c2-4719-a164-3b364073ca20"
         }
     },
+    "CorsoITS": {
+        "2b93fedf-e2a9-4ba4-b2e4-dc479a5c1d0e": {
+            "edizione": 2025,
+            "moduli": [],
+            "nome": "Full Stack"
+        }
+    },
+    "Docente": {
+        "DLNGPP79L30F158N": {
+            "citta_nascita": "4fbd5ba0-be7e-490d-8a9a-b82c339f0d4d",
+            "codice_fiscale": "DLNGPP79L30F158N",
+            "cognome": "Mancini",
+            "nome": "Toni"
+        }
+    },
+    "Modulo": {},
     "Nazioni": {
         "Cina": {
             "nome": "Cina"
@@ -47,5 +63,6 @@
             "nazione": "USA",
             "nome": "Texas"
         }
-    }
+    },
+    "Studente": {}
 }

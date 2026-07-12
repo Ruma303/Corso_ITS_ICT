@@ -16,6 +16,7 @@ livelli di visibilità (nei linguaggi "standard", come Java)
  - privato: visibile (R/W) da tutti gli oggetti della classe
 """
 
+
 class Nazione(ClassUtilsNomi):
     @classmethod
     def create(cls, nome: str) -> Self:
@@ -85,13 +86,15 @@ class Regione(ClassUtilsUUID, ClassUtilsNomi):
 
     @classmethod
     def create_from_dict(cls, _id: UUID, data: dict) -> Self:
-      naz_nome = data["nazione"]
-      naz = Nazione.get_object_by_nome(naz_nome)
-      if not naz:
-          raise KeyError(f"Impossibile caricare la regione: la nazione '{naz_nome}' non esiste.")
+        naz_nome = data["nazione"]
+        naz = Nazione.get_object_by_nome(naz_nome)
+        if not naz:
+            raise KeyError(
+                f"Impossibile caricare la regione: la nazione '{naz_nome}' non esiste."
+            )
 
-      nome_regione = data["nome"]
-      return cls(nome_regione, naz, _id)
+        nome_regione = data["nome"]
+        return cls(nome_regione, naz, _id)
 
     def __init__(self, nome: str, naz: Nazione, _id: UUID) -> None:
         self.__nome = nome
@@ -135,6 +138,18 @@ class Citta(ClassUtilsUUID, ClassUtilsNomi):
         type(self).__tuple_registry[(self.__nome, self.__regione)] = self
 
     @classmethod
+    def all_objects_by_registry(cls) -> dict[tuple[str, Regione], Self]:
+        return cls.__tuple_registry
+
+    @classmethod
+    def find_citta_by_nome(cls, nome: str) -> set[Self]:
+        citta_trovate = set()
+        for (nome_citta, reg), obj in cls.all_objects_by_registry().items():
+            if nome_citta.lower() == nome.lower():
+                citta_trovate.add(obj)
+        return citta_trovate
+
+    @classmethod
     def create(cls, nome: str, reg: Regione) -> Self:
         if nome is None or nome == "":
             raise ValueError("Il nome della città non può essere vuoto")
@@ -156,13 +171,17 @@ class Citta(ClassUtilsUUID, ClassUtilsNomi):
             while True:
                 try:
                     scelta = int(
-                        input("Seleziona la nazione corretta digitando il numero associato: ")
+                        input(
+                            "Seleziona la nazione corretta digitando il numero associato: "
+                        )
                     )
                     if 1 <= scelta <= len(matching_regions_list):
                         reg = matching_regions_list[scelta - 1]
                         break
                     else:
-                        print(f"Indice fuori scala. Inserisci un numero tra 1 e {len(matching_regions_list)}.")
+                        print(
+                            f"Indice fuori scala. Inserisci un numero tra 1 e {len(matching_regions_list)}."
+                        )
                 except ValueError:
                     print("Input non valido. Inserisci un numero intero.")
 
@@ -183,7 +202,9 @@ class Citta(ClassUtilsUUID, ClassUtilsNomi):
         reg_uuid = UUID(data["regione"])
         reg = Regione.get_object_by_uuid(reg_uuid)
         if not reg:
-            raise KeyError(f"Impossibile caricare la città: la regione con uuid {reg_uuid} non esiste")
+            raise KeyError(
+                f"Impossibile caricare la città: la regione con uuid {reg_uuid} non esiste"
+            )
 
         nome = data["nome"]
         # Se l'oggetto è già presente in memoria nel registro tuple, lo restituisce evitando duplicati
@@ -219,10 +240,10 @@ class AreaDisciplinare(ClassUtilsNomi):
     def create(cls, nome: str) -> Self:
         if nome is None or nome == "":
             raise ValueError("Il nome dell'area disciplinare non può essere vuoto")
-        
+
         if cls.get_object_by_nome(nome) is not None:
             raise ValueError(f"Esiste già un'area disciplinare con il nome '{nome}'")
-            
+
         return cls(nome)
 
     @classmethod
@@ -230,7 +251,7 @@ class AreaDisciplinare(ClassUtilsNomi):
         istanza_esistente = cls.get_object_by_nome(nome)
         if istanza_esistente is not None:
             return istanza_esistente
-            
+
         return cls(data.get("nome", nome))
 
     def __init__(self, nome: str) -> None:
@@ -270,14 +291,14 @@ class Modulo(ClassUtilsNomi):
             obj = cls.__all_objects_by_codice[codice]
         else:
             obj = cls(codice, data["nome"], IntGZ(data["ore"]))
-        
+
         # Ripristiniamo l'associazione con i docenti partendo dai loro Codici Fiscali
         if "docenti" in data:
             for cf_str in data["docenti"]:
                 docente_obj = Docente.get_object_by_cf(CodiceFiscale(cf_str))
                 if docente_obj:
                     obj.add_docente(docente_obj)
-                    
+
         return obj
 
     def __init__(self, codice: str, nome: str, ore: IntGZ):
@@ -289,7 +310,7 @@ class Modulo(ClassUtilsNomi):
         self.__docenti_by_modulo: dict[CodiceFiscale, Docente] = {}
 
         # Registrazione nei dizionari di classe
-        type(self)._objects_by_name[self.__nome] = self 
+        type(self)._objects_by_name[self.__nome] = self
         type(self).__all_objects_by_codice[self.__codice] = self
 
     def get_codice(self) -> str:
@@ -302,12 +323,33 @@ class Modulo(ClassUtilsNomi):
         return self.__ore
 
     """=== Gestione docenti ==="""
+
     def add_docenti(self, docenti: set[Docente]) -> None:
         for docente in docenti:
             self.__docenti_by_modulo[docente.get_codice_fiscale()] = docente
-            
+
     def add_docente(self, docente: Docente) -> None:
         self.__docenti_by_modulo[docente.get_codice_fiscale()] = docente
+
+    def add_docente_by_nome(self, nome: str) -> None:
+        docente = Docente.get_object_by_nome(nome)
+        if not docente:
+            raise ValueError(f"Non esiste un docente con questo nome '{nome}'")
+        self.add_docente(docente)
+
+    def add_docente_by_codice_fiscale(self, codice_fiscale: CodiceFiscale) -> None:
+        docente = Docente.get_object_by_cf(codice_fiscale)
+        if not docente:
+            raise ValueError(
+                f"Non esiste un docente con questo codice fiscale '{codice_fiscale}'"
+            )
+        self.add_docente(docente)
+
+    def get_docente(self, nome: str) -> Optional[Docente]:
+        docente = None
+        if self.get_object_by_nome(nome):
+            return docente
+        return None
 
     def get_docenti(self) -> set[Docente]:
         return set(self.__docenti_by_modulo.values())
@@ -315,7 +357,7 @@ class Modulo(ClassUtilsNomi):
     def __str__(self) -> str:
         base_str = f"[{self.__codice}] {self.get_nome()} | durata {self.get_ore()} ore"
         docenti = self.get_docenti()
-        
+
         if not docenti:
             base_str += " | NESSUN DOCENTE ASSOCIATO"
         else:
@@ -331,7 +373,7 @@ class Modulo(ClassUtilsNomi):
                 "codice": self.get_codice(),
                 "nome": self.get_nome(),
                 "ore": self.get_ore(),
-                "docenti": [str(cf) for cf in self.__docenti_by_modulo.keys()]
+                "docenti": [str(cf) for cf in self.__docenti_by_modulo.keys()],
             },
         )
 
@@ -423,14 +465,13 @@ class CorsoITS(ClassUtilsUUID, ClassUtilsNomi):
             },
         )
 
-
     # TODO: completa funzione
-    """ 
+    """
     def numero_medio_esami_per_modulo(self):
         # da implementare get_voto()
         voti = [mod.get_voto() for mod in self.get_moduli()]
         somma_voti = sum(voti)
-        return somma_voti / self.get_num_moduli() 
+        return somma_voti / self.get_num_moduli()
     """
 
 
@@ -458,7 +499,7 @@ class Persona(ABC, ClassUtilsNomi, ClassUtilsCF):
 
         # Tutti gli oggetti delle sottoclassi verranno inserite qui automaticamente
         type(self)._objects_by_cf[self.__cf] = self
-        
+
         # Avendo ereditato da ClassUtilsNomi, registriamo l'oggetto anche per nome completo
         type(self)._objects_by_name[f"{self.__nome} {self.__cognome}"] = self
 
@@ -479,7 +520,6 @@ class Persona(ABC, ClassUtilsNomi, ClassUtilsCF):
 
 
 class Docente(Persona):
-  
     @classmethod
     def create(
         cls,
@@ -499,12 +539,14 @@ class Docente(Persona):
         data: dict,
     ) -> Self:
         if cf in cls._objects_by_cf:
-          return cls._objects_by_cf[cf]
+            return cls._objects_by_cf[cf]
         citta_uuid = UUID(data["citta_nascita"])
         citta = Citta.get_object_by_uuid(citta_uuid)
         if not citta:
             raise KeyError(f"La città di nascita con UUID '{citta_uuid}' non esiste")
-        return cls(nome=data["nome"], cognome=data["cognome"], cf=cf, citta_nascita=citta)
+        return cls(
+            nome=data["nome"], cognome=data["cognome"], cf=cf, citta_nascita=citta
+        )
 
     def __init__(
         self,
@@ -549,7 +591,6 @@ class Studente(Persona):
             raise KeyError(f"La matricola {matricola} esiste già e dev'essere univoca")
         return cls(nome, cognome, cf, citta_nascita, matricola, data_nascita)
 
-
     @classmethod
     def create_from_dict(
         cls,
@@ -564,27 +605,24 @@ class Studente(Persona):
             raise KeyError(f"La città di nascita con UUID '{citta_uuid}' non esiste")
         data_nascita_dt = datetime.fromisoformat(data["data_nascita"])
         return cls(
-            nome=data["nome"], 
-            cognome=data["cognome"], 
-            cf=cf, 
-            citta_nascita=citta, 
-            matricola=data["matricola"], 
-            data_nascita=data_nascita_dt
+            nome=data["nome"],
+            cognome=data["cognome"],
+            cf=cf,
+            citta_nascita=citta,
+            matricola=data["matricola"],
+            data_nascita=data_nascita_dt,
         )
 
+    @classmethod
+    def get_objects_by_matricole(cls):
+        return cls.__all_objects_by_matricole
 
     @classmethod
-    def get_objects_by_matricole(cls): 
-      return cls.__all_objects_by_matricole
-    
-        
-    @classmethod
     def search_for_matricola(cls, matricola: str) -> Optional[Self]:
-      for m, student in cls.get_objects_by_matricole().items():
-        if m == matricola:
-          return student
-      return None
-    
+        for m, student in cls.get_objects_by_matricole().items():
+            if m == matricola:
+                return student
+        return None
 
     def __init__(
         self,

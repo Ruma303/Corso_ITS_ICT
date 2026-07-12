@@ -97,6 +97,18 @@ def crea_modulo():
     # a partire dalla stringa composta da nome e ore del modulo
     codice = uuid5(NAMESPACE_DNS, f"{nome.strip().lower()}:{ore}")
     Modulo.create(str(codice), nome, IntGZ(ore))
+
+    # INFO: aggiunta docenti
+    while True:
+      user_choice = input("Vuoi aggiungere dei docenti? Y/N: ").strip().lower()
+      if user_choice in ("y", "yes", "ok", "si", "sì"):
+        cf_docente = input("Inserisci il codice fiscale: ").strip().lower()
+        obj = Docente.get_object_by_cf(CodiceFiscale(cf_docente))
+        if not obj:
+          raise ValueError(f"Non esiste un docente con questo codice fiscale '{obj}'")
+      else:
+        break
+    
     print(f"Modulo '{nome}' creato!")
 
 
@@ -119,16 +131,40 @@ def crea_docente():
     try:
         cf = CodiceFiscale(input("Codice fiscale? ").strip())
         nome_citta_nascita = input("Città di nascita? ").strip()
-        citta_nascita = Citta.get_object_by_nome(nome_citta_nascita)
-        if citta_nascita is None:
+        
+        set_citta = Citta.find_citta_by_nome(nome_citta_nascita)
+        if not set_citta:
             raise KeyError(
-                f"La città {nome_citta_nascita} non esiste. Impossibile continuare"
+                f"La città '{nome_citta_nascita}' non esiste nel sistema. Impossibile continuare."
             )
+        
+        lista_citta = list(set_citta)
+        
+        if len(lista_citta) == 1:
+            citta_nascita = lista_citta[0]
+        else:
+            print(f"\nEsistono più città con il nome '{nome_citta_nascita}':")
+            for i, citta in enumerate(lista_citta):
+                print(f"\t{i + 1}) {citta.get_nome()} ({citta.get_regione()})")
+                
+            while True:
+                try:
+                    scelta = int(input("Seleziona la città corretta digitando il numero associato: "))
+                    if 1 <= scelta <= len(lista_citta):
+                        citta_nascita = lista_citta[scelta - 1]
+                        break
+                    else:
+                        print(f"Indice non valido. Inserisci un numero tra 1 e {len(lista_citta)}.")
+                except ValueError:
+                    print("Input non valido. Inserisci un numero intero.")
+                    
     except Exception as te:
         print(f"Errore: {te}")
         return
+        
     Docente.create(nome, cognome, cf, citta_nascita)
     print(f"Docente {nome} creato!")
+
 
 
 def crea_studente():
@@ -192,7 +228,7 @@ def ui_ask_what_to_do():
 
         if choice == "0":
             print("Arrivederci!")
-            raise InterruptedError
+            break
 
         fn = menu_actions[choice]["function"]
         if fn is not None:
