@@ -31,11 +31,13 @@ def main():
     while True:
         try:
             ui_ask_what_to_do()
-        except (KeyboardInterrupt, InterruptedError):
+        except KeyboardInterrupt:
             print()
             choice = input("Uscire dal programma? Y/N:\n")
             if choice.lower() in ("yes", "y", "si"):
                 break
+        except InterruptedError:
+            break
         except Exception as err:
             print(f"\nErrore di tipo {type(err).__name__}:\n{err}\n")
             choice = input("Ritentare? Y/N:\n")

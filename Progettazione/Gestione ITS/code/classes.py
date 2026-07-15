@@ -3,18 +3,10 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Optional, Self
-from uuid import UUID, uuid4
+from uuid import UUID, uuid4, uuid5, NAMESPACE_DNS
 
 from class_utils import ClassUtilsCF, ClassUtilsNomi, ClassUtilsUUID
 from datatypes import CodiceFiscale, IntGEZ, IntGZ, RealGEZ, Voto
-
-# Class di interesse per il programma
-
-"""
-livelli di visibilità (nei linguaggi "standard", come Java)
- - pubblico: visibile (R/W) da chiunque
- - privato: visibile (R/W) da tutti gli oggetti della classe
-"""
 
 
 class Nazione(ClassUtilsNomi):
@@ -48,12 +40,11 @@ class Nazione(ClassUtilsNomi):
         return (str(self.get_nome()), {"nome": self.get_nome()})
 
 
-"""
-Il sistema deve garantire l'inserimento di più regioni con lo stesso nome (ma UUID sempre diverso), purché la nazione (il suo UUID) sia diverso. Esempio, possono esistere due Lazio, purché in nazioni diverse: (Lazio, Francia) e (Lazio, Italia) è corretto
-"""
-
 
 class Regione(ClassUtilsUUID, ClassUtilsNomi):
+    """
+    Il sistema deve garantire l'inserimento di più regioni con lo stesso nome (ma UUID sempre diverso), purché la nazione (il suo UUID) sia diverso. Esempio, possono esistere due Lazio, purché in nazioni diverse: (Lazio, Francia) e (Lazio, Italia) è corretto
+    """
     # Registro per garantire l'univocità della coppia (NomeRegione, OggettoNazione)
     __tuple_registry: dict[tuple[str, Nazione], Self] = {}
 
@@ -235,7 +226,17 @@ class Citta(ClassUtilsUUID, ClassUtilsNomi):
         )
 
 
-class AreaDisciplinare(ClassUtilsNomi):
+class AreaDisciplinare():
+    __all_objects_by_nome: dict[str, Self] = {}
+
+    @classmethod
+    def get_object_by_nome(cls, nome: str) -> Optional[Self]:
+        return cls.__all_objects_by_nome.get(nome)
+
+    @classmethod
+    def all_objects_by_nome(cls) -> list[Self]:
+        return list(cls.__all_objects_by_nome.values())
+  
     @classmethod
     def create(cls, nome: str) -> Self:
         if nome is None or nome == "":
@@ -256,7 +257,7 @@ class AreaDisciplinare(ClassUtilsNomi):
 
     def __init__(self, nome: str) -> None:
         self.__nome = nome
-        type(self)._objects_by_name[self.__nome] = self
+        type(self).__all_objects_by_nome[self.__nome] = self
 
     def get_nome(self) -> str:
         return self.__nome
@@ -268,9 +269,9 @@ class AreaDisciplinare(ClassUtilsNomi):
         return (self.get_nome(), {"nome": self.get_nome()})
 
 
-class Modulo(ClassUtilsNomi):
+class Modulo(ClassUtilsNomi, ClassUtilsUUID):
     __all_objects_by_codice: dict[str, Self] = {}
-
+    
     @classmethod
     def get_object_by_codice(cls, codice: str) -> Optional[Self]:
         return cls.__all_objects_by_codice.get(codice)
@@ -280,10 +281,10 @@ class Modulo(ClassUtilsNomi):
         return list(cls.__all_objects_by_codice.values())
 
     @classmethod
-    def create(cls, codice: str, nome: str, ore: IntGZ) -> Self:
+    def create(cls, codice: str, nome: str, ore: IntGZ, docenti: set[Docente] | None = None) -> Self:
         if codice in cls.__all_objects_by_codice:
             raise KeyError(f"Esiste già un modulo con il codice '{codice}'")
-        return cls(codice, nome, ore)
+        return cls(codice, nome, ore, docenti)
 
     @classmethod
     def create_from_dict(cls, codice: str, data: dict) -> Self:
@@ -301,13 +302,17 @@ class Modulo(ClassUtilsNomi):
 
         return obj
 
-    def __init__(self, codice: str, nome: str, ore: IntGZ):
+    def __init__(self, codice: str, nome: str, ore: IntGZ, docenti: set[Docente] | None = None):
         self.__codice = codice
         self.__nome = nome
         self.__ore = ore
 
         # Dizionario specifico di docenti per ogni modulo (Chiave: CF, Valore: Docente)
         self.__docenti_by_modulo: dict[CodiceFiscale, Docente] = {}
+       
+        # Se ci vengono passati dei docenti in fase di inizializzazione, li aggiungiamo subito
+        if docenti:
+            self.add_docenti(docenti)
 
         # Registrazione nei dizionari di classe
         type(self)._objects_by_name[self.__nome] = self
@@ -387,45 +392,48 @@ class CorsoITS(ClassUtilsUUID, ClassUtilsNomi):
         return cls.__objects_by_keys
 
     @classmethod
-    def create(cls, nome: str, edizione: IntGEZ) -> Self:
+    def create(cls, nome: str, edizione: IntGEZ, area: AreaDisciplinare, moduli: set[Modulo]) -> Self:
         # Controllo di integrità sulla coppia univoca
         chiave = (nome, edizione)
         if chiave in cls.__objects_by_keys:
             raise KeyError(
                 f"Esiste già un corso con il nome '{nome}' e edizione '{edizione}'."
             )
-        nuovo_id = uuid4()
-        return cls(nome, edizione, nuovo_id)
+        nuovo_id = uuid5(NAMESPACE_DNS, f"{nome.strip().lower()}:{edizione}")
+        return cls(nome, edizione, nuovo_id, area, moduli)
 
     @classmethod
     def create_from_dict(cls, _id: UUID, data: dict) -> Self:
         nome = data["nome"]
         edizione = IntGEZ(data["edizione"])
+        area = data["area_disciplinare"]
 
         chiave = (nome, edizione)
         if chiave in cls.__objects_by_keys:
             return cls.__objects_by_keys[chiave]
 
         # Ricostruiamo il set di moduli associati partendo dai codici salvati nel JSON
-        moduli_associati = set()
+        moduli = set()
         if "moduli" in data:
             for codice_modulo in data["moduli"]:
                 modulo_obj = Modulo.get_object_by_codice(codice_modulo)
                 if modulo_obj:
-                    moduli_associati.add(modulo_obj)
+                    moduli.add(modulo_obj)
 
-        return cls(nome, edizione, _id, moduli_associati)
+        return cls(nome, edizione, _id, area, moduli)
 
     def __init__(
         self,
         name: str,
         edition: IntGEZ,
         _id: UUID,
+        area_disciplinare: AreaDisciplinare,
         modules: Optional[set[Modulo]] = None,
     ):
         self.__name = name
         self.__edition = edition
         self.__id = _id
+        self.__area_disciplinare = area_disciplinare
         # Se non vengono passati moduli, inizializziamo un set vuoto
         self.__modules = modules if modules is not None else set()
 
@@ -452,6 +460,9 @@ class CorsoITS(ClassUtilsUUID, ClassUtilsNomi):
     def add_modulo(self, modulo: Modulo) -> None:
         self.__modules.add(modulo)
 
+    def get_area_disciplinare(self) -> AreaDisciplinare:
+      return self.__area_disciplinare
+
     def __str__(self) -> str:
         return f"Corso: {self.get_nome()} [Edizione: {self.get_edizione()}] - Moduli totali: {self.get_num_moduli()}"
 
@@ -465,7 +476,7 @@ class CorsoITS(ClassUtilsUUID, ClassUtilsNomi):
             },
         )
 
-    # TODO: completa funzione
+    # TODO: completa funzione bidirezionale
     """
     def numero_medio_esami_per_modulo(self):
         # da implementare get_voto()

@@ -1,4 +1,12 @@
 #############################################
+# Repository Software development           #
+#############################################
+# Ignora i dati persistenti dei database
+**/postgresql_data/
+**/pgadmin_data/
+
+
+#############################################
 # IDE, Editor, impostazioni utente locali   #
 #############################################
 

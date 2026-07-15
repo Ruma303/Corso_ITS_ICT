@@ -1,5 +1,6 @@
 ﻿from datetime import datetime
 from uuid import NAMESPACE_DNS, uuid5
+from utils import yes
 
 from classes import (
     AreaDisciplinare,
@@ -87,29 +88,41 @@ def crea_area_disciplinare():
 def crea_modulo():
     nome = input("Nome Modulo? ")
     if not nome:
-        raise ValueError("Il nome non può essere vuoto.")
+        print("Errore: Il nome non può essere vuoto.")
+        return
+
     try:
-        ore = int(input("Ore modulo? ").strip())
+        ore_input = int(input("Ore modulo? ").strip())
+        ore = IntGZ(ore_input)
     except ValueError as te:
         print(f"Errore: {te}")
         return
-    # INFO: nell'esempio creiamo un codice DETERMINISTICO
-    # a partire dalla stringa composta da nome e ore del modulo
-    codice = uuid5(NAMESPACE_DNS, f"{nome.strip().lower()}:{ore}")
-    Modulo.create(str(codice), nome, IntGZ(ore))
 
-    # INFO: aggiunta docenti
+    codice = str(uuid5(NAMESPACE_DNS, f"{nome.strip().lower()}:{ore}"))
+
+    # Inizializziamo il set temporaneo che conterrà i docenti
+    docenti_da_associare = set()
+
     while True:
-      user_choice = input("Vuoi aggiungere dei docenti? Y/N: ").strip().lower()
-      if user_choice in ("y", "yes", "ok", "si", "sì"):
-        cf_docente = input("Inserisci il codice fiscale: ").strip().lower()
-        obj = Docente.get_object_by_cf(CodiceFiscale(cf_docente))
-        if not obj:
-          raise ValueError(f"Non esiste un docente con questo codice fiscale '{obj}'")
-      else:
-        break
-    
-    print(f"Modulo '{nome}' creato!")
+        user_choice = input("Vuoi aggiungere dei docenti? Y/N: ").strip().lower()
+        if user_choice in yes:
+            cf_docente = input("Inserisci il codice fiscale: ").strip().upper() 
+            try:
+                cf_valido = CodiceFiscale(cf_docente)
+                docente = Docente.get_object_by_cf(cf_valido)
+                if not docente:
+                    print(f"Non esiste un docente con questo codice fiscale '{cf_docente}'. Riprova.")
+                    continue
+                
+                docenti_da_associare.add(docente)
+                print(f"Docente '{docente}' aggiunto in coda per questo modulo.")
+            except ValueError as e:
+                print(f"Errore formato CF: {e}")
+        else:
+            break
+
+    Modulo.create(codice, nome, ore, docenti=docenti_da_associare)
+    print(f"Modulo '{nome}' creato con {len(docenti_da_associare)} docenti associati!")
 
 
 def crea_corso_its():
@@ -121,7 +134,43 @@ def crea_corso_its():
     except ValueError as te:
         print(f"Errore: {te}")
         return
-    CorsoITS.create(nome, IntGEZ(edizione))
+
+    # INFO: controlla se l'area disciplinare esiste, OBBLIGATORIO
+    area_disciplinare = None
+    while True:
+        area_disciplinare_nome = input("Inserisci nome area disciplinare associata: ").strip()
+        area_disciplinare = AreaDisciplinare.get_object_by_nome(area_disciplinare_nome)
+        if area_disciplinare is None:
+            print(f'Errore: area disciplinare "{area_disciplinare_nome}" non trovata.')
+            print("Non è possibile creare un Corso ITS senza associare un'area disciplinare ad esso.")
+            crea = input("Vuoi creare l'area disciplinare adesso? Y/N ").strip().lower()
+            if crea in yes:
+              crea_area_disciplinare()
+            print("\nNota: verrà richiesto di inserire l'area disciplinare da associare al corso.\n")
+            continue
+        break
+      
+    # INFO: aggiungere moduli opzionali
+    moduli_trovati = set()
+    user_choice = input("Vuoi aggiungere dei Moduli? Y/N: ").strip().lower()
+    if user_choice in yes:
+      print("Moduli:")
+      for n in Modulo.all_objects_by_nome():
+          print(f" - {n.get_nome()}")
+      moduli_scelti = input("Inserisci i moduli scrivendo i loro nomi separati da virgole:\n ").lower().strip()
+      # Togliamo lo spazio anche tra i singoli moduli
+      moduli = [m.strip().lower() for m in moduli_scelti.split(",") if m.strip()]
+      
+      for nome_modulo in moduli:
+        obj_modulo = Modulo.get_object_by_nome(nome_modulo)
+        if obj_modulo:
+            moduli_trovati.add(obj_modulo)
+            print(f"Modulo trovato: {obj_modulo.get_nome()}")
+        else:
+            print(f'Modulo "{nome_modulo}" non trovato, ignorato.')
+        
+        
+    CorsoITS.create(nome, IntGEZ(edizione), area_disciplinare, moduli_trovati)
     print(f"CorsoITS '{nome}' creato!")
 
 
@@ -228,7 +277,7 @@ def ui_ask_what_to_do():
 
         if choice == "0":
             print("Arrivederci!")
-            break
+            raise InterruptedError
 
         fn = menu_actions[choice]["function"]
         if fn is not None:

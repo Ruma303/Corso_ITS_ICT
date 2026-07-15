@@ -33,7 +33,7 @@ public class Main {
         );
         System.out.println("\n" + c1);
         c1.deposita(20);
-        // c1.deposita(-3); // ! Generebbe un errore !
+        // c1.deposita(-3); // ! Genererebbe un errore !
         System.out.println(c1.informazioniBanca());
         System.out.println("Nuovo saldo: " + c1.getSaldo());
 

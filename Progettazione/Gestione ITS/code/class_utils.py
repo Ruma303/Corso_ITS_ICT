@@ -12,17 +12,13 @@ class ClassUtilsUUID:
 
     @classmethod
     def all_objects_by_uuid(cls):
-        result = cls._objects_by_uuid.values()
-        if result is None:
-          return None
-        return result
+        return cls._objects_by_uuid.values()
+        
 
     @classmethod
     def get_object_by_uuid(cls, k: UUID) -> Optional[Self]:
-        result = cls._objects_by_uuid.get(k)
-        if result is None:
-          return None
-        return result
+        return cls._objects_by_uuid.get(k)
+        
 
 
 class ClassUtilsNomi:
@@ -34,17 +30,12 @@ class ClassUtilsNomi:
 
     @classmethod
     def all_objects_by_nome(cls):
-        result = cls._objects_by_name.values()
-        if result is None:
-          return None
-        return result
+        return cls._objects_by_name.values()
 
     @classmethod
     def get_object_by_nome(cls, nome: str) -> Optional[Self]:
-      result = cls._objects_by_name.get(nome)
-      if result is None:
-        return None
-      return result
+      return cls._objects_by_name.get(nome)
+      
 
 
 class ClassUtilsCF:
@@ -56,15 +47,10 @@ class ClassUtilsCF:
 
     @classmethod
     def all_objects_by_cf(cls):
-        result = cls._objects_by_cf.values()
-        if result is None:
-          return None
-        return result
+        return cls._objects_by_cf.values()
+        
 
     @classmethod
     def get_object_by_cf(cls, cf: CodiceFiscale) -> Optional[Self]:
-        result = cls._objects_by_cf.get(cf)
-        if result is None:
-          return None
-        return result
-
+        return cls._objects_by_cf.get(cf)
+        

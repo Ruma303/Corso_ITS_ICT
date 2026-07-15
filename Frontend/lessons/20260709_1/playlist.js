@@ -6,7 +6,6 @@ const playlist = [
 ];
 
 
-
 // 1. Stampa la playlist
 console.log("\n1. Stampa la playlist\n")
 playlist.forEach((canzone, index) => {
@@ -14,7 +13,7 @@ playlist.forEach((canzone, index) => {
   let secondiFormattati = String(secondi).padStart(2, '0');
   let minuti = Math.floor(canzone.secondi / 60);
   console.log(`${index}. ${canzone.titolo} - ${canzone.artista} (${minuti} : ${secondiFormattati})`)
-});
+})
 
 // 2. Estrai titoli
 console.log("\n2. Estrai titoli\n")

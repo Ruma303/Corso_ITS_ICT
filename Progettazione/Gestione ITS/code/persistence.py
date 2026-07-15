@@ -115,7 +115,6 @@ def save_all():
         }
         for n in Nazione.all_objects_by_nome():
             k, d = n.to_json()
-            
             data["Nazioni"][k] = d
         for r in Regione.all_objects_by_uuid():
             k, d = r.to_json()
@@ -142,7 +141,7 @@ def save_all():
             data["Studente"][k] = d
         
         fp = open(datafile, "wt")
-        json.dump(data, fp, indent=4, sort_keys=True)
+        json.dump(data, fp, indent=2, sort_keys=True)
         fp.close()
     except Exception as ex:
         print(f"Error saving: {ex}")

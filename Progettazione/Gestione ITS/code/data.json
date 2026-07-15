@@ -1,68 +1,83 @@
 {
-    "AreaDisciplinare": {
-        "IT": {
-            "nome": "IT"
-        },
-        "Marketing and Communication": {
-            "nome": "Marketing and Communication"
-        },
-        "Robotics": {
-            "nome": "Robotics"
-        }
+  "AreaDisciplinare": {
+    "AI": {
+      "nome": "AI"
     },
-    "Citta": {
-        "4fbd5ba0-be7e-490d-8a9a-b82c339f0d4d": {
-            "nome": "Roma",
-            "regione": "66335fda-fb5a-43f6-a275-2b940446fc17"
-        },
-        "e0a94861-2489-4d6b-afe4-bfc1a0c85dbc": {
-            "nome": "Roma",
-            "regione": "088c5058-47c2-4719-a164-3b364073ca20"
-        }
+    "IT": {
+      "nome": "IT"
     },
-    "CorsoITS": {
-        "2b93fedf-e2a9-4ba4-b2e4-dc479a5c1d0e": {
-            "edizione": 2025,
-            "moduli": [],
-            "nome": "Full Stack"
-        }
+    "Marketing and Communication": {
+      "nome": "Marketing and Communication"
     },
-    "Docente": {
-        "DLNGPP79L30F158N": {
-            "citta_nascita": "4fbd5ba0-be7e-490d-8a9a-b82c339f0d4d",
-            "codice_fiscale": "DLNGPP79L30F158N",
-            "cognome": "Mancini",
-            "nome": "Toni"
-        }
+    "Robotics": {
+      "nome": "Robotics"
+    }
+  },
+  "Citta": {
+    "4fbd5ba0-be7e-490d-8a9a-b82c339f0d4d": {
+      "nome": "Roma",
+      "regione": "66335fda-fb5a-43f6-a275-2b940446fc17"
     },
-    "Modulo": {},
-    "Nazioni": {
-        "Cina": {
-            "nome": "Cina"
-        },
-        "Francia": {
-            "nome": "Francia"
-        },
-        "Italia": {
-            "nome": "Italia"
-        },
-        "USA": {
-            "nome": "USA"
-        }
+    "e0a94861-2489-4d6b-afe4-bfc1a0c85dbc": {
+      "nome": "Roma",
+      "regione": "088c5058-47c2-4719-a164-3b364073ca20"
+    }
+  },
+  "Docente": {
+    "BRTGLI84B09H703M": {
+      "citta_nascita": "e0a94861-2489-4d6b-afe4-bfc1a0c85dbc",
+      "codice_fiscale": "BRTGLI84B09H703M",
+      "cognome": "Di Lullo",
+      "nome": "Marco"
     },
-    "Regioni": {
-        "088c5058-47c2-4719-a164-3b364073ca20": {
-            "nazione": "Francia",
-            "nome": "Lazio"
-        },
-        "66335fda-fb5a-43f6-a275-2b940446fc17": {
-            "nazione": "Italia",
-            "nome": "Lazio"
-        },
-        "9bd4b18f-88bd-4f6d-a77e-17392b7d67b0": {
-            "nazione": "USA",
-            "nome": "Texas"
-        }
+    "DLNGPP79L30F158N": {
+      "citta_nascita": "4fbd5ba0-be7e-490d-8a9a-b82c339f0d4d",
+      "codice_fiscale": "DLNGPP79L30F158N",
+      "cognome": "Mancini",
+      "nome": "Toni"
+    }
+  },
+  "Modulo": {
+    "11cb21fb-bd58-5cdb-9d80-9e537de508d9": {
+      "codice": "11cb21fb-bd58-5cdb-9d80-9e537de508d9",
+      "docenti": [],
+      "nome": "Python 1",
+      "ore": 30
     },
-    "Studente": {}
+    "97e7a09e-b721-5c61-8560-0cdb43017695": {
+      "codice": "97e7a09e-b721-5c61-8560-0cdb43017695",
+      "docenti": [],
+      "nome": "Team Building",
+      "ore": 20
+    }
+  },
+  "Nazioni": {
+    "Cina": {
+      "nome": "Cina"
+    },
+    "Francia": {
+      "nome": "Francia"
+    },
+    "Italia": {
+      "nome": "Italia"
+    },
+    "USA": {
+      "nome": "USA"
+    }
+  },
+  "Regioni": {
+    "088c5058-47c2-4719-a164-3b364073ca20": {
+      "nazione": "Francia",
+      "nome": "Lazio"
+    },
+    "66335fda-fb5a-43f6-a275-2b940446fc17": {
+      "nazione": "Italia",
+      "nome": "Lazio"
+    },
+    "9bd4b18f-88bd-4f6d-a77e-17392b7d67b0": {
+      "nazione": "USA",
+      "nome": "Texas"
+    }
+  },
+  "Studente": {}
 }
