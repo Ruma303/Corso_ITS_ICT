@@ -4,6 +4,9 @@
 # Ignora i dati persistenti dei database
 **/postgresql_data/
 **/pgadmin_data/
+**/.nvm
+**/.profile
+**/.zshrc
 
 
 #############################################

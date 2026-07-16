@@ -1,0 +1,63 @@
+services:
+  dev:
+    tty: true
+    image: ${COMPOSE_PROJECT_NAME}_dev
+    build:
+      context: ./dev
+      additional_contexts:
+        - basefolder=${USER_BASE_FOLDER}
+      args:
+        - CONFIG_PATH=${CONFIG_PATH}
+    env_file: .env
+    container_name: ${COMPOSE_PROJECT_NAME}_dev
+    volumes:
+      - ${USER_BASE_FOLDER}:/home/
+    networks:
+      - network
+    restart: unless-stopped
+    ports:
+      - ${NODEJS_EXPOSED_PORTS}:${NODEJS_EXPOSED_PORTS}
+      - ${AUTO_MAPPED_PORTS}:${AUTO_MAPPED_PORTS}
+
+  postgresql:
+    image: ${COMPOSE_PROJECT_NAME}_postgresql
+    build: ./postgresql
+    container_name: ${COMPOSE_PROJECT_NAME}_postgresql
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - ${POSTGRESQL_EXPOSED_PORT}:5432
+    volumes:
+      # Non voglio usare il nome del container in esecuzione
+      # Lo cambio con un percorso sul filesystem (bind mount)
+      - ${USER_BASE_FOLDER}/config/postgresql_data:/var/lib/postgresql/data
+      - ${USER_BASE_FOLDER}:/home/
+    networks:
+      - network
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: ${COMPOSE_PROJECT_NAME}_pgadmin
+    image: dpage/pgadmin4:latest
+    user: root
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    volumes:
+      - ${USER_BASE_FOLDER}/config/pgadmin_data:/var/lib/pgadmin
+      - ${USER_BASE_FOLDER}:/home/
+    ports:
+      - "${PGADMIN_EXPOSED_PORT}:80"
+    networks:
+      - network
+    restart: unless-stopped
+
+volumes:
+  sw_development_config_postgresql:
+  sw_development_config_pgadmin:
+
+networks:
+  network:
+    driver: bridge

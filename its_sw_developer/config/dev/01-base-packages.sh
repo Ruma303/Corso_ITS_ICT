@@ -3,7 +3,7 @@
 # Update the system
 apt update && apt upgrade -y 
 
-# Termina a nano, il resto sono custom
+# Termina a nano, il resto è custom
 apt install -y --no-install-recommends \
 	make \
 	build-essential \
@@ -24,5 +24,9 @@ apt install -y --no-install-recommends \
 	git \
 	nano \
 	vim \
-	wget \
-	uv
+	wget 
+
+# Altro custom:
+
+# uv
+curl -LsSf https://astral.sh/uv/install.sh | sh

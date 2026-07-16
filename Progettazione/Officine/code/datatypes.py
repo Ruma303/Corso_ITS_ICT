@@ -156,11 +156,8 @@ class Indirizzo:
         if not isinstance(cap, CAP):
             raise ValueError("Il parametro 'cap' deve essere un'istanza valida della classe CAP.")
 
-        civico_valido = False
-        for pattern in self.get_civico_patterns():
-            if re.fullmatch(pattern, str(civico)):
-                civico_valido = True
-                break
+        civico_valido = False for pattern in self.get_civico_patterns(): if
+        re.fullmatch(pattern, str(civico)): civico_valido = True break
 
         if not civico_valido:
             raise ValueError(f"Il numero civico '{civico}' non è valido.")
@@ -276,6 +273,7 @@ def execute_tests() -> int:
     print(f"Gli hash di ind_a e ind_b coincidono? {hash(ind_a) == hash(ind_b)} (Atteso: True)")
 
     return 0
+
 
 if __name__ == "__main__":
     exit(execute_tests())
