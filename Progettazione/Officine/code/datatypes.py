@@ -1,6 +1,6 @@
 import re
 from sys import exit
-
+from typing import Any
 
 class Targa(str):
     __patterns = [r'[A-Z0-9]{3,7}', r'[A-Z]{1,2}\s*[\d]{1,6}']
@@ -27,7 +27,7 @@ class Targa(str):
 
 
     def __repr__(self):
-        return f"Targa('{self.valore}')"
+        return f"Targa('{self}')"
 
 
 class Telefono(str): 
@@ -56,14 +56,14 @@ class Telefono(str):
                 f"\nIl numero di telefono '{numero}' non è valido. Deve seguire almeno uno di questi pattern:\n{patterns_str}"
             )
 
-        return = super().__new__(cls, numero)
+        return super().__new__(cls, numero)
 
 
     def __str__(self):
-        return self.numero
+        return self
 
     def __repr__(self):
-        return f"Telefono('{self.numero}')"
+        return f"Telefono('{self}')"
 
 
 class CodiceFiscale(str): 
@@ -95,10 +95,10 @@ class CodiceFiscale(str):
 
 
     def __str__(self):
-        return self.cf
+        return self
 
     def __repr__(self):
-        return f"CodiceFiscale('{self.cf}')"
+        return f"CodiceFiscale('{self}')"
 
 
 class CAP(str):
@@ -108,13 +108,13 @@ class CAP(str):
         if not re.fullmatch(r'[0-9]{5}', str_cap):
             raise ValueError(f"Il cap '{cap}' inserito non è valido.")
         
-        return super().__new__(cls, cap)
+        return super().__new__(cls, str_cap)
 
     def __str__(self):
-        return self.cap
+        return self
 
     def __repr__(self):
-        return f"CAP('{self.cap}')"
+        return f"CAP('{self}')"
 
 
 class Indirizzo: 
@@ -126,8 +126,7 @@ class Indirizzo:
         return cls.__civico_patterns
 
 
-    # Alternativa all'init. Il tipo in uscita è immutabile.
-    # Non serve definire hash e eq
+    # Alternativa all'init. 
 
     # def __new__(cls, via: str, civico: str, cap: CAP):
     #     if not isinstance(cap, CAP):
@@ -151,8 +150,7 @@ class Indirizzo:
     #     return instance
 
 
-    # Oppure, usare soltanto l'init. Molto più semplice ma l'istanza è mutabile, 
-    # i campi via, civico, cap possono essere modificati.
+    # Oppure, usare soltanto l'init. 
     def __init__(self, via: str, civico: str, cap: CAP):
         # 1. Controlli e Validazioni
         if not isinstance(cap, CAP):
@@ -197,7 +195,7 @@ class Indirizzo:
 
     def __eq__(self, other: Any) -> bool:
         # type() verifica la classe esatta, mentre isinstance() verifica anche le sottoclassi
-        if other is None or type(other) != type(self) or hash(self) != hash(other):
+        if other is None or type(other) is not type(self) or hash(self) != hash(other):
             return False
         return (self.get_via(), self.get_civico(), str(self.get_cap())) == (other.get_via(), other.get_civico(), str(other.get_cap()))
 
@@ -281,8 +279,4 @@ def execute_tests() -> int:
 
 if __name__ == "__main__":
     exit(execute_tests())
-
-
-
-
 

@@ -13,7 +13,7 @@
 - Regione
 - Città
 
-## Note sui vincoli
+## Note sui vincoli
 
 1. Le targhe possono essere cambiate. Per identificare univocamente un veicolo si usa un **Identificativo Unico Internazionale** (VIN - Vehicle Identification Number).
 2. Il vincolo di integrità viene spostato sulla targa, ma potrebbe essere un vincolo composto da tutti gli altri campi dell'istanza veicolo.
