@@ -40,7 +40,6 @@ class Nazione(ClassUtilsNomi):
         return (str(self.get_nome()), {"nome": self.get_nome()})
 
 
-
 class Regione(ClassUtilsUUID, ClassUtilsNomi):
     """
     Il sistema deve garantire l'inserimento di più regioni con lo stesso nome (ma UUID sempre diverso), purché la nazione (il suo UUID) sia diverso. Esempio, possono esistere due Lazio, purché in nazioni diverse: (Lazio, Francia) e (Lazio, Italia) è corretto
@@ -236,7 +235,7 @@ class AreaDisciplinare():
     @classmethod
     def all_objects_by_nome(cls) -> list[Self]:
         return list(cls.__all_objects_by_nome.values())
-  
+
     @classmethod
     def create(cls, nome: str) -> Self:
         if nome is None or nome == "":
@@ -271,7 +270,7 @@ class AreaDisciplinare():
 
 class Modulo(ClassUtilsNomi, ClassUtilsUUID):
     __all_objects_by_codice: dict[str, Self] = {}
-    
+
     @classmethod
     def get_object_by_codice(cls, codice: str) -> Optional[Self]:
         return cls.__all_objects_by_codice.get(codice)
@@ -309,7 +308,7 @@ class Modulo(ClassUtilsNomi, ClassUtilsUUID):
 
         # Dizionario specifico di docenti per ogni modulo (Chiave: CF, Valore: Docente)
         self.__docenti_by_modulo: dict[CodiceFiscale, Docente] = {}
-       
+
         # Se ci vengono passati dei docenti in fase di inizializzazione, li aggiungiamo subito
         if docenti:
             self.add_docenti(docenti)

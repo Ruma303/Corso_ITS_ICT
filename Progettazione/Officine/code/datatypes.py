@@ -1,6 +1,7 @@
 import re
 from sys import exit
-from typing import Any
+from typing import Any, Self, Optional
+from uuid import UUID, uuid5, NAMESPACE_DNS
 
 class Targa(str):
     __patterns = [r'[A-Z0-9]{3,7}', r'[A-Z]{1,2}\s*[\d]{1,6}']
@@ -10,6 +11,9 @@ class Targa(str):
         return cls.__patterns
 
     def __new__(cls, targa: str):
+        if targa is None or targa == "":
+            raise ValueError("La targa non può essere vuoto.")
+
         result = False
 
         for pattern in cls.get_patterns():
@@ -30,10 +34,10 @@ class Targa(str):
         return f"Targa('{self}')"
 
 
-class Telefono(str): 
+class Telefono(str):
 
     __patterns = [
-        r'^(?:(?:\+|00)39)?\s?[3]\d{2}(?:\s?\d{3,4}){2,3}$', 
+        r'^(?:(?:\+|00)39)?\s?[3]\d{2}(?:\s?\d{3,4}){2,3}$',
         r'^\+?\s?[\d]{6,10}$'
     ]
 
@@ -42,6 +46,12 @@ class Telefono(str):
         return cls.__patterns
 
     def __new__(cls, numero: str|int):
+        if numero is None or numero == "":
+            raise ValueError("Il numero di telefono non può essere vuoto.")
+
+        if numero is None or numero == "":
+          raise ValueError("Il numero di telefono non può essere vuoto")
+
         result = False
 
         for pattern in cls.get_patterns():
@@ -66,10 +76,11 @@ class Telefono(str):
         return f"Telefono('{self}')"
 
 
-class CodiceFiscale(str): 
+class CodiceFiscale(str):
+
     __patterns = [
-        r"[A-Z0-9]{0,16}", 
-        r"[A-Z]{6}[0-9]{2}[A-EHLMPRST][0-9]{2}[A-Z][0-9]{3}[A-Z]", 
+        r"[A-Z0-9]{0,16}",
+        r"[A-Z]{6}[0-9]{2}[A-EHLMPRST][0-9]{2}[A-Z][0-9]{3}[A-Z]",
         r"[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[0-9A-Z]{5}"
     ]
 
@@ -78,20 +89,29 @@ class CodiceFiscale(str):
         return cls.__patterns
 
     def __new__(cls, cf: str):
-        result = False
+      if cf is None or cf == "":
+        raise ValueError("Il Codice Fiscale non può essere vuoto.")
 
-        for pattern in cls.get_patterns():
-            if re.fullmatch(pattern, cf):
-                result = True
-                break
+      if len(cf) != 16:
+        raise ValueError("Il Codice Fiscale deve contenere 16 caratteri.")
 
-        if not result:
-            patterns_str = ", ".join(cls.get_patterns())
-            raise ValueError(
-                f"\nIl codice fiscale '{cf}' non è valido. Deve seguire almeno uno di questi pattern:\n{patterns_str}"
-            )
+      cf_pulito = cf.strip().upper()
+      result = False
 
-        return super().__new__(cls, cf)
+      for pattern in cls.get_patterns():
+        if re.fullmatch(pattern, cf_pulito):
+          result = True
+          break
+
+      if not result:
+        patterns_str = ", ".join(cls.get_patterns())
+        raise ValueError(
+          f"\nIl codice fiscale '{cf}' non è valido. "
+          + f"Deve seguire almeno uno di questi pattern:\n{patterns_str}"
+        )
+      # Poiché le stringhe sono immutabili, dobbiamo intercettare
+      # l'allocazione tramite __new__ invece di __init__
+      return super().__new__(cls, cf_pulito)
 
 
     def __str__(self):
@@ -104,10 +124,13 @@ class CodiceFiscale(str):
 class CAP(str):
 
     def __new__(cls, cap: str):
+        if cap is None or cap == "":
+            raise ValueError("Il cap non può essere vuoto.")
+
         str_cap = str(cap)
         if not re.fullmatch(r'[0-9]{5}', str_cap):
             raise ValueError(f"Il cap '{cap}' inserito non è valido.")
-        
+
         return super().__new__(cls, str_cap)
 
     def __str__(self):
@@ -117,7 +140,7 @@ class CAP(str):
         return f"CAP('{self}')"
 
 
-class Indirizzo: 
+class Indirizzo:
 
     __civico_patterns = [r"\d+[\w\W\d\s/.-]*"]
 
@@ -126,7 +149,7 @@ class Indirizzo:
         return cls.__civico_patterns
 
 
-    # Alternativa all'init. 
+    # Alternativa all'init.
 
     # def __new__(cls, via: str, civico: str, cap: CAP):
     #     if not isinstance(cap, CAP):
@@ -150,14 +173,20 @@ class Indirizzo:
     #     return instance
 
 
-    # Oppure, usare soltanto l'init. 
+    # Oppure, usare soltanto l'init.
     def __init__(self, via: str, civico: str, cap: CAP):
+        if via is None or civico is None or cap is None:
+            raise ValueError("Errore nell'Indirizzo: via, civico e cap non possono essere vuoti.")
+
         # 1. Controlli e Validazioni
-        if not isinstance(cap, CAP):
+        if type(cap)is not CAP:
             raise ValueError("Il parametro 'cap' deve essere un'istanza valida della classe CAP.")
 
-        civico_valido = False for pattern in self.get_civico_patterns(): if
-        re.fullmatch(pattern, str(civico)): civico_valido = True break
+        civico_valido = False
+        for pattern in self.get_civico_patterns():
+          if re.fullmatch(pattern, str(civico)):
+            civico_valido = True
+            break
 
         if not civico_valido:
             raise ValueError(f"Il numero civico '{civico}' non è valido.")
@@ -176,7 +205,6 @@ class Indirizzo:
 
     def get_cap(self):
         return self.cap
-
 
     def __str__(self):
         return f"{self.via} {self.civico}, {self.cap}"
@@ -197,7 +225,26 @@ class Indirizzo:
         return (self.get_via(), self.get_civico(), str(self.get_cap())) == (other.get_via(), other.get_civico(), str(other.get_cap()))
 
 
+class IntGZ(int):
 
+    def __new__(cls, numero: int | float) -> Self:
+        if type(numero) not in (int, float):
+            raise TypeError("Il tipo del numero dev'essere un 'int' oppure un 'float'")
+        if numero <= 0:
+            raise ValueError("Il numero non può essere negativo o zero")
+        return super().__new__(cls, numero)
+
+
+class IntGEZ(int):
+    def __new__(cls, numero: int | float) -> Self:
+        if type(numero) not in (int, float):
+            raise TypeError("Il tipo del numero dev'essere un 'int' oppure un 'float'")
+        if numero < 0:
+            raise ValueError("Il numero non può essere negativo")
+        return super().__new__(cls, numero)
+
+
+# TEST:
 def execute_tests() -> int:
 
     print("\n=== TEST: TARGHE ===")
@@ -208,6 +255,7 @@ def execute_tests() -> int:
             print(f"Successo: {t}")
         except ValueError as e:
             print(f"Errore: {e}")
+
 
     print("\n=== TEST: TELEFONO ===")
     numeri = ["3331234567", "1234567", "", "(+0) 0"]
@@ -220,7 +268,7 @@ def execute_tests() -> int:
 
 
     print("\n=== TEST: CODICE FISCALE ===")
-    codici = ["RSSMRA80A01H501U", "A1B2C3D4E5", "RSSMRA80A01H501UX", "RSS-MRA-80A01-H"]
+    codici = ["RSSMRA80A01H501U", "A1B2C3D4E5", "RSS-MRA-80A01-HA", ""]
     for cf_test in codici:
         try:
             cf = CodiceFiscale(cf_test)
@@ -228,26 +276,28 @@ def execute_tests() -> int:
         except ValueError as e:
             print(f"Errore: {e}")
 
+
     print("\n=== TEST: CAP ===")
     caps = ["12345", "0", "ABC/a", "3-a. "]
     for cap_test in caps:
         try:
-            cf = CodiceFiscale(cap_test)
+            cf = CAP(cap_test)
             print(f"Successo: {cap_test}")
         except ValueError as e:
             print(f"Errore: {e}")
 
+
     print("\n=== TEST: INDIRIZZO ===")
     # Prepariamo un cap valido e uno invalido per i test composti
     cap_roma = CAP("00153")
-    
+
     # 1. Indirizzo Standard Valido
     try:
         ind1 = Indirizzo("Via Trastevere", "12/A", cap_roma)
         print(f"Successo: {ind1}")
     except ValueError as e:
         print(f"Errore: {e}")
-        
+
     # 2. Indirizzo Civico Alternativo Valido (es. Interno o scala)
     try:
         ind2 = Indirizzo("Corso Vittorio Emanuele", "154 - Scala B", cap_roma)
@@ -267,7 +317,7 @@ def execute_tests() -> int:
     ind_a = Indirizzo("Via Garibaldi", "10", cap_roma)
     ind_b = Indirizzo("Via Garibaldi", "10", cap_roma)
     ind_c = Indirizzo("Via Garibaldi", "11", cap_roma)
-    
+
     print(f"ind_a == ind_b? {ind_a == ind_b} (Atteso: True)")
     print(f"ind_a == ind_c? {ind_a == ind_c} (Atteso: False)")
     print(f"Gli hash di ind_a e ind_b coincidono? {hash(ind_a) == hash(ind_b)} (Atteso: True)")
@@ -277,4 +327,3 @@ def execute_tests() -> int:
 
 if __name__ == "__main__":
     exit(execute_tests())
-
