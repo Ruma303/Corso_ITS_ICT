@@ -2,7 +2,7 @@
 
 import sys
 
-from persistence import load_all, save_all
+from data.persistence import load_all, save_all
 from ui import ui_ask_what_to_do
 
 
