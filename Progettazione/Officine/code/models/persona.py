@@ -5,7 +5,7 @@ from types.datatypes import CodiceFiscale, Indirizzo, Telefono
 from types.validators import DataValidator
 from typing import Self
 
-from associations import dirige, lavora
+from associations import dirige, lavora, vive_a
 from citta import Citta
 from exceptions.link import InvalidLinkException
 from exceptions.model import (
@@ -80,16 +80,6 @@ class Persona:
     def __validate_nascita(nascita: date | None):
         if not isinstance(nascita, date) or nascita is not None:
             raise TypeError("nascita deve essere una istanza di date oppure vuota")
-
-    def __validate_link(self, link):
-        if link is None:
-            raise InvalidLinkException
-        if not isinstance(link, dirige):
-            raise InvalidLinkException
-        if link.get_persona() != self:
-            raise InvalidLinkException
-        if not link.is_valid():
-            raise ValueError("Il link non è valido!")
 
     # INFO: CLASSMETHODS
 
@@ -261,15 +251,21 @@ class Persona:
         self.__lavora = frozenset(x for x in self.__lavora if x != link)
 
     def _add_dirige(self, link: dirige):
+        if link is None:
+            raise InvalidLinkException
+        if not isinstance(link, dirige):
+            raise InvalidLinkException
+        if link.get_persona() != self:
+            raise InvalidLinkException
+        if not link.is_valid():
+            raise ValueError("Il link non è valido!")
         if not self.is_direttore():
             raise IsNotDirettoreException
-        self.__validate_link(link)
         self.__dirige.add(link)
 
     def _remove_dirige(self, link: dirige):
         if not self.is_direttore():
             raise ValueError("self non è un dipendente")
-        self.__validate_link(link)
         self.__dirige = None
 
     # Interfaccia pubblica da richiamare nelle classi
@@ -280,6 +276,22 @@ class Persona:
         if self.get_lavora():
             lavora._remove(self.get_lavora())
         lavora._create(officina, self, assunzione)
+
+    def _add_vive_a(self, link: vive_a):
+      if link is None:
+          raise InvalidLinkException
+      if not isinstance(link, vive_a):
+          raise InvalidLinkException
+      if link.get_persona() != self:
+          raise InvalidLinkException
+      if not link.is_valid():
+          raise ValueError("Il link non è valido!")
+      self.__vive_a = link
+
+    def _remove_vive_a(self, link: vive_a):
+      self.__citta = None
+
+      
 
     # INFO: CONSTRUCTORS
 

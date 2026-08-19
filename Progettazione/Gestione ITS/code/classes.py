@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Optional, Self
-from uuid import UUID, uuid4, uuid5, NAMESPACE_DNS
+from uuid import NAMESPACE_DNS, UUID, uuid4, uuid5
 
 from class_utils import ClassUtilsCF, ClassUtilsNomi, ClassUtilsUUID
 from datatypes import CodiceFiscale, IntGEZ, IntGZ, RealGEZ, Voto
@@ -44,8 +44,9 @@ class Regione(ClassUtilsUUID, ClassUtilsNomi):
     """
     Il sistema deve garantire l'inserimento di più regioni con lo stesso nome (ma UUID sempre diverso), purché la nazione (il suo UUID) sia diverso. Esempio, possono esistere due Lazio, purché in nazioni diverse: (Lazio, Francia) e (Lazio, Italia) è corretto
     """
+
     # Registro per garantire l'univocità della coppia (NomeRegione, OggettoNazione)
-    __tuple_registry: dict[tuple[str, Nazione], Self] = {}
+    __tuple_registry: dict[tuple[str, Nazione], Self] = dict()
 
     @classmethod
     def get_objects_by_name(cls, name: str) -> set[Self]:
@@ -225,7 +226,7 @@ class Citta(ClassUtilsUUID, ClassUtilsNomi):
         )
 
 
-class AreaDisciplinare():
+class AreaDisciplinare:
     __all_objects_by_nome: dict[str, Self] = {}
 
     @classmethod
@@ -280,7 +281,9 @@ class Modulo(ClassUtilsNomi, ClassUtilsUUID):
         return list(cls.__all_objects_by_codice.values())
 
     @classmethod
-    def create(cls, codice: str, nome: str, ore: IntGZ, docenti: set[Docente] | None = None) -> Self:
+    def create(
+        cls, codice: str, nome: str, ore: IntGZ, docenti: set[Docente] | None = None
+    ) -> Self:
         if codice in cls.__all_objects_by_codice:
             raise KeyError(f"Esiste già un modulo con il codice '{codice}'")
         return cls(codice, nome, ore, docenti)
@@ -301,7 +304,9 @@ class Modulo(ClassUtilsNomi, ClassUtilsUUID):
 
         return obj
 
-    def __init__(self, codice: str, nome: str, ore: IntGZ, docenti: set[Docente] | None = None):
+    def __init__(
+        self, codice: str, nome: str, ore: IntGZ, docenti: set[Docente] | None = None
+    ):
         self.__codice = codice
         self.__nome = nome
         self.__ore = ore
@@ -391,7 +396,9 @@ class CorsoITS(ClassUtilsUUID, ClassUtilsNomi):
         return cls.__objects_by_keys
 
     @classmethod
-    def create(cls, nome: str, edizione: IntGEZ, area: AreaDisciplinare, moduli: set[Modulo]) -> Self:
+    def create(
+        cls, nome: str, edizione: IntGEZ, area: AreaDisciplinare, moduli: set[Modulo]
+    ) -> Self:
         # Controllo di integrità sulla coppia univoca
         chiave = (nome, edizione)
         if chiave in cls.__objects_by_keys:
@@ -460,7 +467,7 @@ class CorsoITS(ClassUtilsUUID, ClassUtilsNomi):
         self.__modules.add(modulo)
 
     def get_area_disciplinare(self) -> AreaDisciplinare:
-      return self.__area_disciplinare
+        return self.__area_disciplinare
 
     def __str__(self) -> str:
         return f"Corso: {self.get_nome()} [Edizione: {self.get_edizione()}] - Moduli totali: {self.get_num_moduli()}"
@@ -540,6 +547,8 @@ class Docente(Persona):
     ) -> Self:
         if cf in cls.all_objects_by_cf():
             raise KeyError(f"Il codice fiscale '{cf}' già esiste. Dev'essere univoco")
+        if citta_nascita not in Citta.all_objects_by_registry():
+            raise KeyError(f"La città {citta_nascita} non è registrata")
         return cls(nome, cognome, cf, citta_nascita)
 
     @classmethod
@@ -599,6 +608,8 @@ class Studente(Persona):
             raise KeyError(f"Il codice fiscale '{cf}' già esiste. Dev'essere univoco")
         if matricola in cls.__all_objects_by_matricole:
             raise KeyError(f"La matricola {matricola} esiste già e dev'essere univoca")
+        if citta_nascita not in Citta.all_objects_by_registry():
+            raise KeyError(f"La città {citta_nascita} non è registrata")
         return cls(nome, cognome, cf, citta_nascita, matricola, data_nascita)
 
     @classmethod

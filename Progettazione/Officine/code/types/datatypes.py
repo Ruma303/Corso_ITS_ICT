@@ -1,7 +1,7 @@
 import re
+from pathlib import Path
 from sys import exit
 from typing import Any, Optional, Self
-from pathlib import Path
 
 
 class Targa(str):
@@ -35,10 +35,12 @@ class Targa(str):
 
 
 class Telefono(str):
-    __patterns = [
-        r"^(?:(?:\+|00)39)?\s?[3]\d{2}(?:\s?\d{3,4}){2,3}$",
-        r"^\+?\s?[\d]{6,10}$",
-    ]
+    __patterns = frozenset(
+        [
+            r"^(?:(?:\+|00)39)?\s?[3]\d{2}(?:\s?\d{3,4}){2,3}$",
+            r"^\+?\s?[\d]{6,10}$",
+        ]
+    )
 
     @classmethod
     def get_patterns(cls):
@@ -47,9 +49,6 @@ class Telefono(str):
     def __new__(cls, numero: str | int):
         if numero is None or numero == "":
             raise ValueError("Il numero di telefono non può essere vuoto.")
-
-        if numero is None or numero == "":
-            raise ValueError("Il numero di telefono non può essere vuoto")
 
         result = False
 
@@ -75,16 +74,18 @@ class Telefono(str):
 
 
 class CodiceFiscale(str):
-    __patterns = [
-        r"[A-Z0-9]{0,16}",
-        r"[A-Z]{6}[0-9]{2}[A-EHLMPRST][0-9]{2}[A-Z][0-9]{3}[A-Z]",
-        r"[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[0-9A-Z]{5}",
-    ]
+    __patterns = frozenset(
+        [
+            r"[A-Z0-9]{0,16}",
+            r"[A-Z]{6}[0-9]{2}[A-EHLMPRST][0-9]{2}[A-Z][0-9]{3}[A-Z]",
+            r"[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[0-9A-Z]{5}",
+        ]
+    )
 
     @classmethod
     def get_patterns(cls):
         return cls.__patterns
-        
+
     def __new__(cls, cf: str):
         if cf is None or cf == "":
             raise ValueError("Il Codice Fiscale non può essere vuoto.")
@@ -118,7 +119,7 @@ class CodiceFiscale(str):
 
 
 class Indirizzo:
-    __civico_patterns = [r"\d+[\w\W\d\s/.-]*"]
+    __civico_patterns = frozenset([r"\d+[\w\W\d\s/.-]*"])
 
     @classmethod
     def get_civico_patterns(cls):
@@ -127,7 +128,7 @@ class Indirizzo:
     # Oppure, usare soltanto l'init.
     def __init__(self, via: str, civico: str):
         if via is None or civico is None:
-            raise ValueError(
+            raise TypeError(
                 "Errore nell'Indirizzo: via e civico non possono essere vuoti."
             )
 
@@ -168,7 +169,7 @@ class Indirizzo:
             return False
         return (self.get_via(), self.get_civico()) == (
             other.get_via(),
-            other.get_civico()
+            other.get_civico(),
         )
 
 
@@ -229,7 +230,6 @@ def execute_tests() -> int:
             print(f"Successo: {cf}")
         except ValueError as e:
             print(f"Errore: {e}")
-
 
     print("\n=== TEST: INDIRIZZO ===")
     # Prepariamo un cap valido e uno invalido per i test composti

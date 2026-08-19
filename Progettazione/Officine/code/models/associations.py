@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 from datetime import date
-from Progettazione.Officine.code.exceptions.model import IsNotValidPersonaException
-from Progettazione.Officine.code.types.validators import DataValidator
 from types.datatypes import IntGEZ
 from typing import Any
 
+from citta import Citta
 from exceptions.link import InvalidLinkException
+from nazione import Nazione
 from officina import Officina
 from persona import Persona
-from citta import Citta
-from nazione import Nazione
 from veicolo import Veicolo
+
+from Progettazione.Officine.code.exceptions.model import IsNotValidPersonaException
+from Progettazione.Officine.code.types.validators import DataValidator
 
 
 class lavora:
@@ -169,7 +170,6 @@ class dirige:
 
 
 class vive_a:
-
     @classmethod
     def _create(cls, persona: Persona, citta: Citta):
         link = cls(persona, citta)
@@ -190,14 +190,14 @@ class vive_a:
     def get_persona(self):
         return self.__persona
 
-    def __set_persona(self, persona: Persona):
-        return self.__persona = persona
-
-    def __set_citta(self, citta: Citta):
-        return self.__citta = citta
-
     def is_valid(self) -> bool:
         return self.__is_valid
+
+    def __set_persona(self, persona: Persona):
+        self.__persona = persona
+
+    def __set_citta(self, citta: Citta):
+        self.__citta = citta
 
     def _set_is_valid(self, value: bool):
         self.__is_valid = value
@@ -220,7 +220,6 @@ class vive_a:
 
 
 class naz_veic:
-
     @classmethod
     def _create(cls, nazione: Nazione, veicolo: Veicolo):
         link = cls(nazione, veicolo)
@@ -235,21 +234,20 @@ class naz_veic:
         link.__nazione = None
         link.__veicolo = None
 
-
     def get_nazione(self):
         return self.__nazione
 
     def get_veicolo(self):
         return self.__veicolo
 
+    def get_is_valid(self) -> bool:
+        return self.__is_valid
+
     def __set_nazione(self, nazione: Nazione):
-        return self.__nazione = nazione
+        self.__nazione = nazione
 
     def __set_veicolo(self, veicolo: Veicolo):
-        return self.__veicolo = veicolo
-
-    def is_valid(self) -> bool:
-        return self.__is_valid
+        self.__veicolo = veicolo
 
     def _set_is_valid(self, value: bool):
         self.__is_valid = value
@@ -260,7 +258,7 @@ class naz_veic:
         self._set_is_valid(True)
 
     def __hash__(self):
-        return hash((self.get_veicolo()))
+        return hash((self.get_veicolo(), self.get_nazione()))
 
     def __eq__(self, other: Any):
         if type(self) is not type(other):
