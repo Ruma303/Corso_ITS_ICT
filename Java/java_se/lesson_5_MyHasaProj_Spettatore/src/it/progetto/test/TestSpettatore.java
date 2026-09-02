@@ -6,7 +6,6 @@ public class TestSpettatore {
 
   public static void main(String[] args) {
 
-
     Biglietto b1 = new Biglietto("Il Re Leone",    'A', 1,  45.0f);
     Biglietto b2 = new Biglietto("Il Re Leone",    'A', 2,  45.0f);
     Biglietto b3 = new Biglietto("Cats",           'B', 5,  30.0f);

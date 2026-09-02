@@ -1,0 +1,5 @@
+[
+  { "id": "c1", "nome": "Calcio", "tipo": "calcio", "coperto": true,  "posti": 22 },
+  { "id": "c2", "nome": "Padel",  "tipo": "padel",  "coperto": false, "posti": 4  },
+  { "id": "c3", "nome": "Tennis", "tipo": "tennis", "coperto": false, "posti": 4  }
+]

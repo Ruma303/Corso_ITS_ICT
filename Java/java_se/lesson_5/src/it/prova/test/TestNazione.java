@@ -43,17 +43,11 @@ public class TestNazione {
     );
   }
 
-
-
-
-
-
   private static String menu() {
     return """
-        {
+            
             HELLO GENTE!
             Welcome to Nazioni games!
-        }
         """;
   }
 }
