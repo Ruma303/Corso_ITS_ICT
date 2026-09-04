@@ -1,0 +1,80 @@
+[
+  {
+    "nome": "Mario",
+    "cognome": "Rossi",
+    "eta": 18,
+    "sesso": "male"
+  },
+  {
+    "nome": "Mario",
+    "cognome": "Rosso",
+    "eta": 18,
+    "sesso": "male"
+  },
+  {
+    "nome": "Mario",
+    "cognome": "Rossi",
+    "eta": 18,
+    "sesso": "male"
+  },
+  {
+    "nome": "Mario",
+    "cognome": "Rossi",
+    "eta": 8,
+    "sesso": "male"
+  },
+  {
+    "nome": "Giulia",
+    "cognome": "Bianchi",
+    "eta": 24,
+    "sesso": "female"
+  },
+  {
+    "nome": "Luca",
+    "cognome": "Romano",
+    "eta": 35,
+    "sesso": "male"
+  },
+  {
+    "nome": "Sara",
+    "cognome": "Ferrari",
+    "eta": 311,
+    "sesso": "female"
+  },
+  {
+    "nome": "Andrea",
+    "cognome": "Esposito",
+    "eta": 22,
+    "sesso": "male"
+  },
+  {
+    "nome": "Francesca",
+    "cognome": "Colombo",
+    "eta": 27,
+    "sesso": "female"
+  },
+  {
+    "nome": "Matteo",
+    "cognome": "Ricci",
+    "eta": 41,
+    "sesso": "male"
+  },
+  {
+    "nome": "Elena",
+    "cognome": "Marino",
+    "eta": 229,
+    "sesso": "female"
+  },
+  {
+    "nome": "Davide",
+    "cognome": "Greco",
+    "eta": 33,
+    "sesso": "male"
+  },
+  {
+    "nome": "Chiara",
+    "cognome": "Conti",
+    "eta": 26,
+    "sesso": null
+  }
+]

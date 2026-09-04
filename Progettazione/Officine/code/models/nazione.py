@@ -1,25 +1,13 @@
 from __future__ import annotations
 
-from typing import Optional, Self
+from typing import Self
 
-from associations import naz_veic
-
-# class GenericObjValidate:
-
-#         def __init__(self, obj: any):
-
-#             match (obj):
-#                 case type(obj) == str:
-#                     # tutte le validazioni sulle str
-#                 case type(obj) == Nazione:
-#                     if not Nazione.get_object_by_nome(nazione):
-#                         raise KeyError(f"La nazione {nazione} non esiste nel registro")
+from .associations import naz_veic
 
 
 class Nazione:
-    __objects_by_nome: dict[str, Self]
-    __set_name_nazioni: set[str]
-    __set_naz_veic: set[naz_veic]
+    __objects_by_nome: dict[str, Self] = dict()
+    # __set_naz_veic: set[naz_veic]
 
     # INFO: VALIDATORS
 
@@ -31,15 +19,11 @@ class Nazione:
     # INFO: CLASSMETHODS
 
     @classmethod
-    def all_objects_by_nome(cls):
+    def all_objects_by_nome(cls) -> dict[str, Self]:
         return cls.__objects_by_nome
-
+        
     @classmethod
-    def set_objects_by_nome(cls):
-        return cls.__objects_by_nome.values()
-
-    @classmethod
-    def get_object_by_nome(cls, nome: str) -> Optional[Self]:
+    def get_object_by_nome(cls, nome: str) -> Self | None:
         return cls.__objects_by_nome.get(nome)
 
     # INFO: GETTERS
@@ -48,25 +32,30 @@ class Nazione:
         return self.__nome
 
     def get_regex_targa(self) -> frozenset[str]:
-        return frozenset(self.__regex_naz)
+        return frozenset(self.__regex_targa)
 
     # INFO: SETTERS
 
     def __set_nome(self, nome: str) -> None:
-        if nome is None or nome == "":
-            raise ValueError("Nome nazione non può essere vuoto")
-        if not isinstance(nome, str):
-            raise TypeError("Il nome della nazione dev'essere una stringa")
+        Nazione.__validate_nome(nome)
         if nome in type(self).all_objects_by_nome():
             raise KeyError(f"La nazione '{nome}' già è presente nel sistema")
 
-        # Per consentire la mutabilità, va rimossa la chiave dal dizionario
-        del type(self).__objects_by_nome[self.__nome]
+        # Se il nome inviato è identico a quello attuale, non occorre fare nulla
+        if hasattr(self, "_Nazione__nome") and self.__nome == nome:
+            return
 
-        type(self).__objects_by_nome[self.__nome] = self
+        # Per consentire la mutabilità, va rimossa la chiave dal dizionario
+        if hasattr(self, "_Nazione__nome"):
+          del type(self).__objects_by_nome[self.__nome]
+
+        # Per poi aggiungere la nuova chiave con il nuovo nome
         self.__nome = nome
+        type(self).__objects_by_nome[self.__nome] = self
+
 
     # INFO: ASSOCIATIONS
+    # TODO: il setter per aggiornare __regex_targa è l'associazione
 
     def add_regex_targa(self, regex: str):
         if not regex or not isinstance(regex, str):
@@ -88,18 +77,21 @@ class Nazione:
         Nazione.__validate_nome(nome)
         return super().__new__(cls)
 
-    def __init__(self):
-        self.__regex_targa = set()
+    def __init__(self, nome: str):
+        self.__set_nome(nome)
+        self.__regex_targa = set() # [1..*]
+        # TODO: Richiedere almeno una regex per la targa della nazione valida e inserirla
 
         type(self).all_objects_by_nome()[self.__nome] = self
+
 
     # INFO: UTILITIES
 
     def __str__(self):
         return f"{self.__nome}"
 
-    def to_json(self) -> tuple[str, dict]:
-        return (
-            str(self.get_nome()),
-            {"nome": self.get_nome(), "regex": self.get_regex_targa()},
-        )
+    # def to_json(self) -> tuple[str, dict]:
+    #     return (
+    #         str(self.get_nome()),
+    #         {"nome": self.get_nome(), "regex": self.get_regex_targa()},
+    #     )

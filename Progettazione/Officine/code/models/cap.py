@@ -3,6 +3,10 @@ import re
 
 class CAP(str):
 
+    # INFO: ASSOCIATIONS
+
+    # INFO: CONSTRUCTORS
+
     def __new__(cls, cap: str):
 
         if cap is None or cap == "":
@@ -13,6 +17,8 @@ class CAP(str):
             raise ValueError(f"Il cap '{cap}' inserito non è valido.")
 
         return super().__new__(cls, str_cap)
+
+    # INFO: UTILITIES
 
     def __str__(self):
         return self

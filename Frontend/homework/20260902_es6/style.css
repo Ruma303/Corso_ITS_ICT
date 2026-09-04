@@ -1,0 +1,197 @@
+:root {
+  --blu:     #007bff;   /* primario brand (il blu "primary" di Bootstrap) */
+  --verde:   #2e7d32;   /* accento di successo (CTA conferma, badge Novità) */
+  --scuro:   #343a40;   /* antracite tenue per il footer (non nero pieno) */
+  --grigio:  #f5f5f7;   /* sfondo pagina */
+  --testo:   #1a1a1a;
+  --gap:     1.5rem;
+  --raggio:  8px;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  color: var(--testo);
+  background: var(--grigio);
+  margin: 0;
+}
+
+main {
+  max-width: 1200px;
+}
+
+/* ---------- Header / navbar (a mano, sarà sostituita da Bootstrap in L4) ---------- */
+/* header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: var(--blu);
+  color: white;
+}
+
+header .logo { font-size: 1.5rem; font-weight: bold; }
+
+header nav { display: flex; gap: 1.5rem; }
+
+header nav a {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+header nav a:hover { text-decoration: underline; } */
+
+/* nav ul {
+  display: flex;
+  gap: 1.5rem;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+h1 {
+  color: var(--blu);
+  font-size: 2.5rem;
+} */
+
+/* ---------- Griglia campi (CSS grid, sarà sostituita da row/col in L4) ---------- */
+/* #campi .griglia-campi {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+} */
+
+/* ---------- Card (flexbox, sarà sostituita dal componente Card in L4) ---------- */
+/* .card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  background: white;
+  border-radius: var(--raggio);
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--verde);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.1); }
+} */
+
+/* ---------- Bottoni ---------- */
+/* .btn {
+  background: var(--blu);
+  color: white;
+  padding: calc(var(--gap) / 2) var(--gap);
+  border-radius: var(--raggio);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-accedi {
+  background: white;
+  color: var(--blu);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-prenota {
+  background: var(--blu);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-prenota:hover { background: var(--verde); } */
+
+/* ---------- Form ---------- */
+/* .form-stilizzato {
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.form-stilizzato label {
+  display: block;
+  margin: 1rem 0 0.5rem;
+  font-weight: 600;
+}
+
+.form-stilizzato input,
+.form-stilizzato select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-stilizzato input:focus,
+.form-stilizzato select:focus {
+  outline: none;
+  border-color: var(--blu);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.required { color: red; }
+
+.btn-submit {
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 0.75rem;
+  background: var(--blu);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-submit:hover { background: var(--verde); }
+
+.container-label {
+  display: flex;
+  gap: 1rem;
+} */
+
+/* ---------- Footer ---------- */
+footer {
+  background: var(--scuro);
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+footer a { color: white; }

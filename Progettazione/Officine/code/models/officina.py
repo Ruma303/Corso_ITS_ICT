@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from types.datatypes import Indirizzo, Telefono
+from types.datatypes import CodiceFiscale, Indirizzo, Telefono
 from types.validators import DataValidator
 from typing import Self
 
@@ -8,8 +8,6 @@ from associations import dirige, lavora
 from exceptions.link import InvalidLinkException
 from exceptions.model import IsNotDirettoreException
 from persona import Persona
-
-from Progettazione.Officine.prof.main import CodiceFiscale
 
 
 class Officina:
@@ -83,6 +81,10 @@ class Officina:
 
     # INFO: SETTERS
 
+    def __set_nome(self, nome: str):
+        DataValidator.__validate_str(nome)
+        self.__nome = nome
+
     def __set_telefono(self, telefono: Telefono) -> None:
         DataValidator.__validate_telefono(telefono)
         self.__telefono = telefono
@@ -137,6 +139,8 @@ class Officina:
         DataValidator.__validate_telefono(telefono)
         DataValidator.__validate_indirizzo(indirizzo)
 
+        return super().__new__(cls)
+
     def __init__(
         self,
         nome: str,
@@ -144,10 +148,9 @@ class Officina:
         telefono: Telefono,
         direttore: Persona,
     ):
-        self.__nome = nome  # <<imm>> {id}
+        self.__set_nome(nome)  # <<imm>> {id}
         self.__set_indirizzo(indirizzo)  # <<imm>> {id}
         self.__set_telefono(telefono)
-        self.__direttore = direttore
 
         # Associazioni
 
@@ -158,23 +161,23 @@ class Officina:
         # Salvataggio con vincolo composto (nome, indirizzo)
         type(self).__objects_by_registry[(self.__nome, self.__indirizzo)] = self
         type(self).__objects_by_telefono[self.__telefono] = self
-        type(self).__objects_by_direttore[self.__direttore.get_codice_fiscale()] = self
+        # type(self).__objects_by_direttore[self.__direttore.get_codice_fiscale()] = self
 
     # INFO: UTILITIES
 
     def __str__(self) -> str:
-        return f"{self.__nome} ({self.__indirizzo})"
+        return f"{self.get_nome()} ({self.get_indirizzo()}) | tel: [{self.get_telefono()}] - Direttore: {self.get_direttore()}"
 
-    def to_json(self) -> tuple[str, dict]:
-        return (
-            str(self.get_nome()),
-            {
-                "nome": self.get_nome(),
-                "indirizzo": {
-                    "via": self.get_indirizzo().get_via(),
-                    "civico": self.get_indirizzo().get_civico(),
-                },
-            },
-        )
+    # def to_json(self) -> tuple[str, dict]:
+    #     return (
+    #         str(self.get_nome()),
+    #         {
+    #             "nome": self.get_nome(),
+    #             "indirizzo": {
+    #                 "via": self.get_indirizzo().get_via(),
+    #                 "civico": self.get_indirizzo().get_civico(),
+    #             },
+    #         },
+    #     )
 
     # def numero_dipendenti(self) -> IntGEZ: ...

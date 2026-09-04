@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional, Self
+from typing import Self
 
 
 class Riparazione:
@@ -9,6 +9,8 @@ class Riparazione:
     __riparazioni_terminate: set[Self] = set()
 
     # INFO: VALIDATORS
+
+    
     # INFO: CLASSMETHODS
 
     @classmethod
@@ -25,7 +27,7 @@ class Riparazione:
         codice: str,
         accettazione: datetime,
         is_terminata: bool,
-        riconsegna: Optional[datetime] = None,
+        riconsegna: datetime | None = None,
     ) -> Self:
         if not codice:
             raise ValueError("Il codice non può essere vuoto o nullo")
@@ -63,7 +65,7 @@ class Riparazione:
             riconsegna_obj = datetime.fromisoformat(data["riconsegna"])
 
         return cls(codice_obj, accettazione_obj, is_terminata_obj, riconsegna_obj)
-    
+
     # INFO: GETTERS
 
     def get_codice(self) -> str:
@@ -75,22 +77,33 @@ class Riparazione:
     def get_is_terminata(self) -> bool:
         return self.__is_terminata
 
-    def get_riconsegna(self) -> Optional[datetime]:
+    def get_riconsegna(self) -> datetime | None:
         return self.__riconsegna if self.__is_terminata else None
 
 
     # INFO: SETTERS
-    
+
     # INFO: ASSOCIATIONS
 
     # INFO: CONSTRUCTORS
+
+    def __new__(
+        cls,
+        codice: str,
+        accettazione: datetime,
+        is_terminata: bool,
+        riconsegna: datetime | None
+    ):
+
+      
+
 
     def __init__(
         self,
         codice: str,
         accettazione: datetime,
         is_terminata: bool,
-        riconsegna: Optional[datetime],
+        riconsegna: datetime | None,
     ):
         if not codice:
             raise ValueError("Il codice della Riparazione non può essere vuoto")
@@ -111,14 +124,14 @@ class Riparazione:
 
     # INFO: UTILITIES
 
-    def to_json(self) -> tuple[str, dict]:
-        riconsegna_val = self.get_riconsegna()
-        return (
-            self.get_codice(),
-            {
-                "codice": self.get_codice(),
-                "accettazione": self.get_accettazione().isoformat(),
-                "is_terminata": self.get_is_terminata(),
-                "riconsegna": riconsegna_val.isoformat() if riconsegna_val else None,
-            },
-        )
+    # def to_json(self) -> tuple[str, dict]:
+    #     riconsegna_val = self.get_riconsegna()
+    #     return (
+    #         self.get_codice(),
+    #         {
+    #             "codice": self.get_codice(),
+    #             "accettazione": self.get_accettazione().isoformat(),
+    #             "is_terminata": self.get_is_terminata(),
+    #             "riconsegna": riconsegna_val.isoformat() if riconsegna_val else None,
+    #         },
+    #     )

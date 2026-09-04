@@ -23,12 +23,9 @@ class Persona:
     # INFO: VALIDATORS
 
     @staticmethod
-    def __validate_nome(nome: str):
-        DataValidator.__validate_str(nome)
-
-    @staticmethod
     def __validate_cognome(cognome: str):
-        DataValidator.__validate_str(cognome)
+        # Riutilizzo della stessa validazione
+        DataValidator.__validate_nome(cognome)
 
     @staticmethod
     def __validate_codice_fiscale(codice_fiscale: CodiceFiscale | str):
@@ -54,33 +51,7 @@ class Persona:
     def __validate_persona(self):
         if not (self.is_cliente() or self.is_dipendente() or self.is_direttore()):
             raise IsNotValidPersonaException
-
-    @staticmethod
-    def __validate_indirizzo(indirizzo: Indirizzo):
-        if not indirizzo:
-            raise ValueError("indirizzo non può essere None o vuoto")
-        if not isinstance(indirizzo, Indirizzo):
-            raise TypeError("indirizzo deve essere una istanza di Indirizzo")
-
-    @staticmethod
-    def __validate_citta(citta: Citta):
-        if not citta:
-            raise ValueError("citta non può essere None o vuoto")
-        if not isinstance(citta, Citta):
-            raise TypeError("citta deve essere una istanza di Citta")
-
-    @staticmethod
-    def __validate_telefono(telefono: Telefono):
-        if not telefono:
-            raise ValueError("telefono non può essere None o vuoto")
-        if not isinstance(telefono, Telefono):
-            raise TypeError("telefono deve essere una istanza di Telefono")
-
-    @staticmethod
-    def __validate_nascita(nascita: date | None):
-        if not isinstance(nascita, date) or nascita is not None:
-            raise TypeError("nascita deve essere una istanza di date oppure vuota")
-
+            
     # INFO: CLASSMETHODS
 
     @classmethod
@@ -148,32 +119,32 @@ class Persona:
             self.__codice_fiscale = codice_fiscale
 
     def __set_nome(self, nome: str):
-        Persona.__validate_nome(nome)
+        DataValidator.__validate_nome(nome)
         self.__nome = nome
 
     def __set_cognome(self, cognome: str):
         Persona.__validate_cognome(cognome)
         self.__cognome = cognome
 
-    def __set_nascita(self, nascita: date | None):
-        Persona.__validate_nascita(nascita)
+    def __set_nascita(self, nascita: date):
+        DataValidator.__validate_date(nascita)
         self.__nascita = nascita
 
     def __set_indirizzo(self, indirizzo: Indirizzo, citta: Citta):
-        Persona.__validate_indirizzo(indirizzo)
-        Persona.__validate_citta(citta)
+        DataValidator.__validate_indirizzo(indirizzo)
+        DataValidator.__validate_citta(citta)
         self.__indirizzo = indirizzo
         self.__citta = citta
 
     def __set_telefono(self, telefono: Telefono):
-        Persona.__validate_telefono(telefono)
+        DataValidator.__validate_telefono(telefono)
         self.__telefono = telefono
 
     # Setter per associazione con attributi vincolanti
     # Impostare il campo "nascita" solo se "is_direttore" == True
     def _set_direttore(self, nascita: date):
         self.__validate_persona()
-        Persona.__validate_nascita(nascita)
+        DataValidator.__validate_date(nascita)
         self.__nascita = nascita
         self.__is_direttore = True
 
@@ -291,7 +262,6 @@ class Persona:
     def _remove_vive_a(self, link: vive_a):
       self.__citta = None
 
-      
 
     # INFO: CONSTRUCTORS
 
@@ -310,15 +280,17 @@ class Persona:
     ):
 
         Persona.__validate_codice_fiscale(codice_fiscale)
-        Persona.__validate_nome(nome)
+        DataValidator.__validate_nome(nome)
         Persona.__validate_cognome(cognome)
-        Persona.__validate_indirizzo(indirizzo)
-        Persona.__validate_citta(citta)
-        Persona.__validate_telefono(telefono)
+        DataValidator.__validate_indirizzo(indirizzo)
+        DataValidator.__validate_citta(citta)
+        DataValidator.__validate_telefono(telefono)
         Persona.__validate_persona_params(is_cliente, is_dipendente, is_direttore)
 
-        if is_direttore:
-            Persona.__validate_nascita(nascita)
+        if is_direttore and nascita:
+            DataValidator.__validate_date(nascita)
+
+        return super().__new__(cls)
 
     def __init__(
         self,
@@ -345,7 +317,7 @@ class Persona:
         self.__set_indirizzo(indirizzo, citta)
         self.__set_telefono(telefono)
 
-        if self.is_direttore():
+        if self.is_direttore() and nascita:
             self.__set_nascita(nascita)
         else:
             self.__set_nascita(None)
@@ -361,14 +333,15 @@ class Persona:
     def __str__(self) -> str:
         return f"{self.get_cognome()}, {self.get_nome()} residente in {self.get_indirizzo()}"
 
-    def to_json(self) -> tuple[str, dict]:
-        return (
-            str(self.get_codice_fiscale()),
-            {
-                "nome": self.get_nome(),
-                "cognome": self.get_cognome(),
-                "codice_fiscale": str(self.get_codice_fiscale()),
-                "citta_nascita": str(self.get_citta_nascita()),
-                "indirizzo": str(self.get_indirizzo()),
-            },
-        )
+    # def to_json(self) -> tuple[str, dict]:
+    #     return (
+    #         str(self.get_codice_fiscale()),
+    #         {
+    #             "nome": self.get_nome(),
+    #             "cognome": self.get_cognome(),
+    #             "codice_fiscale": str(self.get_codice_fiscale()),
+    #             "citta_nascita": str(self.get_citta_nascita()),
+    #             "indirizzo": str(self.get_indirizzo()),
+    #             "data_nascita": str(self.get_nascita())
+    #         },
+    #     )

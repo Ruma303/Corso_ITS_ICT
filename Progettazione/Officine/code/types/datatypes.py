@@ -118,6 +118,7 @@ class CodiceFiscale(str):
         return f"CodiceFiscale('{self}')"
 
 
+# Creazione tipo composto
 class Indirizzo:
     __civico_patterns = frozenset([r"\d+[\w\W\d\s/.-]*"])
 
@@ -164,7 +165,6 @@ class Indirizzo:
         return hash((self.via, self.civico))
 
     def __eq__(self, other: Any) -> bool:
-        # type() verifica la classe esatta, mentre isinstance() verifica anche le sottoclassi
         if other is None or type(other) is not type(self) or hash(self) != hash(other):
             return False
         return (self.get_via(), self.get_civico()) == (

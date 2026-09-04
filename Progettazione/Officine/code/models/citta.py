@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional, Self
+from typing import Self
 
-from nazione import Nazione
+from .nazione import Nazione
 
 
 class Citta:
@@ -28,7 +28,7 @@ class Citta:
         return cls.__objects_by_nome.values()
 
     @classmethod
-    def get_object_by_nome(cls, nome: str) -> Optional[Self]:
+    def get_object_by_nome(cls, nome: str) -> Self | None:
         return cls.__objects_by_nome.get(nome)
 
     @classmethod
@@ -55,6 +55,14 @@ class Citta:
 
     # INFO: ASSOCIATIONS
 
+    # def _citta_reg
+
+    # def _citta_cap
+
+    # def _citta_off (sede officina)
+
+    # def _citta_pers (Persona vive_a)
+
     # INFO: CONSTRUCTORS
 
     def __new__(cls, nome: str, nazione: Nazione):
@@ -74,11 +82,11 @@ class Citta:
     def __str__(self) -> str:
         return f"{self.__nome} ({self.__nazione})"
 
-    def to_json(self) -> tuple[str, dict]:
-        return (
-            str(self.get_nome()),
-            {
-                "nome": self.get_nome(),
-                "nazione": str(self.get_nome()),
-            },
-        )
+    # def to_json(self) -> tuple[str, dict]:
+    #     return (
+    #         str(self.get_nome()),
+    #         {
+    #             "nome": self.get_nome(),
+    #             "nazione": str(self.get_nome()),
+    #         },
+    #     )

@@ -1,5 +1,5 @@
-from types.datatypes import Indirizzo, Telefono
 from datetime import date
+from types.datatypes import Indirizzo, Telefono
 
 from exceptions.link import InvalidLinkException
 from models.citta import Citta
@@ -10,6 +10,11 @@ class DataValidator:
     def __validate_bool(value: bool):
         if type(value) is not bool or value is None:
             raise TypeError(f"'{value}' deve essere un booleano")
+
+    @staticmethod
+    def __validate_nome(nome: str):
+        if not nome or not isinstance(nome, str):
+            raise TypeError("Il nome deve essere una stringa valida e non vuota")
 
     @staticmethod
     def __validate_str(value: str):
@@ -40,12 +45,12 @@ class DataValidator:
     @staticmethod
     def __validate_date(value: date):
         if not value:
-          raise ValueError(f"'{value}' non può essere None o vuoto")
+            raise ValueError(f"'{value}' non può essere None o vuoto")
         if not isinstance(value, date):
-          raise TypeError(f"'{value}' deve essere una istanza di datetime.date")
+            raise TypeError(f"'{value}' deve essere una istanza di datetime.date")
 
     # Copiare e incollare nella classe dove utilizzarlo per avere l'istanza self corretta
-    """ 
+    """
     def __validate_link(self, link):
         if link is None:
             raise InvalidLinkException("Il link non può essere None o vuoto")
