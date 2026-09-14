@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from datetime import date
 from types.datatypes import CodiceFiscale, Indirizzo, Telefono
-from types.validators import DataValidator
+from types.validators import AssociationValidator, DataValidator
 from typing import Self
 
-from associations import dirige, lavora, vive_a
+from associations import dirige, lavora
 from citta import Citta
-from exceptions.link import InvalidLinkException
+from exceptions.link import (
+    InvalidLinkException,
+)
 from exceptions.model import (
     IsNotDipendenteException,
     IsNotDirettoreException,
@@ -17,24 +19,10 @@ from models.officina import Officina
 
 
 class Persona:
-    __objects_by_codice_fiscale: dict[CodiceFiscale | str, Self] = dict()
+    __objects_by_codice_fiscale: dict[CodiceFiscale, Self] = dict()
     __objects_by_name: dict[str, Self] = dict()
 
     # INFO: VALIDATORS
-
-    @staticmethod
-    def __validate_cognome(cognome: str):
-        # Riutilizzo della stessa validazione
-        DataValidator.__validate_nome(cognome)
-
-    @staticmethod
-    def __validate_codice_fiscale(codice_fiscale: CodiceFiscale | str):
-        if not codice_fiscale:
-            raise TypeError("Il codice fiscale non può essere None o vuoto")
-        if not isinstance(codice_fiscale, CodiceFiscale):
-            raise TypeError(
-                f"'{codice_fiscale}' deve essere una istanza di CodiceFiscale o una stringa"
-            )
 
     @staticmethod  # Validazione senza classe o istanza
     def __validate_persona_params(
@@ -48,10 +36,11 @@ class Persona:
             )
 
     # Validazione con istanza
-    def __validate_persona(self):
+    def __validate_persona(self) -> bool:
         if not (self.is_cliente() or self.is_dipendente() or self.is_direttore()):
             raise IsNotValidPersonaException
-            
+        return True
+
     # INFO: CLASSMETHODS
 
     @classmethod
@@ -93,12 +82,6 @@ class Persona:
     def get_citta_nascita(self) -> Citta | None:
         return self.__citta
 
-    def get_lavora(self) -> frozenset[lavora]:
-        return frozenset(self.__lavora)
-
-    def get_dirige(self) -> set[dirige] | None:
-        return self.__dirige
-
     def is_dipendente(self) -> bool:
         return self.__is_dipendente
 
@@ -108,43 +91,59 @@ class Persona:
     def is_cliente(self) -> bool:
         return self.__is_cliente
 
+    def get_links_dirige(self) -> frozenset[dirige]:
+        """Restituisce la collezione immutabile dei link associativi 'dirige'."""
+        return self.__links_dirige
+
+    def get_direttori(self) -> frozenset[Persona]:
+        """Restituisce la collezione immutabile dei direttori con associazione 'dirige' valida."""
+        return frozenset(d.get_persona() for d in self.__links_dirige if d.is_valid())
+
+    def get_officine_dirette(self) -> frozenset[Officina]:
+        """Restituisce l'insieme delle Officine dirette dall'istanza corrente.
+        
+        Realizza il pattern della delegazione navigando la classe associativa 'dirige'.
+        """
+        return frozenset(link.get_officina() for link in self.__links_dirige if link.is_valid())
+
+    def get_lavora(self) -> frozenset[lavora]:
+        return frozenset(link for link in self.__links_lavora if link.is_valid())
+
     # INFO: SETTERS
 
-    def __set_codice_fiscale(self, codice_fiscale: CodiceFiscale | str):
-        Persona.__validate_codice_fiscale(codice_fiscale)
-        # Se viene passata una str, usiamo il costruttore per il dato CodiceFiscale
-        if type(codice_fiscale) is str:
-            self.__codice_fiscale = CodiceFiscale(codice_fiscale)
-        else:
-            self.__codice_fiscale = codice_fiscale
-
+    def __set_codice_fiscale(self, codice_fiscale: CodiceFiscale):
+        DataValidator.validate_codice_fiscale(codice_fiscale)
+        self.__codice_fiscale = codice_fiscale
+        
     def __set_nome(self, nome: str):
-        DataValidator.__validate_nome(nome)
+        DataValidator.validate_str(nome)
         self.__nome = nome
 
     def __set_cognome(self, cognome: str):
-        Persona.__validate_cognome(cognome)
+        DataValidator.validate_str(cognome)
         self.__cognome = cognome
 
-    def __set_nascita(self, nascita: date):
-        DataValidator.__validate_date(nascita)
-        self.__nascita = nascita
+    def __set_nascita(self, nascita: date | None):
+        if nascita:
+            DataValidator.validate_date(nascita)
+        else:
+            self.__nascita = nascita
 
     def __set_indirizzo(self, indirizzo: Indirizzo, citta: Citta):
-        DataValidator.__validate_indirizzo(indirizzo)
-        DataValidator.__validate_citta(citta)
+        DataValidator.validate_indirizzo(indirizzo)
+        DataValidator.validate_citta(citta)
         self.__indirizzo = indirizzo
         self.__citta = citta
 
     def __set_telefono(self, telefono: Telefono):
-        DataValidator.__validate_telefono(telefono)
+        DataValidator.validate_telefono(telefono)
         self.__telefono = telefono
 
     # Setter per associazione con attributi vincolanti
     # Impostare il campo "nascita" solo se "is_direttore" == True
     def _set_direttore(self, nascita: date):
         self.__validate_persona()
-        DataValidator.__validate_date(nascita)
+        DataValidator.validate_date(nascita)
         self.__nascita = nascita
         self.__is_direttore = True
 
@@ -155,7 +154,7 @@ class Persona:
 
     def _reset_direttore(self):
         if not self.is_dipendente() and not self.is_cliente():
-            raise ValueError(
+            raise IsNotValidPersonaException(
                 f"Non puoi eliminare il ruolo di direttore della persona {self}"
             )
 
@@ -174,7 +173,7 @@ class Persona:
 
     def _set_is_cliente(self, value: bool):
         self.__validate_persona()
-        DataValidator.__validate_bool(value)
+        DataValidator.validate_bool(value)
         self.__is_cliente = value
 
         # [V.Persona.complete]
@@ -184,7 +183,7 @@ class Persona:
 
     def _set_is_dipendente(self, value: bool):
         self.__validate_persona()
-        DataValidator.__validate_bool(value)
+        DataValidator.validate_bool(value)
         self.__is_dipendente = value
 
         # [V.Persona.complete]
@@ -194,74 +193,50 @@ class Persona:
 
     # INFO: ASSOCIAZIONI
 
+    def _add_dirige(self, link: dirige) -> None:
+        """Metodo protetto invocato da dirige._create."""
+        AssociationValidator.validate_dirige(self, link)
+        if not self.is_direttore():
+          raise IsNotDirettoreException("Impossibile associare la funzione di direzione ad una Persona non direttore.")        # Aggiornamento immutabile del frozenset tramite unione insiemistica
+        self.__links_dirige = self.__links_dirige | frozenset([link])
+
+    def _remove_dirige(self, link: dirige) -> None:
+        """Metodo protetto invocato da dirige._remove."""
+        if not self.is_direttore():
+            raise IsNotDirettoreException
+        # Filtra il set rimuovendo il link passato
+        if link in self.__links_dirige:
+            self.__links_dirige = frozenset(l for l in self.__links_dirige if l != link)
+
+    # IMPORTANT: Interfaccia pubblica
+    def add_lavoratore(self, officina: Officina, assunzione: date): 
+      """Interfaccia pubblica per l'assegnazione o sostituzione del ruolo 'lavora' al dipendente."""
+      if self is None or not self.__validate_persona():
+        raise IsNotValidPersonaException
+      if not self.is_dipendente():
+        raise IsNotDipendenteException
+      if officina is None:
+        raise InvalidLinkException("L'officina passata non è valida")
+      DataValidator.validate_date(assunzione)
+      for link in self.__links_lavora:
+          if link is not None and link.is_valid() and link.get_officina() == officina:
+              raise InvalidLinkException("Esiste già un link di 'lavora' attivo tra la persona e l'officina specificata.")
+
+      lavora._create(officina, self, assunzione)
+
+
     def _add_lavora(self, link: lavora):
+        AssociationValidator.validate_lavora(self, link)
         if not self.is_dipendente():
-            raise ValueError("self non è un dipendente")
-        if link is None:
-            raise ValueError("link non può essere None o vuoto")
-        if not isinstance(link, lavora):
-            raise TypeError("link deve essere di class lavora")
-        if link.get_persona() != self:
-            raise ValueError("Il link non appartiene a questa istanza")
-        if not link.is_valid():
-            raise ValueError("link non è valido!")
+            raise IsNotDipendenteException
 
         # Per aggiungere elementi a un frozenset, creiamo un nuovo frozenset
         # unendo i dati del precedente
-        self.__lavora = self.__lavora | frozenset([link])
+        self.__links_lavora = self.__links_lavora | frozenset([link])
 
     def _remove_lavora(self, link: lavora):
-        # Vincolo: Almeno un link deve rimanere
-        if len(self.__lavora) <= 1 and link in self.__lavora:
-            raise ValueError(
-                "Impossibile rimuovere il link: deve esserci almeno un link 'lavora'"
-            )
-
-        # Creiamo un nuovo frozenset escludendo l'elemento
-        # Sfruttiamo una list comprehension per creare un frozenset di tutti i link meno quello passato
-        self.__lavora = frozenset(x for x in self.__lavora if x != link)
-
-    def _add_dirige(self, link: dirige):
-        if link is None:
-            raise InvalidLinkException
-        if not isinstance(link, dirige):
-            raise InvalidLinkException
-        if link.get_persona() != self:
-            raise InvalidLinkException
-        if not link.is_valid():
-            raise ValueError("Il link non è valido!")
-        if not self.is_direttore():
-            raise IsNotDirettoreException
-        self.__dirige.add(link)
-
-    def _remove_dirige(self, link: dirige):
-        if not self.is_direttore():
-            raise ValueError("self non è un dipendente")
-        self.__dirige = None
-
-    # Interfaccia pubblica da richiamare nelle classi
-    # Le officine aggiunte alle persone hanno 0..*
-    def add_officina(self, officina: Officina, assunzione: date):
-        if not self.is_dipendente():
-            raise IsNotDipendenteException
-        if self.get_lavora():
-            lavora._remove(self.get_lavora())
-        lavora._create(officina, self, assunzione)
-
-    def _add_vive_a(self, link: vive_a):
-      if link is None:
-          raise InvalidLinkException
-      if not isinstance(link, vive_a):
-          raise InvalidLinkException
-      if link.get_persona() != self:
-          raise InvalidLinkException
-      if not link.is_valid():
-          raise ValueError("Il link non è valido!")
-      self.__vive_a = link
-
-    def _remove_vive_a(self, link: vive_a):
-      self.__citta = None
-
+        if link in self.__links_lavora: 
+          self.__links_lavora = frozenset(x for x in self.__links_lavora if x != link)
 
     # INFO: CONSTRUCTORS
 
@@ -279,16 +254,16 @@ class Persona:
         is_direttore: bool,
     ):
 
-        Persona.__validate_codice_fiscale(codice_fiscale)
-        DataValidator.__validate_nome(nome)
-        Persona.__validate_cognome(cognome)
-        DataValidator.__validate_indirizzo(indirizzo)
-        DataValidator.__validate_citta(citta)
-        DataValidator.__validate_telefono(telefono)
+        DataValidator.validate_codice_fiscale(codice_fiscale)
+        DataValidator.validate_str(nome)
+        DataValidator.validate_str(cognome)
+        DataValidator.validate_indirizzo(indirizzo)
+        DataValidator.validate_citta(citta)
+        DataValidator.validate_telefono(telefono)
         Persona.__validate_persona_params(is_cliente, is_dipendente, is_direttore)
 
         if is_direttore and nascita:
-            DataValidator.__validate_date(nascita)
+            DataValidator.validate_date(nascita)
 
         return super().__new__(cls)
 
@@ -322,15 +297,18 @@ class Persona:
         else:
             self.__set_nascita(None)
 
-        self.__lavora = set()  # [0..*]
-        self.__dirige = set()  # [0..*]
+        self.__links_lavora: frozenset[lavora] = frozenset()  # [0..*]
+        self.__links_dirige: frozenset[dirige] = frozenset()  # [0..*]
 
+        type(self).__objects_by_name[f"{self}"] = self
         type(self).__objects_by_codice_fiscale[self.__codice_fiscale] = self
-        type(self).__objects_by_name[f"{self.__nome} {self.__cognome}"] = self
 
     # INFO: UTILITIES
 
     def __str__(self) -> str:
+        return f"{self.get_cognome()}, {self.get_nome()}"
+
+    def __repr__(self) -> str:
         return f"{self.get_cognome()}, {self.get_nome()} residente in {self.get_indirizzo()}"
 
     # def to_json(self) -> tuple[str, dict]:

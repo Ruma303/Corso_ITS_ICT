@@ -2,26 +2,31 @@ from __future__ import annotations
 
 from typing import Self
 
-from .associations import naz_veic
+from Progettazione.Officine.code.types.datatypes import Targa
+from Progettazione.Officine.code.types.validators import DataValidator
 
 
 class Nazione:
     __objects_by_nome: dict[str, Self] = dict()
-    # __set_naz_veic: set[naz_veic]
+    __objects_by_targhe: dict[Targa, Self] = dict() 
+    __set_regex_targhe: set[Targa] = set() 
 
     # INFO: VALIDATORS
-
-    @staticmethod
-    def __validate_nome(nome: str):
-        if not nome or not isinstance(nome, str):
-            raise TypeError("Il nome deve essere una stringa valida e non vuota")
 
     # INFO: CLASSMETHODS
 
     @classmethod
     def all_objects_by_nome(cls) -> dict[str, Self]:
         return cls.__objects_by_nome
-        
+
+    @classmethod
+    def all_targhe_in_nazioni(cls) -> dict[Targa, Self]:
+        return cls.__objects_by_targhe
+
+    @classmethod
+    def set_targhe_nazione(cls) -> set[Targa]:
+        return cls.__set_regex_targhe
+
     @classmethod
     def get_object_by_nome(cls, nome: str) -> Self | None:
         return cls.__objects_by_nome.get(nome)
@@ -32,58 +37,63 @@ class Nazione:
         return self.__nome
 
     def get_regex_targa(self) -> frozenset[str]:
-        return frozenset(self.__regex_targa)
+        """Restituisce l'insieme delle targhe associate a questa specifica istanza"""
+        return frozenset(self.__regex_targhe)
 
     # INFO: SETTERS
 
-    def __set_nome(self, nome: str) -> None:
-        Nazione.__validate_nome(nome)
-        if nome in type(self).all_objects_by_nome():
-            raise KeyError(f"La nazione '{nome}' già è presente nel sistema")
+    def __set_regex_targa(self, regex: str):
+        DataValidator.validate_str(regex)
+        nuova_targa = Targa(regex)
+        DataValidator.validate_targa(nuova_targa)
+        if nuova_targa in type(self).all_targhe_in_nazioni():
+            raise ValueError(f"Questa targa '{regex}' è già registrata in una nazione")
+        # Aggiunta al set di questa nazione
+        self.__regex_targhe.add(regex)
 
-        # Se il nome inviato è identico a quello attuale, non occorre fare nulla
-        if hasattr(self, "_Nazione__nome") and self.__nome == nome:
-            return
+        # Aggiunta al set di tutte le regex per nazioni
+        type(self).all_targhe_in_nazioni()[nuova_targa] = self
+        # Aggiuunta al set statico di classe
+        type(self).set_targhe_nazione().add(nuova_targa)
 
-        # Per consentire la mutabilità, va rimossa la chiave dal dizionario
-        if hasattr(self, "_Nazione__nome"):
-          del type(self).__objects_by_nome[self.__nome]
-
-        # Per poi aggiungere la nuova chiave con il nuovo nome
-        self.__nome = nome
-        type(self).__objects_by_nome[self.__nome] = self
-
-
-    # INFO: ASSOCIATIONS
-    # TODO: il setter per aggiornare __regex_targa è l'associazione
-
-    def add_regex_targa(self, regex: str):
-        if not regex or not isinstance(regex, str):
-            raise TypeError("La regex dev'essere una stringa")
-        if regex in self.__regex_targa:
-            print("Questa regex era già presente per questa nazione")
-        self.__regex_targa.add(regex)
-
-    def remove_regex_targa(self, regex: str):
-        if len(self.__regex_targa) <= 1:
+    def __remove_regex_targa(self, regex: str) -> None:
+        if len(self.__regex_targhe) <= 1:
             raise KeyError(
                 "Non è possibile rimuovere tutte le regex. Almeno una è obbligatoria"
             )
-        self.__regex_targa.discard(regex)
+        if regex in self.__regex_targhe:
+            self.__regex_targhe.remove(regex)
+            targa_obj = Targa(regex)
+            type(self).all_targhe_in_nazioni().pop(targa_obj, None)
+            type(self).set_targhe_nazione().discard(targa_obj)
+
+    # INFO: ASSOCIATIONS
 
     # INFO: CONSTRUCTORS
 
-    def __new__(cls, nome: str):
-        Nazione.__validate_nome(nome)
+    def __new__(cls, nome: str, regex_targa: set[str] | str):
+        DataValidator.validate_str(nome)
+
+        # Converte tutto in un set[str] o utilizza set[str] se già viene passato
+        targhe_da_validare = (
+            {regex_targa} if isinstance(regex_targa, str) else regex_targa
+        )
+
+        if not targhe_da_validare:
+            raise ValueError("È necessario fornire almeno una targa/regex.")
+        for targa_str in targhe_da_validare:
+            DataValidator.validate_str(targa_str)
+
         return super().__new__(cls)
 
-    def __init__(self, nome: str):
-        self.__set_nome(nome)
-        self.__regex_targa = set() # [1..*]
-        # TODO: Richiedere almeno una regex per la targa della nazione valida e inserirla
+    def __init__(self, nome: str, regex_targa: set[str] | str):
+        self.__nome = nome
+        type(self).__objects_by_nome[self.__nome] = self
+        self.__regex_targhe: set[str] = set()
 
-        type(self).all_objects_by_nome()[self.__nome] = self
-
+        targhe_set = {regex_targa} if isinstance(regex_targa, str) else regex_targa
+        for targa in targhe_set:
+            self.__set_regex_targa(targa)
 
     # INFO: UTILITIES
 

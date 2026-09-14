@@ -1,5 +1,5 @@
 - [x] Datatypes
-- [ ] Tutte le classi da sole
+- [x] Tutte le classi da sole
 - [ ] Associazioni singole
 - [ ] Associazioni doppie
 - [ ] UI

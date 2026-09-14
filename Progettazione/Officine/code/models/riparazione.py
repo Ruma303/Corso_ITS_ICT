@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from curses import termname
 from datetime import datetime
 from typing import Self
+
+from .types.validators import DataValidator
 
 
 class Riparazione:
@@ -10,12 +13,25 @@ class Riparazione:
 
     # INFO: VALIDATORS
 
-    
+    @classmethod
+    def __validate_riconsegna(riconsegna: datetime | None) -> bool:
+        if riconsegna is None: return False
+        else:
+          DataValidator.__validate_date(riconsegna)
+          if riconsegna < self.get_accettazione():
+            raise ValueError(f"La data di riconsegna '{riconsegna}' non può essere antecedente alla sua accettazione '{accettazione}'")
+          return True
+          
+
     # INFO: CLASSMETHODS
 
     @classmethod
     def all_objects_by_codice(cls):
         return cls.__objects_by_codice
+
+    @classmethod
+    def all_codici(cls):
+      return cls.__objects_by_codice.values()
 
     @classmethod
     def all_riparazioni_terminate(cls):
@@ -66,6 +82,7 @@ class Riparazione:
 
         return cls(codice_obj, accettazione_obj, is_terminata_obj, riconsegna_obj)
 
+
     # INFO: GETTERS
 
     def get_codice(self) -> str:
@@ -83,6 +100,29 @@ class Riparazione:
 
     # INFO: SETTERS
 
+    def __set_codice(self, codice: str):
+      DataValidator.__validate_str(codice)
+      if codice in Riparazione.all_codici()
+        raise KeyError(f"Il codice {codice} è già presente")
+      self.__codice = codice
+      type(self).all_objects_by_codice()[self.__codice] = self
+
+    def __set_accettazione(accettazione: datetime):
+      DataValidator.__validate_date(accettazione)
+      self.__accettazione = accettazione
+
+    def __set_terminata(terminata: bool):
+      DataValidator.__validate_bool(terminata)
+      self.__is_terminata = is_terminata
+
+    def __set_riconsegna(riconsegna: datetime | None):
+      if Riparazione.__validate_riconsegna(riconsegna) and self.__is_terminata:
+          self.__riconsegna = riconsegna
+          type(self).all_riparazioni_terminate().add(self)
+      else:
+          self.__riconsegna = None
+      
+
     # INFO: ASSOCIATIONS
 
     # INFO: CONSTRUCTORS
@@ -91,12 +131,16 @@ class Riparazione:
         cls,
         codice: str,
         accettazione: datetime,
-        is_terminata: bool,
+        is_terminata: bool = False, # Default
         riconsegna: datetime | None
     ):
+      DataValidator.__validate_str(codice)
+      DataValidator.__validate_date(accettazione)
+      DataValidator.__validate_bool(is_terminata)
+      if riconsegna:
+        DataValidator.__validate_date(riconsegna)
 
-      
-
+      return super().__new__(cls)
 
     def __init__(
         self,
@@ -110,17 +154,10 @@ class Riparazione:
         if type(accettazione) is not datetime:
             raise TypeError("La data accettazione dev'essere di tipo datetime")
 
-        self.__codice = codice
-        self.__accettazione = accettazione
-        self.__is_terminata = is_terminata
-
-        if self.__is_terminata:
-            self.__riconsegna = riconsegna
-            type(self).all_riparazioni_terminate().add(self)
-        else:
-            self.__riconsegna = None
-
-        type(self).all_objects_by_codice()[self.__codice] = self
+        self.__set_codice(codice)
+        self.__set_accettazione(accettazione)
+        self.__set_terminata(is_terminata)
+        self.__set_riconsegna(riconsegna)
 
     # INFO: UTILITIES
 

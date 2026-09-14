@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from Progettazione.Officine.code.types.validators import DataValidator
 from types.datatypes import IntGEZ, Targa
 from typing import Self
 
@@ -60,19 +61,24 @@ class Veicolo:
 
     # INFO: ASSOCIATIONS
 
+    def __set_nazione(self, nazione: Nazione):
+        DataValidator.__validate_nazione(nazione)
+        self.__nazione = nazione
+
     # def mod_vei
 
     # INFO: CONSTRUCTORS
 
-    def __new__(cls, targa: Targa, immatricolazione: IntGEZ): 
-        Veicolo.__validate_targa(targa)
-        Veicolo.__validate_immatricolazione(immatricolazione)
+    def __new__(cls, targa: Targa, immatricolazione: IntGEZ, nazione: Nazione): 
+        DataValidator.__validate_targa(targa)
+        DataValidator.__validate_immatricolazione(immatricolazione)
+        DataValidator.__validate_nazione(nazione)
         return super().__new__(cls)
 
-    def __init__(self, targa: Targa, immatricolazione: IntGEZ):
-
+    def __init__(self, targa: Targa, immatricolazione: IntGEZ, nazione: Nazione):
         self.__set_targa(targa)
         self.__set_immatricolazione(immatricolazione)
+        self.__set_nazione(nazione)
 
         type(self).all_objects_by_targa()[self.__targa] = self
 
