@@ -1,0 +1,98 @@
+# Specifica realizzativa use-case Pubblicazione post
+
+pubblica(
+	vend:Utente, 
+	i_pubbl:datetime, 
+	desc:str, 
+	prezzo: Float_GEZ, 
+	val:Valuta,
+	cat:Categoria,
+	met_pagam: set[MetodoPagamento,
+	tipologia: TipologiaPost,
+	rialzo: Float_GZ | None,
+	durata: TimeDelta_GZ | None,
+	stato: StatoPost
+): Post
+	
+	algoritmo:
+		if met_pagam == empty:
+			solleva eccezione "è necessario almeno un metodo di pagamento"
+
+		if (tipologia==asta) != (rialzo is not None):
+			solleva eccezione "errore nella combinazione tipologia/rialzo"
+
+    """
+		Tavola di verità
+
+		tip==asta    rialzo is not none     condizione if
+		-------------------------------------------------
+		   T 			T 						F
+		   T 			F 						T --> eccez
+		   F 			T 						T --> eccez
+		   F 			F 						F
+
+
+		Approccio 1 è equivalente, ma più compatto dei seguenti Approccio 2 e Approccio 3.
+
+
+		# Approccio 2
+		if tipologia == asta and rialzo is None:
+			solleva eccezione
+		elif tipologia != asta and rialzo is not None:
+			solleva la stessa eccezione
+
+
+		# Approccio 3
+		if (tipologia == asta and rialzo is None)
+			or
+			(tipologia != asta and rialzo is not None):
+
+			solleva eccezione
+
+    """	
+
+		# In modo del tutto simile...
+		if (tipologia==asta) != (durata not None);
+			solleva eccezione
+
+	
+		Se tipologia == asta, allora:
+			viene creato result:Asta;
+			result.rialzo = rialzo;
+			result.durata = durata;
+
+		altrimenti viene creato result:CompraloSubito;
+
+		result.istante_pubbl = i_pubbl;
+		result.descrizione = desc;
+		result.prezzo = prezzo;
+		result.stato = stato;
+
+		Viene creato il link (vend, result):pubblica;
+		Viene creato il link (result, cat):post_cat;
+		Viene creato il link (result, val):post_valuta;
+
+		Viene creato un link (result, m):post_metodo_pag
+			per ogni m in met_pagam;
+
+
+# Specifica realizzativa use-case Registrazione Utente
+
+registrazione(nome: str, registrazione: datetime): Utente
+  - pre:
+    - nome == vuoto: 
+        solleva eccezione "Il nome non può essere vuoto"
+    - se l'utente già esiste con questo nome:
+        solleva eccezione "Utente già registrato nel sistema"
+    - registrazione == vuoto:
+        solleva eccezione "La data di registrazione è richiesta"
+
+    - Va integrato il vincolo {complete} nella specifica_realizzativa_vincoli_esterni
+
+  - algoritmo:
+    result = viene creata l'istanza u : Utente
+  
+    -- i link non devono essere creati adesso, giusto? 
+      L'utente potrebbe non ancora dover vendere o comprare nulla
+
+  

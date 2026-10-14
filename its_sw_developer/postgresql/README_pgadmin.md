@@ -46,7 +46,6 @@ Il query tool permette di inviare comandi SQL. Scrivere uno o più comandi (sepa
 ## Documentazione specifica ##
 Per ulteriori dettagli su PGAdmin, consultare la [documentazione specifica](https://www.pgadmin.org/docs/pgadmin4/latest/index.html).
 
-
 ----------
 
 [Home](../README.md)

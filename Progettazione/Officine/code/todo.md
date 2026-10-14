@@ -1,6 +1,6 @@
 - [x] Datatypes
 - [x] Tutte le classi da sole
-- [ ] Associazioni singole
+- [x] Associazioni singole
 - [ ] Associazioni doppie
 - [ ] UI
 - [ ] Persistenza

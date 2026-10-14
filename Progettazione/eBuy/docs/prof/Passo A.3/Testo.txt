@@ -1,0 +1,1 @@
+Estendere lo schema concettuale per modellare anche i requisiti da riga 14 a riga 26.

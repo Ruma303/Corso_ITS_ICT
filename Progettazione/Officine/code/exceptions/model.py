@@ -21,3 +21,13 @@ class IsNotDirettoreException(IsNotDipendenteException):
     """Sollevata quando le autorizzazioni dell'istanza non corrispondono a quelle di un direttore."""
     def __init__(self, message: str = "L'istanza non è un direttore valido"):
         super().__init__(message)
+
+class IsNotOfficinaException(Exception):
+    """Sollevata quando l'istanza non è della classe Officina."""
+    def __init__(self, message: str = "L'istanza non è un'Officina valida"):
+        super().__init__(message)
+
+class IsNotCAPException(Exception):
+    """Sollevata quando l'istanza non è della classe CAP."""
+    def __init__(self, message: str = "L'istanza non è un CAP valido"):
+        super().__init__(message)

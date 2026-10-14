@@ -1,0 +1,60 @@
+1. Degli utenti registrati interessa:
+	1.1 nome utente (univoco)
+	1.2 data di registrazione
+
+
+2. Dei post interessa:
+	2.1 l'utente che l'ha pubblicato (v. req. 1)
+	2.2 l'istante di pubblicazione
+	2.3 la descrizione
+	2.4 la categoria (v. req. 3)
+	2.5 prezzo
+	2.6 metodi di pagamento
+	2.7 stato (nuovo o usato)
+	2.8 tipologia ("asta" oppure "compralo subito")	
+	2.9 Dei post di tipologia "asta" interessa:
+		2.9.1 prezzo iniziale
+		2.9.2 ammontare rialzo
+		2.9.3 istante di scadenza
+	2.10 Dei post di tipologia "compralo subito"
+		2.10.1 prezzo
+
+
+3. Delle categorie interessa:	
+	3.1. nome
+
+4. Dei metodi di pagamento interessa:
+	4.1. nome
+
+
+99. Il sistema deve offrire le seguenti funzionalità:
+	99.1. gli utenti (via Web) devono poter pubblicare post per oggetti in vendita, con o senza asta.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

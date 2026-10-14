@@ -12,8 +12,6 @@ def load_all():
         fp = open(datafile, "rt")
         data: dict = json.load(fp)
         fp.close()
-
-        
         try:
             for k, obj in data.get("Nazioni", {}).items():
                 try:

@@ -177,6 +177,7 @@ class IntGZ(int):
     def __new__(cls, numero: int | float) -> Self:
         if type(numero) not in (int, float):
             raise TypeError("Il tipo del numero dev'essere un 'int' oppure un 'float'")
+        int(numero)
         if numero <= 0:
             raise ValueError("Il numero non può essere negativo o zero")
         return super().__new__(cls, numero)
@@ -186,6 +187,7 @@ class IntGEZ(int):
     def __new__(cls, numero: int | float) -> Self:
         if type(numero) not in (int, float):
             raise TypeError("Il tipo del numero dev'essere un 'int' oppure un 'float'")
+        int(numero)
         if numero < 0:
             raise ValueError("Il numero non può essere negativo")
         return super().__new__(cls, numero)

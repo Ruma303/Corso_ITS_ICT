@@ -1,0 +1,5 @@
+Specifica realizzativa classe Asta
+
+scadenza(): datetime
+	algoritmo:
+		return this.istante_pubbl + this.durata

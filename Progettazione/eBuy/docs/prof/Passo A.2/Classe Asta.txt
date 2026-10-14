@@ -1,0 +1,6 @@
+Specifica classe Asta
+
+scadenza(): DataOra
+	pre: nessuna
+	post:
+		result = this.istante_pubbl + this.durata

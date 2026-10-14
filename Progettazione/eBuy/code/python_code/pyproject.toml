@@ -1,0 +1,26 @@
+[project]
+name = "python-code"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Ruma303", email = "matteoh8@hotmail.it" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "alembic>=1.20.0",
+    "fastapi[standard]>=0.143.1",
+    "psycopg[binary]>=3.3.6",
+    "pytest>=9.1.1",
+    "sqlalchemy>=2.1.4",
+]
+
+[project.scripts]
+ebuy = "python_code.main:main"
+
+[build-system]
+requires = ["uv_build>=0.12.22,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["test"]

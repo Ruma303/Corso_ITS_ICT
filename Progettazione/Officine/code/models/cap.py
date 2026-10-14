@@ -13,7 +13,7 @@ from Progettazione.Officine.code.exceptions.link import (
 from Progettazione.Officine.code.types.validators import DataValidator
 from Progettazione.Officine.prof.main import Citta
 
-from .associations import citta_cap
+from .associations import cap_off, citta_cap
 
 
 class CAP(str):
@@ -45,7 +45,7 @@ class CAP(str):
         """Crea un link citta_cap"""
         DataValidator.validate_link(link)
         DataValidator.validate_instance(link, citta_cap, "citta_cap")
-        if link.get_citta() != self:
+        if link.get_cap() != self:
             raise InvalidLinkOwnerException
         self.__links_cap = self.__links_cap | frozenset([link])
 
@@ -53,15 +53,30 @@ class CAP(str):
         """Rimuove un link citta_cap"""
         DataValidator.validate_link(link)
         DataValidator.validate_instance(link, citta_cap, "citta_cap")
-        if link.get_citta() != self:
+        if link.get_cap() != self:
             raise InvalidLinkOwnerException
         if link in self.__links_cap:
-            self.__links_cap = self.__links_cap | frozenset([link])
+            self.__links_cap = frozenset({l for l in self.__links_cap if l != link})
 
     # 0..*
-    def _add_cap_off(): ...
+    def _add_cap_off(self, link: cap_off): 
+      """Crea un link cap_off"""
+      DataValidator.validate_link(link)
+      DataValidator.validate_instance(link, cap_off, "cap_off")
+      if link.get_cap() != self:
+          raise InvalidLinkOwnerException
+      if link in self.__set_of_caps:
+        print(f"Link già esistente con questa officina '{link.get_officina()}'")
+      else: 
+        self.__links_cap_off = self.__links_cap_off | frozenset([link])
 
-    def _remove_cap_off(): ...
+    def _remove_cap_off(self, link: cap_off):
+      """Rimuove un link cap_off"""
+      DataValidator.validate_link(link)
+      DataValidator.validate_instance(link, cap_off, "cap_off")
+      if link.get_cap() != self:
+          raise InvalidLinkOwnerException
+      self.__links_cap_off = frozenset({l for l in self.__links_cap_off if l != link})
 
     # INFO: CONSTRUCTORS
 

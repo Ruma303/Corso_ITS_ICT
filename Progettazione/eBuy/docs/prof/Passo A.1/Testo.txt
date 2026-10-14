@@ -1,0 +1,1 @@
+Definire lo schema concettuale per modellare i requisiti da riga 1 a riga 6.

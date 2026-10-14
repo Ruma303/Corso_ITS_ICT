@@ -1,0 +1,21 @@
+Float_GEZ:
+	- Eredita da float
+	- Impedisce valori < 0
+
+Float_GZ:
+	- Eredita da Float_GEZ
+	- Impedisce valori <= 0
+
+TimeDelta_GZ:
+	- Eredita da timedelta
+	- Impedisce valori <= 0
+
+StatoPost:
+	- Eredita da StrEnum
+	- Due istanze possibili: nuovo, usato
+
+
+
+TipologiaPost:
+	- Eredita da StrEnum
+	- Due istanze possibili: asta, compralo_subito

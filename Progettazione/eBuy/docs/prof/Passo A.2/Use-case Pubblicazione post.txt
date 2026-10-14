@@ -1,0 +1,42 @@
+Specifica use-case Pubblicazione post
+
+	pubblica(
+		vend:Utente, 
+		i_pubbl:DataOra, 
+		desc:Stringa, 
+		prezzo:Reale>=0, 
+		val:Valuta,
+		cat:Categoria,
+		met_pagam: MetodoPagamento [1..*],
+		tipologia: {asta, compralo_subito}
+		rialzo: Reale > 0 [0..1],
+		durata: Durata > 0 [0..1],
+		stato: {nuovo, usato}
+	): Post
+		
+		pre: 
+			tipologia=asta se e solo se rialzo ha un valore
+			and
+			tipologia=asta se e solo se durata ha un valore;
+
+		post: 
+			Se tipologia = asta, allora:
+				viene creato result:Asta;
+				result.rialzo = rialzo;
+				result.durata = durata;
+
+			altrimenti viene creato result:CompraloSubito;
+
+			result.istante_pubbl = i_pubbl;
+			result.descrizione = desc;
+			result.prezzo = prezzo;
+			result.stato = stato;
+
+			Viene creato il link (vend, result):pubblica;
+			Viene creato il link (result, cat):post_cat;
+			Viene creato il link (result, val):post_valuta;
+
+			Viene creato un link (result, m):post_metodo_pag
+				per ogni m in met_pagam;
+
+

@@ -10,7 +10,11 @@ from models.citta import Citta
 from models.officina import Officina
 from models.persona import Persona
 
-from Progettazione.Officine.code.exceptions.model import IsNotValidPersonaException
+from Progettazione.Officine.code.exceptions.model import (
+    IsNotCAPException,
+    IsNotOfficinaException,
+    IsNotValidPersonaException,
+)
 from Progettazione.Officine.code.types.validators import DataValidator
 
 
@@ -75,6 +79,7 @@ class dirige:
         self.__persona = persona
 
     def _set_is_valid(self, value: bool):
+        DataValidator.validate_bool(value)
         self.__is_valid = value
 
     # INFO: CONSTRUCTORS
@@ -122,6 +127,8 @@ class lavora:
         link.get_persona()._remove_lavora(link)
         link.get_officina()._remove_lavora(link)
         link.__is_valid = False
+        link.__set_persona(None)
+        link.__set_officina(None)
 
     # INFO: GETTERS
 
@@ -168,6 +175,7 @@ class lavora:
         self.__assunzione = assunzione
 
     def _set_is_valid(self, value: bool):
+        DataValidator.validate_bool(value)
         self.__is_valid = value
 
     # INFO: CONSTRUCTORS
@@ -287,28 +295,81 @@ class citta_cap:
         )
 
 
-class citta_off: 
+class cap_off:
+    """Classe associativa per la gestione della relazione bidirezionale 'cap_off'."""
 
-  @classmethod
-  def _create(cls, officina: Officina, cap: CAP):
-    link = cls(officina, cap)
-    officina._add_cap_off(link)
-    cap._add_cap_off(link)
-    return link
+    # INFO: CLASSMETHODS
 
-  @classmethod
-  def _remove(cls, link: citta_off):
-    DataValidator.validate_link(link)
+    @classmethod
+    def _create(cls, officina: Officina, cap: CAP):
+        link = cls(officina, cap)
+        officina._add_cap_off(link)
+        cap._add_cap_off(link)
+        return link
 
-    link.get_officina()._remove_cap_off(link)
-    link.get_cap()._remove_cap_off(link)
-    
-    link.__set_validate(False)
-    link.get_officina() = None
-    link.get_cap() = None
+    @classmethod
+    def _remove(cls, link: cap_off):
+        DataValidator.validate_link(link)
 
-  def __init__(self, officina: Officina, cap: CAP):
-    self.__set_is_valid(True)
-    self.__set_officina(officina)
-    self.__set_cap(cap)
-    
+        link.get_officina()._remove_cap_off(link)
+        link.get_cap()._remove_cap_off(link)
+
+        link._set_is_valid(False)
+        link.__officina = None
+        link.__cap = None
+
+    # INFO: CONSTRUCTORS
+
+    def __init__(self, officina: Officina, cap: CAP):
+        self._set_is_valid(True)
+        self.__set_officina(officina)
+        self.__set_cap(cap)
+
+    # INFO: GETTERS
+
+    def get_officina(self):
+        return self.__officina
+
+    def get_cap(self):
+        return self.__cap
+
+    # INFO: SETTERS
+
+    def __set_officina(self, officina: Officina):
+        if not self.is_valid():
+            raise InvalidLinkException
+        if not isinstance(officina, Officina):
+            raise IsNotOfficinaException
+        self.__officina = officina
+
+    def is_valid(self) -> bool:
+        return self.__is_valid
+
+    def __set_cap(self, cap: CAP):
+        if not self.is_valid():
+            raise InvalidLinkException
+        if not isinstance(cap, CAP):
+            raise IsNotCAPException
+        self.__cap = cap
+
+    def _set_is_valid(self, value: bool):
+        DataValidator.validate_bool(value)
+        self.__is_valid = value
+
+    # INFO: UTILITIES
+
+    def __hash__(self):
+        return hash((self.get_cap(), self.get_officina()))
+
+    def __eq__(self, other: Any):
+        if not other or not self:
+            return False
+        if type(self) is not type(other):
+            return False
+        if not (self.is_valid() and other.is_valid()):
+            return False
+
+        return (
+            self.get_cap() == other.get_cap
+            and self.get_officina() == other.get_officina
+        )

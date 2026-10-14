@@ -1,0 +1,4 @@
+- [x] Installare SCSS/SASS
+- [x] Installare Boostrap CSS e JS
+- [x] Installare Font Awesome
+- [ ] Connessione con API backend

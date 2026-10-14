@@ -1,0 +1,7 @@
+- [x] Datatypes
+  - [x] Testing
+- [ ] Tutte le classi da sole
+- [ ] Associazioni singole
+- [ ] Associazioni doppie
+- [ ] UI (Console)
+- [ ] Persistenza
