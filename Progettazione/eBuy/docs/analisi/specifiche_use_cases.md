@@ -10,7 +10,7 @@ pubblica(
 	val: Valuta,
 	cat: Categoria,
 	met_pagam: MetodoPagamento [1..*],
-	tipologia: Tipologia,
+	tipologia: Tipologia, # Asta o CompraloSubito
 	rialzo: RealGZ [0..1],
 	durata: Durata [0..1],
 	stato: Stato,

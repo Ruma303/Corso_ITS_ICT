@@ -1,0 +1,38 @@
+[project]
+name = "ebuy_py"
+version = "0.1.0"
+description = "eBuy: piattaforma di aste online"
+readme = "README.md"
+
+authors = [
+    { name = "Ruma303", email = "matteoh8@hotmail.it" }
+]
+
+requires-python = ">=3.14"
+
+dependencies = [
+    "alembic>=1.20.0",
+    "fastapi[standard]>=0.143.1",
+    "psycopg[binary]>=3.3.6",
+    "sqlalchemy>=2.1.4",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    # opzionali: pytest-cov, ruff, mypy
+]
+
+[project.scripts]
+ebuy = "python_code.main:main" # console UI
+
+[build-system]
+requires = ["uv_build>=0.12.22,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.fastapi]
+entrypoint = "python_code.api.app:app"
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+markers = ["integration: richiedono un database PostgreSQL reale"]

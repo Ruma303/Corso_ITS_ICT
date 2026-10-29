@@ -95,4 +95,5 @@ registrazione(nome: str, registrazione: datetime): Utente
     -- i link non devono essere creati adesso, giusto? 
       L'utente potrebbe non ancora dover vendere o comprare nulla
 
-  
+
+  # Specifica realizzativa use-case Tutti i post di categoria di un Utente

@@ -16,6 +16,7 @@
 - u is-a VenditoreProfessionale se u.garanzia è int >= 2 anni
 - u is-a VenditoreProfessionale se e solo se u.url è valorizzato
 
+
 [V.Utente.pubblica_singolo_post]
 TODO: Un utente può pubblicare un singolo Post alla volta
 

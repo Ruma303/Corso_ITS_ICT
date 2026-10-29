@@ -7,14 +7,19 @@ scadenza() : datetime
     - result = this.ist_pubbl + this.durata
 
   
-ammontare(p: Post) : FloatGEZ
+prezzo_finale() : FloatGEZ
   - pre:
-    - p.prezzo >= 0
-    - p.tipologia = Asta
-    - p.rialzo >= 0
+    p.tipologia = Asta
+  	p.scadenza() != 0 # l'asta non dev'essere conclusa
+    p.prezzo >= 0
+    p.rialzo >= 0
 
   - algoritmo:
-    - result = p.prezzo + p.rialzo
+		# Ogni invocazione di questa operazione incrementa un contatore di classe "numero_rialzi"
+    numero_rialzi = 0
+    for b in SOMMA(bid) # insieme di associazioni (u: Utente, p: CompraloSubito): bid
+  		numero_rialzi = numero_rialzi + 1
+  
+	  result = p.prezzo + (rialzo x numero_rialzi)
 
-
-ottieni_vincitorer() # non so se è uno use-case
+ottieni_vincitore() # non so se è uno use-case

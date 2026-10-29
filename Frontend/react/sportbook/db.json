@@ -1,0 +1,134 @@
+{
+  "persone": [
+    {
+      "id": 1,
+      "nome": "Mario",
+      "cognome": "Rossi",
+      "eta": 18,
+      "sesso": "male",
+      "email": "mario.rossi@gmail.com",
+      "telefono": "+39 333 123 4567",
+      "dataNascita": "2006-04-15"
+    },
+    {
+      "id": 2,
+      "nome": "Mario",
+      "cognome": "Rosso",
+      "eta": 18,
+      "sesso": "male",
+      "email": "mario.rosso@outlook.it",
+      "telefono": "+39 347-987-6543",
+      "dataNascita": "2006-11-02"
+    },
+    {
+      "id": 3,
+      "nome": "Mario",
+      "cognome": "Rossi",
+      "eta": 18,
+      "sesso": "male",
+      "email": "mario.rossi@libero.it",
+      "telefono": "333/4567891",
+      "dataNascita": "2006-08-18"
+    },
+    {
+      "id": 4,
+      "nome": "Mario",
+      "cognome": "Rossi",
+      "eta": 8,
+      "sesso": "male",
+      "email": "mario.rossi8@icloud.com",
+      "telefono": "12345",
+      "dataNascita": "2018-02-09"
+    },
+    {
+      "id": 5,
+      "nome": "Giulia",
+      "cognome": "Bianchi",
+      "eta": 24,
+      "sesso": "female",
+      "email": "giulia.bianchi@gmail.com",
+      "telefono": "345 678 9012",
+      "dataNascita": "2001-09-23"
+    },
+    {
+      "id": 6,
+      "nome": "Luca",
+      "cognome": "Romano",
+      "eta": 35,
+      "sesso": "male",
+      "email": "luca.romano@hotmail.com",
+      "telefono": "331.234.5678",
+      "dataNascita": "1989-12-04"
+    },
+    {
+      "id": 7,
+      "nome": "Sara",
+      "cognome": "Ferrari",
+      "eta": 311,
+      "sesso": "female",
+      "email": "sara.ferrari@domain",
+      "telefono": "abc123456",
+      "dataNascita": "1912-02-29"
+    },
+    {
+      "id": 8,
+      "nome": "Andrea",
+      "cognome": "Esposito",
+      "eta": 22,
+      "sesso": "male",
+      "email": "andrea.esposito@alice.it",
+      "telefono": "+39 339-555-7788",
+      "dataNascita": "2003-06-30"
+    },
+    {
+      "id": 9,
+      "nome": "Francesca",
+      "cognome": "Colombo",
+      "eta": 27,
+      "sesso": "female",
+      "email": "francesca.colombo@yahoo.it",
+      "telefono": "333-11-22-33",
+      "dataNascita": "1998-07-12"
+    },
+    {
+      "id": 10,
+      "nome": "Matteo",
+      "cognome": "Ricci",
+      "eta": 41,
+      "sesso": "male",
+      "email": "matteo.ricci@studio.it",
+      "telefono": "+393112345678",
+      "dataNascita": "1984-01-17"
+    },
+    {
+      "id": 11,
+      "nome": "Elena",
+      "cognome": "Marino",
+      "eta": 229,
+      "sesso": "female",
+      "email": "elena.marino@virgilio.it",
+      "telefono": "invalid-phone",
+      "dataNascita": "2026-99-99"
+    },
+    {
+      "id": 12,
+      "nome": "Davide",
+      "cognome": "Greco",
+      "eta": 33,
+      "sesso": "male",
+      "email": "davide.greco@gmail.com",
+      "telefono": "+39 320 111 2233",
+      "dataNascita": "1991-03-22"
+    },
+    {
+      "id": 13,
+      "nome": "Chiara",
+      "cognome": "Conti",
+      "eta": 26,
+      "sesso": null,
+      "email": "chiara.conti@live.it",
+      "telefono": "333 444 5555",
+      "dataNascita": "1999-10-10"
+    }
+  ]
+}
