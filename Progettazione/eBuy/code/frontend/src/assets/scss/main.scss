@@ -1,0 +1,13 @@
+// 1. Override delle variabili di Bootstrap, prima dell'import
+$primary: #6f42c1;
+$font-family-base: 'Inter', sans-serif;
+$border-radius: 0.5rem;
+
+// 2. Import di Bootstrap dal sorgente SCSS
+@import 'bootstrap/scss/bootstrap';
+
+// 3. I tuoi stili personalizzati
+.hero {
+  padding: 4rem 0;
+  background: $primary;
+}

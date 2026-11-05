@@ -11,4 +11,3 @@ where p.id = a.persona
 and pr.id = a.progetto
 and pr.nome = 'Pegasus'
 order by p.cognome desc;
-

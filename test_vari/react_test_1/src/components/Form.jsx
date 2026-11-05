@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { validaForm } from './validazioni';
+import { validaForm } from '../validazioni';
 
 export default function Form({ children, createUtente }) {
   const formIniziale = {
@@ -40,7 +40,7 @@ export default function Form({ children, createUtente }) {
       const updatedForm = {
         ...prev,
         [name]: val
-      };
+      }
 
       // Se cambia la data di nascita, aggiorniamo sia age che adult tramite checkAge
       if (name === 'birthdate') {
