@@ -1,7 +1,6 @@
 CREATE DATABASE GestioneITS;
 
 
-
 CREATE DOMAIN String AS VARCHAR(100);
 
 CREATE DOMAIN CodiceFiscale AS String;

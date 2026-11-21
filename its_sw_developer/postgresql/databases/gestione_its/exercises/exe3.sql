@@ -104,50 +104,141 @@ JOIN Docente d ON d.cf = dim.docente
 JOIN Persona pd ON pd.cf = d.cf; -- Secondo alias su Persona
 -- 153
 
+/* Esercitazione 16
 
--- Raggruppamenti (esempi)
+Visualizzare tutti i moduli il cui nome contiene la parola:
+"Data"
 
-SELECT es.modulo AS modulo_superato, COUNT(*)
-FROM Studente s, Persona p, esame_superato es, Modulo m, 
-Docente d, doc_insegna_modulo dim
+Mostrare:
+• codice
+• nome
+• ore
+**/
+
+SELECT nome, codice, ore
+FROM Modulo
+WHERE nome LIKE "%Data%";
+
+-- "Data Analysis"	"DS01"	50
+
+
+/* Esercitazione 17
+
+Visualizzare:
+• matricola
+• nome
+• cognome
+degli studenti il cui cognome inizia per: "B"
+Ordinare per cognome crescente.
+**/
+
+SELECT s.matricola, p.nome, p.cognome
+FROM Studente s, Persona p
 WHERE s.cf = p.cf
-	AND s.cf = es.studente 
-	AND m.codice = es.modulo
-	AND m.codice = dim.modulo 
-	AND d.cf = dim.docente
-GROUP BY modulo_superato;
+AND p.cognome LIKE 'B%'
+ORDER BY cognome ASC;
 
--- Conteggio per modulo (es. “quanti esami superati per ogni modulo”)
+-- "MAT019"	"Michela"	"Bruni"
 
-SELECT m.nome AS modulo_superato, COUNT(*) AS numero_esami
-FROM esame_superato es
-JOIN Modulo m ON m.codice = es.modulo
-GROUP BY m.nome;
 
--- Lista di studenti/docenti per modulo, ma su un’unica riga per modulo (usando STRING_AGG per concatenare i valori)
+/* Esercitazione 18
 
-SELECT m.nome AS modulo_superato,
-       STRING_AGG(DISTINCT s.matricola, ', ') AS studenti,
-       STRING_AGG(DISTINCT pd.nome || ' ' || pd.cognome, ', ') AS docenti
-FROM Studente s
-JOIN esame_superato es ON es.studente = s.cf
-JOIN Modulo m ON m.codice = es.modulo
-JOIN doc_insegna_modulo dim ON dim.modulo = m.codice
-JOIN Docente d ON d.cf = dim.docente
-JOIN Persona pd ON pd.cf = d.cf
-GROUP BY m.nome;
+Visualizzare tutti i moduli che NON contengono la parola:
+"Java"
+Mostrare:
+• codice
+• nome
+**/
 
-SELECT s.matricola, 
-       p.nome, 
-       p.cognome,
-       m.nome AS modulo_superato,
-       STRING_AGG(DISTINCT pd.nome || ' ' || pd.cognome, ', ') AS docente
-FROM Studente s
-JOIN Persona p ON s.cf = p.cf
-JOIN esame_superato es ON es.studente = s.cf
-JOIN Modulo m ON m.codice = es.modulo
-JOIN doc_insegna_modulo dim ON dim.modulo = m.codice
-JOIN Docente d ON d.cf = dim.docente
-JOIN Persona pd ON pd.cf = d.cf
-GROUP BY s.matricola, p.nome, p.cognome, m.nome
-ORDER BY s.matricola, m.nome;
+SELECT codice, nome
+FROM Modulo 
+WHERE nome NOT LIKE 'Java';
+
+-- 12
+
+/* Esercizio 19
+
+Visualizzare:
+• nome docente
+• cognome docente
+• nome modulo
+per tutti i docenti il cui cognome termina con: "i"
+**/
+
+SELECT p.nome, p.cognome, m.nome
+FROM Docente d, Persona p, Modulo m, doc_insegna_modulo dim
+WHERE d.cf = p.cf 
+AND dim.docente = d.cf
+AND dim.modulo = m.codice
+AND p.cognome LIKE '%i';
+
+-- 12
+
+/* Esercizio 20
+
+Visualizzare tutti i moduli con codice:
+• DB01
+• JAVA01
+• SPR01
+
+Mostrare:
+• codice
+• nome
+• ore
+**/
+
+SELECT codice, nome, ore
+FROM Modulo WHERE codice IN ('DB01', 'JAVA01', 'SPR01');
+
+-- 3
+
+/* Esercizio 21
+
+Visualizzare:
+• matricola
+• corso 
+frequentato degli studenti iscritti ad uno dei seguenti corsi:
+• Full Stack Developer
+• Data Analyst
+**/
+
+SELECT s.matricola, s.corso_nome
+FROM Studente s, CorsoITS c
+WHERE s.corso_nome = c.nome 
+AND s.corso_edizione = c.edizione
+AND c.nome IN ('Full Stack Developer', 'Data Analyst');
+
+-- 21
+
+
+/* Esercizio 22
+
+Visualizzare:
+• codice modulo
+• nome modulo
+
+dei moduli che NON appartengono ai corsi:
+• Full Stack Developer
+• Cyber Security Specialist
+**/
+
+SELECT mic.modulo, m.nome
+FROM Modulo m, modulo_in_corso mic, CorsoITS c
+WHERE mic.modulo = m.codice 
+AND mic.corso_nome = c.nome
+AND mic.corso_edizione = c.edizione
+AND c.nome NOT IN ('Full Stack Developer', 'Cyber Security Specialist');
+
+-- 4
+
+
+SELECT s.matricola, p.nome, p.cognome, c.nome
+FROM Studente s, Persona p, CorsoITS c
+WHERE s.cf = p.cf
+AND s.corso_nome = c.nome
+AND s.corso_edizione = c.edizione
+AND p.cognome ILIKE '%a%'
+AND c.nome IN ('Full Stack Developer', 'Data Analyst')
+ORDER BY p.cognome ASC, p.nome ASC;
+
+-- 9

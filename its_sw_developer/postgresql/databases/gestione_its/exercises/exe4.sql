@@ -55,6 +55,7 @@ SELECT p.nome || ' ' || p.cognome as docente, m.nome
 FROM Docente d, Persona p, Modulo m, doc_insegna_modulo dim
 WHERE d.cf = p.cf AND dim.docente = d.cf AND dim.modulo = m.codice
 AND p.cognome LIKE '%i';
+
 -- 12
 
 
@@ -74,7 +75,9 @@ SELECT codice, nome, ore FROM Modulo
 WHERE codice in ('DB01', 'JAVA01', 'SPR01');
 -- 3
 
-/* Esercizio 26
+
+
+/* Esercizio 21
 
 Visualizzare:
 • matricola
@@ -91,7 +94,7 @@ AND c.nome IN ('Full Stack Developer', 'Data Analyst');
 -- 21
 
 
-/* Esercizio 27
+/* Esercizio 22
 
 Visualizzare:
 • codice modulo
@@ -107,9 +110,10 @@ WHERE m.codice = mic.modulo
 AND mic.corso_nome = c.nome
 AND mic.corso_edizione = c.edizione
 AND c.nome NOT IN ('Full Stack Developer', 'Cyber Security Specialist');
+
 -- 4
 
-/* Esercizio 28
+/* Esercizio 23
 
 Visualizzare:
 • matricola studente

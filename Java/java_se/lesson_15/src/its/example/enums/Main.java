@@ -123,7 +123,6 @@ public class Main {
             System.out.println(s);
         }
 
-
         // Generazione della lista di StatoOrdine
         StatoOrdine[] statoOrdini = generateStatiOrdiniSupplier().get();
 
